@@ -1,11 +1,13 @@
+import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/auth_repository.dart';
+import 'package:ai_tutor_web/features/auth/presentation/widgets/form_field_label.dart';
+import 'package:ai_tutor_web/shared/styles/app_colors.dart';
+import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.repository});
-
-  static const routeName = '/login';
 
   final AuthRepository repository;
 
@@ -130,205 +132,249 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F7F9), // soft blue/grey like the mock
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Card(
-              elevation: 1.5,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(28, 28, 28, 24),
-                child: AutofillGroup(
-                  child: Form(
-                    key: _formKey,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 8),
-                        Text('AiTutor',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
-                              color: const Color(0xFF0D3B44), // deep teal
-                            )),
-                        const SizedBox(height: 6),
-                        Text('Login',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            )),
-                        const SizedBox(height: 22),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          const double desiredWidth = 480;
+          final double maxWidth = constraints.maxWidth;
+          final double horizontalPadding =
+              maxWidth > desiredWidth ? (maxWidth - desiredWidth) / 2 : 16;
+          final double clampedSidePadding =
+              (horizontalPadding * 2).clamp(0.0, maxWidth);
+          final double availableWidth = maxWidth - clampedSidePadding;
+          final double cardWidth =
+              availableWidth > 0 ? availableWidth.clamp(0.0, desiredWidth) : desiredWidth;
 
-                        // Email or Username
-                        Text('Email or Username',
-                            style: theme.textTheme.labelMedium),
-                        const SizedBox(height: 6),
-                        TextFormField(
-                          controller: _idCtrl,
-                          focusNode: _idFocus,
-                          autofillHints: const [AutofillHints.username, AutofillHints.email],
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: _idValidator,
-                          onFieldSubmitted: (_) => _passFocus.requestFocus(),
-                          decoration: const InputDecoration(
-                            hintText: 'you@example.com',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-
-                        // Password
-                        Text('Password', style: theme.textTheme.labelMedium),
-                        const SizedBox(height: 6),
-                        TextFormField(
-                          controller: _passCtrl,
-                          focusNode: _passFocus,
-                          obscureText: _obscure,
-                          textInputAction: TextInputAction.done,
-                          autofillHints: const [AutofillHints.password],
-                          onFieldSubmitted: (_) => _login(),
-                          validator: _passValidator,
-                          decoration: InputDecoration(
-                            hintText: '••••••••',
-                            border: const OutlineInputBorder(),
-                            isDense: true,
-                            suffixIcon: IconButton(
-                              tooltip: _obscure ? 'Show password' : 'Hide password',
-                              onPressed: () => setState(() => _obscure = !_obscure),
-                              icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+          return SingleChildScrollView(
+            padding: EdgeInsets.only(
+              top: 160,
+              left: horizontalPadding,
+              right: horizontalPadding,
+              bottom: 48,
+            ),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: cardWidth,
+                ),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: AppColors.shadow,
+                        blurRadius: 24,
+                        offset: Offset(0, 16),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 36),
+                    child: AutofillGroup(
+                      child: Form(
+                        key: _formKey,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'AiTutor',
+                              textAlign: TextAlign.center,
+                              style: AppTypography.brandWordmark,
                             ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: _loading ? null : _forgotPassword,
-                            child: const Text('Forgot Password?'),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-
-                        // Login button
-                        SizedBox(
-                          height: 46,
-                          child: FilledButton(
-                            onPressed: _loading ? null : _login,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF1F646A), // teal button
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Welcome back',
+                              textAlign: TextAlign.center,
+                              style: AppTypography.signupTitle,
+                            ),
+                            const SizedBox(height: 28),
+                            const FormFieldLabel(text: 'Email or Username'),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              controller: _idCtrl,
+                              focusNode: _idFocus,
+                              autofillHints: const [
+                                AutofillHints.username,
+                                AutofillHints.email,
+                              ],
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: _idValidator,
+                              onFieldSubmitted: (_) => _passFocus.requestFocus(),
+                              decoration: const InputDecoration(
+                                hintText: 'you@example.com',
                               ),
                             ),
-                            child: _loading
-                                ? const SizedBox(
-                                    height: 18,
-                                    width: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : const Text('Login'),
-                          ),
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        // Divider "Or Continue with"
-                        Row(
-                          children: [
-                            const Expanded(child: Divider(thickness: 1)),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: Text('Or Continue with',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    color: Colors.grey.shade700,
-                                  )),
-                            ),
-                            const Expanded(child: Divider(thickness: 1)),
-                          ],
-                        ),
-
-                        const SizedBox(height: 14),
-
-                        // Social buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _loading ? null : _googleSignIn,
-                                icon: const FaIcon(FontAwesomeIcons.google, size: 18),
-                                label: const Text('Google'),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                            const SizedBox(height: 18),
+                            const FormFieldLabel(text: 'Password'),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              controller: _passCtrl,
+                              focusNode: _passFocus,
+                              obscureText: _obscure,
+                              textInputAction: TextInputAction.done,
+                              autofillHints: const [AutofillHints.password],
+                              onFieldSubmitted: (_) => _login(),
+                              validator: _passValidator,
+                              decoration: InputDecoration(
+                                hintText: 'Enter your password',
+                                suffixIcon: IconButton(
+                                  tooltip: _obscure ? 'Show password' : 'Hide password',
+                                  onPressed: () => setState(() => _obscure = !_obscure),
+                                  icon: Icon(
+                                    _obscure
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                    color: AppColors.iconMuted,
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _loading
-                                    ? null
-                                    : () {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Hook this to Azure AD / Microsoft (OAuth/MSAL).',
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                icon: const FaIcon(FontAwesomeIcons.microsoft, size: 18),
-                                label: const Text('Microsoft'),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
+                            const SizedBox(height: 12),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: _loading ? null : _forgotPassword,
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
+                                  'Forgot Password?',
+                                  style: AppTypography.linkSmall,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 18),
-                        Center(
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text("Don't have an account? ",
-                                  style: theme.textTheme.bodySmall),
-                              TextButton(
-                                onPressed: _loading
-                                    ? null
-                                    : () => ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                              content: Text('Navigate to Register page')),
+                            const SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 46,
+                              child: ElevatedButton(
+                                onPressed: _loading ? null : _login,
+                                child: _loading
+                                    ? const SizedBox(
+                                        height: 18,
+                                        width: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                         ),
-                                child: const Text('Register'),
-                              )
-                            ],
-                          ),
+                                      )
+                                    : const Text('Login'),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              children: [
+                                const Expanded(child: Divider()),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Text(
+                                    'Or continue with',
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: AppColors.textMuted,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                                const Expanded(child: Divider()),
+                              ],
+                            ),
+                            const SizedBox(height: 18),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: _loading ? null : _googleSignIn,
+                                    icon: const FaIcon(FontAwesomeIcons.google, size: 18),
+                                    label: Text(
+                                      'Google',
+                                      style: AppTypography.bodySmall.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: _loading
+                                        ? null
+                                        : () {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Hook this to Azure AD / Microsoft (OAuth/MSAL).',
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                    icon: const FaIcon(FontAwesomeIcons.microsoft, size: 18),
+                                    label: Text(
+                                      'Microsoft',
+                                      style: AppTypography.bodySmall.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            Center(
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 4,
+                                children: [
+                                  Text(
+                                    "Don't have an account?",
+                                    style: AppTypography.bodySmall.copyWith(fontSize: 14),
+                                  ),
+                                  TextButton(
+                                    onPressed: _loading
+                                        ? null
+                                        : () => Navigator.of(context)
+                                            .pushReplacementNamed(AppRoutes.signup),
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: Size.zero,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: Text(
+                                      'Create one',
+                                      style: AppTypography.linkSmall.copyWith(fontSize: 14),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

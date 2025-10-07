@@ -1,7 +1,7 @@
+import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/auth/presentation/widgets/form_field_label.dart';
 import 'package:ai_tutor_web/features/auth/presentation/widgets/signup_header.dart';
 import 'package:ai_tutor_web/features/auth/presentation/widgets/terms_and_policy_checkbox.dart';
-import 'package:ai_tutor_web/screens/login_screen.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -252,7 +252,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.of(context)
-                                      .pushNamed(LoginScreen.routeName),
+                                      .pushReplacementNamed(AppRoutes.login),
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: Size.zero,

@@ -38,8 +38,8 @@ class AppTheme {
       checkboxTheme: CheckboxThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         side: const BorderSide(color: AppColors.checkboxBorder, width: 1.2),
-        fillColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primary;
           }
           return Colors.white;
