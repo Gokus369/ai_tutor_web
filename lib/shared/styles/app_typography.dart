@@ -53,4 +53,74 @@ class AppTypography {
         fontWeight: FontWeight.w600,
         color: Colors.white,
       );
+
+  static TextStyle get dashboardTitle => GoogleFonts.nunitoSans(
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+        letterSpacing: 0.2,
+      );
+
+  static TextStyle get sectionTitle => GoogleFonts.nunitoSans(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get metricValue => GoogleFonts.nunitoSans(
+        fontSize: 26,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get metricLabel => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textMuted,
+        letterSpacing: 0.2,
+      );
+
+  static TextStyle get quickAction => GoogleFonts.nunitoSans(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
+      );
+
+  static TextStyle get sidebarItem => GoogleFonts.nunitoSans(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: AppColors.sidebarIcon.withValues(alpha: 0.85),
+      );
+
+  static TextStyle get sidebarItemActive => GoogleFonts.nunitoSans(
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textInverse,
+      );
+
+  static TextStyle statusChip(Color textColor) => GoogleFonts.nunitoSans(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      );
+
+  static TextStyle get tableHeader => GoogleFonts.nunitoSans(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary.withValues(alpha: 0.72),
+        letterSpacing: 0.2,
+      );
+
+  static TextStyle get tableCell => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get tableLink => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.primary,
+        decoration: TextDecoration.underline,
+      );
 }
