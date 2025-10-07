@@ -4,6 +4,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.repository});
+
+  static const routeName = '/login';
+
   final AuthRepository repository;
 
   @override
