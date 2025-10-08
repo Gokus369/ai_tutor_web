@@ -14,8 +14,8 @@ class DashboardSidebar extends StatelessWidget {
   static final List<_SidebarItemData> _items = [
     _SidebarItemData(label: 'Dashboard', icon: Icons.dashboard_outlined, route: AppRoutes.dashboard),
     _SidebarItemData(label: 'Classes', icon: Icons.school_outlined, route: AppRoutes.classes),
-    _SidebarItemData(label: 'Students', icon: Icons.group_outlined),
-    _SidebarItemData(label: 'Syllabus', icon: Icons.list_alt_outlined),
+    _SidebarItemData(label: 'Students', icon: Icons.group_outlined, route: AppRoutes.students),
+    _SidebarItemData(label: 'Syllabus', icon: Icons.list_alt_outlined, route: AppRoutes.syllabus),
     _SidebarItemData(label: 'Lessons Planner', icon: Icons.calendar_month_outlined),
     _SidebarItemData(label: 'Attendance', icon: Icons.fact_check_outlined),
     _SidebarItemData(label: 'Progress', icon: Icons.show_chart_outlined),

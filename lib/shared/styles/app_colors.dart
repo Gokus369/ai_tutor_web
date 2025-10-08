@@ -102,4 +102,35 @@ class AppColors {
   static const Color classMetaText = Color(0xFF565656);
   static const Color classProgressTrack = Color(0xFFE0E0E0);
   static const Color classProgressValue = Color(0xFF23616E);
+
+  static const Color syllabusBackground = Color(0xFFFCFDFD);
+  static const Color syllabusSectionBackground = Color(0xFFF5F6FA);
+  static const Color syllabusCardBorder = Color(0xFFD5D5D5);
+  static const Color syllabusDivider = Color(0xFFE0E0E0);
+  static const Color syllabusSearchBorder = Color(0xFFDBDBDB);
+  static const Color syllabusSearchBackground = Color(0xFFE8F0F3);
+  static const Color syllabusStatusInProgress = Color(0xFFFF8C00);
+  static const Color syllabusStatusCompleted = Color(0xFF00B69B);
+  static const Color syllabusStatusText = Color(0xFFFFFFFF);
+  static const Color syllabusMuted = Color(0xFF7E7E7E);
+  static const Color syllabusProgressTrack = Color(0xFFE0E0E0);
+  static const Color syllabusProgressValue = Color(0xFF23616E);
+  static const Color syllabusOverlay = Color(0xB22B3034);
+
+  static const Color studentsBackground = Color(0xFFF5F6FA);
+  static const Color studentsCardBackground = Color(0xFFFCFDFD);
+  static const Color studentsCardBorder = Color(0xFFD5D5D5);
+  static const Color studentsHeaderBackground = Color(0xFFE9F1F4);
+  static const Color studentsSearchBackground = Color(0xFFE8F0F3);
+  static const Color studentsSearchBorder = Color(0xFFD5D5D5);
+  static const Color studentsFilterBackground = Color(0xFFFCFDFD);
+  static const Color studentsFilterBorder = Color(0xFFD5D5D5);
+  static const Color studentsTableDivider = Color(0xFFE0E0E0);
+  static const Color studentsProgressTrack = Color(0xFFE0E0E0);
+  static const Color studentsProgressValue = Color(0xFF23616E);
+  static const Color studentsPerformanceTop = Color(0xFF00B69B);
+  static const Color studentsPerformanceAverage = Color(0xFFF9B61A);
+  static const Color studentsPerformanceAttention = Color(0xFFFF2B2B);
+  static const Color studentsStatusActive = Color(0xFF00B69B);
+  static const Color studentsStatusInactive = Color(0xFF121417);
 }

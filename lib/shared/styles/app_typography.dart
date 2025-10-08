@@ -160,4 +160,64 @@ class AppTypography {
         fontWeight: FontWeight.w700,
         color: AppColors.textPrimary,
       );
+
+  static TextStyle get syllabusSectionHeading => GoogleFonts.nunitoSans(
+        fontSize: 22,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get syllabusStatusChip => GoogleFonts.nunitoSans(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: AppColors.syllabusStatusText,
+      );
+
+  static TextStyle get syllabusModuleTitle => GoogleFonts.nunitoSans(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get syllabusModuleMeta => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.syllabusMuted,
+      );
+
+  static TextStyle get studentsTableHeader => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get studentsTableCell => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get studentsPerformanceTop => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: AppColors.studentsPerformanceTop,
+      );
+
+  static TextStyle get studentsPerformanceAverage => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: AppColors.studentsPerformanceAverage,
+      );
+
+  static TextStyle get studentsPerformanceAttention => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: AppColors.studentsPerformanceAttention,
+      );
+
+  static TextStyle get studentsStatusText => GoogleFonts.nunitoSans(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: AppColors.white,
+      );
 }

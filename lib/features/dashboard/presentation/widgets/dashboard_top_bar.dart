@@ -71,7 +71,7 @@ class DashboardTopBar extends StatelessWidget {
 }
 
 class _NotificationBell extends StatelessWidget {
-  const _NotificationBell({super.key});
+  const _NotificationBell();
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -108,7 +108,7 @@ class _NotificationBell extends StatelessWidget {
             width: 10,
             height: 10,
             decoration: const BoxDecoration(
-              color: AppColors.classStudentIconBackground,
+              color: AppColors.accentPink,
               shape: BoxShape.circle,
             ),
           ),
@@ -119,15 +119,13 @@ class _NotificationBell extends StatelessWidget {
 }
 
 class _ProfileMenu extends StatelessWidget {
-  const _ProfileMenu({super.key});
+  const _ProfileMenu();
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<int>(
       offset: const Offset(0, 52),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      onSelected: (value) {
-        // TODO: Hook up account actions when backend is ready.
-      },
+      onSelected: (_) {},
       itemBuilder: (context) => [
         PopupMenuItem(
           value: 0,
