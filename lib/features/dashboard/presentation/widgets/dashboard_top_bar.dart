@@ -9,7 +9,7 @@ class DashboardTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 72,
-      padding: const EdgeInsets.symmetric(horizontal: 36),
+      padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 16),
       decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
@@ -18,24 +18,35 @@ class DashboardTopBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: SizedBox(
-              height: 44,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
-                  filled: true,
-                  fillColor: AppColors.summaryCardBackground,
-                  contentPadding: EdgeInsets.zero,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: AppColors.summaryCardBorder),
+          SizedBox(
+            width: 388,
+            height: 38,
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search',
+                prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
+                filled: true,
+                fillColor: AppColors.searchFieldBackground,
+                contentPadding: EdgeInsets.zero,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(19),
+                  borderSide: const BorderSide(
+                    color: AppColors.searchFieldBorder,
+                    width: 0.6,
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(19),
+                  borderSide: const BorderSide(
+                    color: AppColors.searchFieldBorder,
+                    width: 0.6,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(19),
+                  borderSide: const BorderSide(
+                    color: AppColors.searchFieldBorder,
+                    width: 0.6,
                   ),
                 ),
               ),
@@ -64,7 +75,7 @@ class _NotificationBell extends StatelessWidget {
             height: 46,
             width: 46,
             decoration: BoxDecoration(
-              color: AppColors.summaryCardBackground,
+              color: AppColors.summaryTileBackground,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.summaryCardBorder),
             ),
@@ -141,7 +152,7 @@ class _ProfileMenu extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.summaryCardBorder),
-              color: AppColors.summaryCardBackground,
+              color: AppColors.summaryTileBackground,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),

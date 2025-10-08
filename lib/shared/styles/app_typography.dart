@@ -39,7 +39,7 @@ class AppTypography {
   static TextStyle get bodySmall => GoogleFonts.nunitoSans(
         fontSize: 13,
         fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
+        color: AppColors.greyMedium,
       );
 
   static TextStyle get linkSmall => GoogleFonts.nunitoSans(
@@ -83,7 +83,7 @@ class AppTypography {
   static TextStyle get quickAction => GoogleFonts.nunitoSans(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: Colors.white,
+        color: AppColors.quickActionContent,
       );
 
   static TextStyle get sidebarItem => GoogleFonts.nunitoSans(
@@ -107,7 +107,7 @@ class AppTypography {
   static TextStyle get tableHeader => GoogleFonts.nunitoSans(
         fontSize: 13,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary.withValues(alpha: 0.72),
+        color: AppColors.greyDark,
         letterSpacing: 0.2,
       );
 

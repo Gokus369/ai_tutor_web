@@ -14,16 +14,16 @@ class UpcomingTasksTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+      padding: const EdgeInsets.fromLTRB(28, 28, 28, 18),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.summaryCardBorder),
+        color: AppColors.tableRowBackground,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: AppColors.summaryCardBorder, width: 1),
         boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 24,
-            offset: Offset(0, 14),
+            blurRadius: 18,
+            offset: Offset(0, 10),
           ),
         ],
       ),
@@ -37,13 +37,13 @@ class UpcomingTasksTable extends StatelessWidget {
               _StatusFilter(),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           _TableHeader(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           for (int i = 0; i < tasks.length; i++) ...[
             _TaskRow(tasks[i]),
             if (i != tasks.length - 1)
-              const Divider(height: 1, color: AppColors.tableRowDivider),
+              const Divider(height: 1, thickness: 0.6, color: AppColors.tableRowDivider),
           ],
         ],
       ),
@@ -56,22 +56,46 @@ class _StatusFilter extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(19),
         border: Border.all(color: AppColors.summaryCardBorder),
         color: AppColors.surface,
       ),
       child: DropdownButtonHideUnderline(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        child: SizedBox(
+          height: 28,
+          width: 72,
           child: DropdownButton<String>(
             value: 'All',
-            icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: AppColors.textPrimary),
-            style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+            isExpanded: true,
+            icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textPrimary),
+            style: AppTypography.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+            underline: const SizedBox.shrink(),
             onChanged: (_) {},
             items: const [
-              DropdownMenuItem(value: 'All', child: Text('All')),
-              DropdownMenuItem(value: 'Completed', child: Text('Completed')),
-              DropdownMenuItem(value: 'Pending', child: Text('Pending')),
+              DropdownMenuItem(
+                value: 'All',
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('All'),
+                ),
+              ),
+              DropdownMenuItem(
+                value: 'Completed',
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Completed'),
+                ),
+              ),
+              DropdownMenuItem(
+                value: 'Pending',
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Pending'),
+                ),
+              ),
             ],
           ),
         ),
@@ -83,22 +107,44 @@ class _StatusFilter extends StatelessWidget {
 class _TableHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final TextStyle headerStyle = AppTypography.tableHeader;
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: AppColors.tableHeaderBackground,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.tableRowDivider, width: 0.6),
       ),
       child: Row(
         children: [
-          Expanded(flex: 3, child: Text('Task', style: headerStyle)),
-          Expanded(flex: 2, child: Text('Class', style: headerStyle)),
-          Expanded(flex: 2, child: Text('Date - Time', style: headerStyle)),
+          Expanded(
+            flex: 3,
+            child: Text(
+              'Task',
+              style: AppTypography.tableHeader.copyWith(color: AppColors.textPrimary),
+            ),
+          ),
           Expanded(
             flex: 2,
-            child: Text('Status', style: headerStyle, textAlign: TextAlign.right),
+            child: Text(
+              'Class',
+              style: AppTypography.tableHeader.copyWith(color: AppColors.textPrimary),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              'Date - Time',
+              style: AppTypography.tableHeader.copyWith(color: AppColors.textPrimary),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              'Status',
+              style: AppTypography.tableHeader.copyWith(color: AppColors.textPrimary),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),
@@ -113,10 +159,10 @@ class _TaskRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle bodyStyle = AppTypography.tableCell;
+    final TextStyle bodyStyle = AppTypography.tableCell.copyWith(color: AppColors.textPrimary);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       child: Row(
         children: [
           Expanded(
@@ -125,10 +171,7 @@ class _TaskRow extends StatelessWidget {
           ),
           Expanded(
             flex: 2,
-            child: Text(
-              _task.className,
-              style: AppTypography.tableLink,
-            ),
+            child: Text(_task.className, style: bodyStyle),
           ),
           Expanded(
             flex: 2,

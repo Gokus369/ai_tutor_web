@@ -19,11 +19,10 @@ class DashboardSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(minWidth: 220, maxWidth: 260),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFFFFFF), AppColors.summaryCardBackground],
+          colors: [AppColors.summaryCardGradientStart, AppColors.summaryCardGradientEnd],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -32,8 +31,8 @@ class DashboardSummaryCard extends StatelessWidget {
         boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 24,
-            offset: Offset(0, 14),
+            blurRadius: 18,
+            offset: Offset(0, 10),
           ),
         ],
       ),
@@ -58,7 +57,7 @@ class DashboardSummaryCard extends StatelessWidget {
               color: iconBackground,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 24),
+            child: Icon(icon, color: AppColors.iconForeground, size: 24),
           ),
         ],
       ),
