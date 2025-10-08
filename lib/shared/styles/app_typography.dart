@@ -123,4 +123,41 @@ class AppTypography {
         color: AppColors.primary,
         decoration: TextDecoration.underline,
       );
+
+  static TextStyle get classCardTitle => GoogleFonts.nunitoSans(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get classCardBadge => GoogleFonts.nunitoSans(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: AppColors.classBadgeText,
+      );
+
+  static TextStyle get classCardMeta => GoogleFonts.nunitoSans(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: AppColors.classMetaText,
+      );
+
+  static TextStyle get classCardDescription => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.classMetaText,
+        height: 1.4,
+      );
+
+  static TextStyle get classProgressLabel => GoogleFonts.nunitoSans(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.classMetaText,
+      );
+
+  static TextStyle get classProgressValue => GoogleFonts.nunitoSans(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      );
 }

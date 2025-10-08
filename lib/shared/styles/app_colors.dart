@@ -90,4 +90,16 @@ class AppColors {
   static const Color greyMuted = Color(0xFF8A8C8F);
   static const Color greyLight = Color(0xFFD8D8D8);
   static const Color greyExtraLight = Color(0xFFECECEC);
+
+  static const Color classCardBackground = Color(0xFFF5F6FA);
+  static const Color classCardBorder = Color(0xFFD5D5D5);
+  static const Color classCardShadow = Color(0x0D000000);
+  static const Color classBadgeBackground = Color(0xFFDEDDFF);
+  static const Color classBadgeText = Color(0xFF5452FF);
+  static const Color classStudentIconBackground = Color(0xFFFF9DB2);
+  static const Color classSubjectIconBackground = Color(0xFFDEDDFF);
+  static const Color classSubjectIconColor = Color(0xFF9810FA);
+  static const Color classMetaText = Color(0xFF565656);
+  static const Color classProgressTrack = Color(0xFFE0E0E0);
+  static const Color classProgressValue = Color(0xFF23616E);
 }

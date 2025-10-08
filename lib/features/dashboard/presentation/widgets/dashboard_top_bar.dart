@@ -18,44 +18,52 @@ class DashboardTopBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SizedBox(
-            width: 388,
-            height: 38,
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search',
-                prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
-                filled: true,
-                fillColor: AppColors.searchFieldBackground,
-                contentPadding: EdgeInsets.zero,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(19),
-                  borderSide: const BorderSide(
-                    color: AppColors.searchFieldBorder,
-                    width: 0.6,
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 388),
+            child: SizedBox(
+              height: 38,
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search',
+                  prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
+                  filled: true,
+                  fillColor: AppColors.searchFieldBackground,
+                  contentPadding: EdgeInsets.zero,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(19),
+                    borderSide: const BorderSide(
+                      color: AppColors.searchFieldBorder,
+                      width: 0.6,
+                    ),
                   ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(19),
-                  borderSide: const BorderSide(
-                    color: AppColors.searchFieldBorder,
-                    width: 0.6,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(19),
+                    borderSide: const BorderSide(
+                      color: AppColors.searchFieldBorder,
+                      width: 0.6,
+                    ),
                   ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(19),
-                  borderSide: const BorderSide(
-                    color: AppColors.searchFieldBorder,
-                    width: 0.6,
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(19),
+                    borderSide: const BorderSide(
+                      color: AppColors.searchFieldBorder,
+                      width: 0.6,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-          const Spacer(),
-          _NotificationBell(),
-          const SizedBox(width: 24),
-          _ProfileMenu(),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [
+                _NotificationBell(),
+                SizedBox(width: 16),
+                _ProfileMenu(),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -63,51 +71,55 @@ class DashboardTopBar extends StatelessWidget {
 }
 
 class _NotificationBell extends StatelessWidget {
+  const _NotificationBell({super.key});
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(24),
-      onTap: () {},
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            height: 46,
-            width: 46,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Icon(Icons.notifications_none_rounded, size: 28, color: AppColors.primary),
+        Positioned(
+          top: -6,
+          right: -8,
+          child: Container(
+            width: 16,
+            height: 16,
             decoration: BoxDecoration(
-              color: AppColors.summaryTileBackground,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.summaryCardBorder),
+              color: AppColors.accentPink,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
             ),
-            child: const Icon(Icons.notifications_none_rounded, color: AppColors.primary),
-          ),
-          Positioned(
-            top: -4,
-            right: -4,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.quickActionOrange,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: const Text(
+            child: const Center(
+              child: Text(
                 '6',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 9,
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+        Positioned(
+          bottom: -6,
+          left: 10,
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: const BoxDecoration(
+              color: AppColors.classStudentIconBackground,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
 
 class _ProfileMenu extends StatelessWidget {
+  const _ProfileMenu({super.key});
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<int>(
@@ -145,17 +157,17 @@ class _ProfileMenu extends StatelessWidget {
         ),
       ],
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.summaryCardBorder),
+              borderRadius: BorderRadius.circular(22),
               color: AppColors.summaryTileBackground,
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(22),
               child: Image.network(
                 'https://i.pravatar.cc/150?img=47',
                 fit: BoxFit.cover,
