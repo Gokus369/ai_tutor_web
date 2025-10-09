@@ -333,7 +333,7 @@ class _StudentsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final bool useCompact = compact || constraints.maxWidth < 900;
+        final bool useCompact = compact || constraints.maxWidth < 940;
 
         return Container(
           decoration: BoxDecoration(
@@ -391,20 +391,7 @@ class _StudentsTable extends StatelessWidget {
               else
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
-                  child: Column(
-                    children: [
-                      _TableHeader(),
-                      const SizedBox(height: 18),
-                      for (int i = 0; i < students.length; i++) ...[
-                        _StudentRowView(student: students[i]),
-                        if (i != students.length - 1)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 18),
-                            child: Divider(height: 1, color: AppColors.studentsTableDivider),
-                          ),
-                      ],
-                    ],
-                  ),
+                  child: _DesktopStudentsTable(students: students),
                 ),
             ],
           ),
@@ -414,33 +401,222 @@ class _StudentsTable extends StatelessWidget {
   }
 }
 
-class _TableHeader extends StatelessWidget {
+class _DesktopStudentsTable extends StatelessWidget {
+  const _DesktopStudentsTable({required this.students});
+
+  final List<StudentReport> students;
+
+  static const double _actionsWidth = 44;
+  static const double _columnSpacing = 24;
+  static const List<int> _columnFlex = [
+    27, // Name
+    8, // Class
+    12, // Attendance
+    25, // Progress
+    16, // Performance
+    12, // Status
+  ];
+
+  static const List<Alignment> _headerAlignments = [
+    Alignment.centerLeft,
+    Alignment.center,
+    Alignment.center,
+    Alignment.centerLeft,
+    Alignment.centerLeft,
+    Alignment.center,
+  ];
+
+  static const List<Alignment> _cellAlignments = [
+    Alignment.centerLeft,
+    Alignment.center,
+    Alignment.center,
+    Alignment.centerLeft,
+    Alignment.centerLeft,
+    Alignment.center,
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        _HeaderCell(label: 'Name', flex: 3),
-        _HeaderCell(label: 'Class', flex: 2),
-        _HeaderCell(label: 'Attendance %', flex: 2),
-        _HeaderCell(label: 'Progress %', flex: 2),
-        _HeaderCell(label: 'Performance', flex: 2),
-        _HeaderCell(label: 'Status', flex: 2),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _DesktopHeaderRow(),
+        const SizedBox(height: 14),
+        for (int i = 0; i < students.length; i++) ...[
+          _DesktopStudentRow(student: students[i]),
+          if (i != students.length - 1)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Divider(height: 1, color: AppColors.studentsTableDivider),
+            ),
+        ],
       ],
     );
   }
 }
 
-class _HeaderCell extends StatelessWidget {
-  const _HeaderCell({required this.label, required this.flex});
+class _DesktopHeaderRow extends StatelessWidget {
+  const _DesktopHeaderRow();
 
-  final String label;
-  final int flex;
+  static const List<String> _labels = [
+    'Name',
+    'Class',
+    'Attendance %',
+    'Progress %',
+    'Performance',
+    'Status',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      flex: flex,
-      child: Text(label, style: AppTypography.studentsTableHeader),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.studentsFilterBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.studentsFilterBorder, width: 1.2),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      child: Column(
+        children: [
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (int i = 0; i < _labels.length; i++) ...[
+                  Expanded(
+                    flex: _DesktopStudentsTable._columnFlex[i],
+                    child: Align(
+                      alignment: _DesktopStudentsTable._headerAlignments[i],
+                      child: Text(
+                        _labels[i],
+                        style: AppTypography.studentsTableHeader,
+                      ),
+                    ),
+                  ),
+                  if (i != _labels.length - 1) ...[
+                    const SizedBox(width: _DesktopStudentsTable._columnSpacing / 2),
+                    const _ColumnDivider(),
+                    const SizedBox(width: _DesktopStudentsTable._columnSpacing / 2),
+                  ],
+                ],
+                const SizedBox(width: _DesktopStudentsTable._columnSpacing / 2),
+                const _ColumnDivider(),
+                const SizedBox(width: _DesktopStudentsTable._columnSpacing / 2),
+                SizedBox(
+                  width: _DesktopStudentsTable._actionsWidth,
+                  child: const SizedBox(),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            height: 1,
+            color: AppColors.studentsTableDivider,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DesktopStudentRow extends StatelessWidget {
+  const _DesktopStudentRow({required this.student});
+
+  final StudentReport student;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget progressCell() {
+      return Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 8,
+              decoration: BoxDecoration(
+                color: AppColors.studentsProgressTrack,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: student.progress.clamp(0, 1),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.studentsProgressValue,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 48,
+            child: Text(
+              '${(student.progress * 100).round()}%',
+              style: AppTypography.studentsTableCell,
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      );
+    }
+
+    Widget buildCell(int index) {
+      switch (index) {
+        case 0:
+          return Text(student.name, style: AppTypography.studentsTableCell);
+        case 1:
+          return Text(student.className, style: AppTypography.studentsTableCell);
+        case 2:
+          return Text('${(student.attendance * 100).round()}%',
+              style: AppTypography.studentsTableCell);
+        case 3:
+          return progressCell();
+        case 4:
+          return _PerformanceLabel(performance: student.performance);
+        case 5:
+          return _StatusChip(status: student.status);
+      }
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Column(
+        children: [
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (int i = 0; i < _DesktopStudentsTable._columnFlex.length; i++) ...[
+                  Expanded(
+                    flex: _DesktopStudentsTable._columnFlex[i],
+                    child: Align(
+                      alignment: _DesktopStudentsTable._cellAlignments[i],
+                      child: buildCell(i),
+                    ),
+                  ),
+                  if (i != _DesktopStudentsTable._columnFlex.length - 1) ...[
+                    const SizedBox(width: _DesktopStudentsTable._columnSpacing / 2),
+                    const _ColumnDivider(),
+                    const SizedBox(width: _DesktopStudentsTable._columnSpacing / 2),
+                  ],
+                ],
+                const SizedBox(width: _DesktopStudentsTable._columnSpacing / 2),
+                const _ColumnDivider(),
+                const SizedBox(width: _DesktopStudentsTable._columnSpacing / 2),
+                const SizedBox(width: _DesktopStudentsTable._actionsWidth, child: _RowActions()),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            height: 1,
+            color: AppColors.studentsTableDivider,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -471,7 +647,23 @@ class _StudentCompactCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(student.name, style: AppTypography.sectionTitle.copyWith(fontSize: 18)),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    student.name,
+                    style: AppTypography.sectionTitle.copyWith(fontSize: 18),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Student options',
+                  padding: EdgeInsets.zero,
+                  splashRadius: 18,
+                  icon: const Icon(Icons.more_horiz, color: AppColors.iconMuted),
+                  onPressed: () {},
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             _MetaRow(label: 'Class', value: student.className, labelStyle: labelStyle, valueStyle: valueStyle),
             const SizedBox(height: 6),
@@ -524,54 +716,6 @@ class _MetaRow extends StatelessWidget {
   }
 }
 
-class _StudentRowView extends StatelessWidget {
-  const _StudentRowView({required this.student});
-
-  final StudentReport student;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(flex: 3, child: Text(student.name, style: AppTypography.studentsTableCell)),
-        Expanded(flex: 2, child: Text(student.className, style: AppTypography.studentsTableCell)),
-        Expanded(flex: 2, child: Text('${(student.attendance * 100).round()}%', style: AppTypography.studentsTableCell)),
-        Expanded(
-          flex: 2,
-          child: Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: AppColors.studentsProgressTrack,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: student.progress.clamp(0, 1),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.studentsProgressValue,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text('${(student.progress * 100).round()}%', style: AppTypography.studentsTableCell),
-            ],
-          ),
-        ),
-        Expanded(flex: 2, child: _PerformanceLabel(performance: student.performance)),
-        Expanded(flex: 2, child: _StatusChip(status: student.status)),
-      ],
-    );
-  }
-}
-
 class _PerformanceLabel extends StatelessWidget {
   const _PerformanceLabel({required this.performance});
 
@@ -619,7 +763,7 @@ class _StatusChip extends StatelessWidget {
     final Color background = status == StudentStatus.active
         ? AppColors.studentsStatusActive
         : AppColors.studentsStatusInactive;
-    final String label = status == StudentStatus.active ? 'Active' : 'In Active';
+    final String label = status == StudentStatus.active ? 'Active' : 'Inactive';
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -635,6 +779,40 @@ class _StatusChip extends StatelessWidget {
           label,
           style: AppTypography.studentsStatusText,
         ),
+      ),
+    );
+  }
+}
+
+class _RowActions extends StatelessWidget {
+  const _RowActions();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: IconButton(
+        tooltip: 'Student options',
+        padding: EdgeInsets.zero,
+        splashRadius: 20,
+        icon: const Icon(Icons.more_horiz, color: AppColors.iconMuted),
+        onPressed: () {},
+      ),
+    );
+  }
+}
+
+class _ColumnDivider extends StatelessWidget {
+  const _ColumnDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: double.infinity,
+      child: VerticalDivider(
+        width: 1,
+        thickness: 1,
+        color: AppColors.studentsTableDivider,
       ),
     );
   }
