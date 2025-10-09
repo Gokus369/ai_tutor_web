@@ -185,7 +185,7 @@ class _SyllabusScreenState extends State<SyllabusScreen> {
 }
 
 class _SearchField extends StatelessWidget {
-  const _SearchField({super.key});
+  const _SearchField();
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -216,7 +216,7 @@ class _SearchField extends StatelessWidget {
 }
 
 class _AddSubjectButton extends StatelessWidget {
-  const _AddSubjectButton({super.key});
+  const _AddSubjectButton();
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -233,7 +233,7 @@ class _AddSubjectButton extends StatelessWidget {
 }
 
 class _ClassSelector extends StatefulWidget {
-  const _ClassSelector({super.key});
+  const _ClassSelector();
   @override
   State<_ClassSelector> createState() => _ClassSelectorState();
 }

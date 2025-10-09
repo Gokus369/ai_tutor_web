@@ -1,4 +1,5 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
+import 'package:ai_tutor_web/auth_repository.dart';
 import 'package:ai_tutor_web/features/auth/presentation/widgets/form_field_label.dart';
 import 'package:ai_tutor_web/features/auth/presentation/widgets/signup_header.dart';
 import 'package:ai_tutor_web/features/auth/presentation/widgets/terms_and_policy_checkbox.dart';
@@ -7,7 +8,9 @@ import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  const SignupScreen({super.key, required this.repository});
+
+  final AuthRepository repository;
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -42,6 +45,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _acceptTerms = false;
   bool _showPassword = false;
   bool _showConfirmPassword = false;
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -113,6 +117,12 @@ class _SignupScreenState extends State<SignupScreen> {
                             decoration: const InputDecoration(
                               hintText: 'Enter your full name',
                             ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Enter your full name';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 18),
                           const FormFieldLabel(text: 'Email Address'),
@@ -123,6 +133,17 @@ class _SignupScreenState extends State<SignupScreen> {
                             decoration: const InputDecoration(
                               hintText: 'Enter your email',
                             ),
+                            validator: (value) {
+                              final email = value?.trim() ?? '';
+                              if (email.isEmpty) {
+                                return 'Enter your email';
+                              }
+                              final emailRegex = RegExp(r'^[\w\.\-]+@[\w\.\-]+\.[A-Za-z]{2,}$');
+                              if (!emailRegex.hasMatch(email)) {
+                                return 'Enter a valid email address';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 18),
                           const FormFieldLabel(text: 'Password'),
@@ -143,6 +164,21 @@ class _SignupScreenState extends State<SignupScreen> {
                                     setState(() => _showPassword = !_showPassword),
                               ),
                             ),
+                            validator: (value) {
+                              final password = value ?? '';
+                              if (password.isEmpty) {
+                                return 'Enter your password';
+                              }
+                              if (password.length < 8) {
+                                return 'Password must be at least 8 characters';
+                              }
+                              final hasLetter = RegExp(r'[A-Za-z]').hasMatch(password);
+                              final hasDigit = RegExp(r'\d').hasMatch(password);
+                              if (!hasLetter || !hasDigit) {
+                                return 'Include both letters and numbers';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 18),
                           const FormFieldLabel(text: 'Confirm Password'),
@@ -164,6 +200,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ),
                               ),
                             ),
+                            validator: (value) {
+                              final confirmation = value ?? '';
+                              if (confirmation.isEmpty) {
+                                return 'Confirm your password';
+                              }
+                              if (confirmation != _passwordController.text) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 18),
                           const FormFieldLabel(text: 'Role'),
@@ -224,20 +270,28 @@ class _SignupScreenState extends State<SignupScreen> {
                             value: _acceptTerms,
                             onChanged: (value) =>
                                 setState(() => _acceptTerms = value ?? false),
-                            onTermsTap: () {
-                              // TODO: Navigate to terms of use
-                            },
-                            onPrivacyTap: () {
-                              // TODO: Navigate to privacy policy
-                            },
+                            onTermsTap: () =>
+                                Navigator.of(context).pushNamed(AppRoutes.termsOfUse),
+                            onPrivacyTap: () =>
+                                Navigator.of(context).pushNamed(AppRoutes.privacyPolicy),
                           ),
                           const SizedBox(height: 24),
                           SizedBox(
                             width: double.infinity,
                             height: 38,
                             child: ElevatedButton(
-                              onPressed: _acceptTerms ? _onSubmit : null,
-                              child: const Text('Create Account'),
+                              onPressed:
+                                  (!_acceptTerms || _submitting) ? null : () => _onSubmit(),
+                              child: _submitting
+                                  ? const SizedBox(
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : const Text('Create Account'),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -279,21 +333,44 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit() async {
+    FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match.')),
+    setState(() => _submitting = true);
+    try {
+      final user = await widget.repository.register(
+        fullName: _fullNameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        role: _selectedRole,
+        educationBoard: _selectedBoard,
+        school: _selectedSchool,
       );
-      return;
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Welcome, ${user.displayName}!')),
+      );
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.dashboard,
+        (_) => false,
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      final message = e.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
     }
-
-    // TODO: Handle actual sign-up logic.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Account created successfully!')),
-    );
   }
 }

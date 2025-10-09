@@ -8,4 +8,6 @@ class AppRoutes {
   static const String classes = '/classes';
   static const String syllabus = '/syllabus';
   static const String students = '/students';
+  static const String termsOfUse = '/terms-of-use';
+  static const String privacyPolicy = '/privacy-policy';
 }

@@ -6,8 +6,10 @@ import 'auth_repository.dart';
 import 'features/auth/presentation/signup_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/classes/presentation/classes_screen.dart';
-import 'features/syllabus/presentation/syllabus_screen.dart';
 import 'features/students/presentation/students_screen.dart';
+import 'features/syllabus/presentation/syllabus_screen.dart';
+import 'features/legal/presentation/privacy_policy_screen.dart';
+import 'features/legal/presentation/terms_of_use_screen.dart';
 import 'screens/login_screen.dart';
 
 void main() {
@@ -27,12 +29,14 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.light(),
       initialRoute: AppRoutes.signup,
       routes: {
-        AppRoutes.signup: (_) => const SignupScreen(),
+        AppRoutes.signup: (_) => SignupScreen(repository: repository),
         AppRoutes.login: (_) => LoginScreen(repository: repository),
         AppRoutes.dashboard: (_) => const DashboardScreen(),
         AppRoutes.classes: (_) => const ClassesScreen(),
         AppRoutes.syllabus: (_) => const SyllabusScreen(),
         AppRoutes.students: (_) => const StudentsScreen(),
+        AppRoutes.termsOfUse: (_) => const TermsOfUseScreen(),
+        AppRoutes.privacyPolicy: (_) => const PrivacyPolicyScreen(),
       },
     );
   }

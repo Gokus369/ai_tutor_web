@@ -209,7 +209,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
 }
 
 class _StudentSearchField extends StatelessWidget {
-  const _StudentSearchField({super.key, this.height = 44, this.width, this.borderRadius = 14});
+  const _StudentSearchField({this.height = 44, this.width, this.borderRadius = 14});
 
   @override
   Widget build(BuildContext context) {
