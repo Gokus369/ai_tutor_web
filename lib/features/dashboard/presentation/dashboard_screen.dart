@@ -2,11 +2,10 @@ import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/dashboard/domain/models/dashboard_summary.dart';
 import 'package:ai_tutor_web/features/dashboard/domain/models/quick_action.dart';
 import 'package:ai_tutor_web/features/dashboard/domain/models/upcoming_task.dart';
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_summary_card.dart';
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_top_bar.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/quick_action_button.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/upcoming_tasks_table.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -105,118 +104,144 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Row(
+    return DashboardShell(
+      activeRoute: AppRoutes.dashboard,
+      builder: (context, shell) {
+        final double width = shell.contentWidth;
+        final bool isWide = shell.isDesktop;
+        final bool isTablet = shell.isTablet;
+
+        final int summaryColumns;
+        if (width >= 960) {
+          summaryColumns = 4;
+        } else if (width >= 640) {
+          summaryColumns = 2;
+        } else {
+          summaryColumns = 1;
+        }
+
+        final double summarySpacing = 20;
+        final double summaryItemWidth = summaryColumns == 1
+            ? double.infinity
+            : (width - summarySpacing * (summaryColumns - 1)) / summaryColumns;
+
+        const double actionSpacing = 16;
+        const double desiredActionWidth = 254;
+        final double requiredWidthForSingleRow =
+            desiredActionWidth * _quickActions.length +
+                actionSpacing * (_quickActions.length - 1);
+        final double innerWidth = (width - 48).clamp(0.0, width);
+        final bool useFixedActionWidth =
+            shell.isDesktop || innerWidth >= requiredWidthForSingleRow;
+
+        double? actionWidth;
+        if (!useFixedActionWidth) {
+          late final int actionColumns;
+          if (width >= 960) {
+            actionColumns = 4;
+          } else if (width >= 720) {
+            actionColumns = 3;
+          } else if (width >= 520) {
+            actionColumns = 2;
+          } else {
+            actionColumns = 1;
+          }
+
+          actionWidth = actionColumns == 1
+              ? innerWidth
+              : (innerWidth - actionSpacing * (actionColumns - 1)) / actionColumns;
+        }
+
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const DashboardSidebar(activeRoute: AppRoutes.dashboard),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.dashboardGradientTop, AppColors.dashboardGradientBottom],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+            Text('Dashboard', style: AppTypography.dashboardTitle),
+            const SizedBox(height: 24),
+            Wrap(
+              spacing: summarySpacing,
+              runSpacing: summarySpacing,
+              children: [
+                for (final metric in _summaryMetrics)
+                  SizedBox(
+                    width: summaryItemWidth,
+                    child: DashboardSummaryCard(
+                      title: metric.title,
+                      value: metric.value,
+                      icon: metric.icon,
+                      iconBackground: metric.iconBackground,
+                    ),
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const DashboardTopBar(),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 32),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: SizedBox(
-                            width: 1238,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text('Dashboard', style: AppTypography.dashboardTitle),
-                                const SizedBox(height: 28),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    for (final metric in _summaryMetrics)
-                                      SizedBox(
-                                        width: 262,
-                                        height: 110,
-                                        child: DashboardSummaryCard(
-                                          title: metric.title,
-                                          value: metric.value,
-                                          icon: metric.icon,
-                                          iconBackground: metric.iconBackground,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 28),
-                                Container(
-                                  width: 1238,
-                                  height: 178,
-                                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.quickActionsContainer,
-                                    borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(color: AppColors.summaryCardBorder),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: AppColors.shadow,
-                                        blurRadius: 20,
-                                        offset: Offset(0, 14),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Quick Actions',
-                                        style: AppTypography.sectionTitle.copyWith(
-                                          color: AppColors.quickActionsTitle,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 18),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          for (final action in _quickActions)
-                                            SizedBox(
-                                              width: 254,
-                                              height: 92,
-                                              child: QuickActionButton(
-                                                label: action.label,
-                                                icon: action.icon,
-                                                color: action.color,
-                                                onTap: action.onTap,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 36),
-                                SizedBox(
-                                  width: 1238,
-                                  child: UpcomingTasksTable(tasks: _upcomingTasks),
-                                ),
-                              ],
+              ],
+            ),
+            const SizedBox(height: 28),
+            Container(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              decoration: BoxDecoration(
+                color: AppColors.quickActionsContainer,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.summaryCardBorder),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppColors.shadow,
+                    blurRadius: 20,
+                    offset: Offset(0, 14),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Quick Actions',
+                    style: AppTypography.sectionTitle.copyWith(
+                      color: AppColors.quickActionsTitle,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  if (useFixedActionWidth)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        for (final action in _quickActions)
+                          SizedBox(
+                            width: desiredActionWidth,
+                            child: QuickActionButton(
+                              label: action.label,
+                              icon: action.icon,
+                              color: action.color,
+                              onTap: action.onTap,
                             ),
                           ),
-                        ),
-                      ),
+                      ],
+                    )
+                  else
+                    Wrap(
+                      spacing: actionSpacing,
+                      runSpacing: actionSpacing,
+                      children: [
+                        for (final action in _quickActions)
+                          SizedBox(
+                            width: actionWidth!,
+                            child: QuickActionButton(
+                              label: action.label,
+                              icon: action.icon,
+                              color: action.color,
+                              onTap: action.onTap,
+                            ),
+                          ),
+                      ],
                     ),
-                  ],
-                ),
+                ],
               ),
             ),
+            SizedBox(height: isWide ? 36 : 28),
+            UpcomingTasksTable(
+              tasks: _upcomingTasks,
+              compact: !isWide && !isTablet,
+            ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }

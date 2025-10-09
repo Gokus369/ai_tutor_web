@@ -1,7 +1,6 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_top_bar.dart';
 import 'package:ai_tutor_web/features/students/domain/models/student_report.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -80,130 +79,153 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return DashboardShell(
+      activeRoute: AppRoutes.students,
+      builder: (context, shell) {
+        final double width = shell.contentWidth;
+        final bool isCompact = width < 960;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const DashboardSidebar(activeRoute: AppRoutes.students),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.dashboardGradientTop, AppColors.dashboardGradientBottom],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+            if (width >= 640)
+              Row(
+                children: [
+                  Expanded(
+                    child: Text('Students', style: AppTypography.dashboardTitle),
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const DashboardTopBar(),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 32),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: SizedBox(
-                            width: 1200,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text('Students', style: AppTypography.dashboardTitle),
-                                    const Spacer(),
-                                    SizedBox(
-                                      width: 163,
-                                      height: 50,
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary,
-                                          foregroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                          textStyle: AppTypography.button,
-                                        ),
-                                        child: const Text('+ Add Student'),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                Container(
-                                  width: 1138,
-                                  height: 78,
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.studentsCardBackground,
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1.2),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.primary.withValues(alpha: 0.08),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 10),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const _StudentSearchField(height: 38, width: 367, borderRadius: 24),
-                                      const SizedBox(width: 18),
-                                      _FilterDropdown(
-                                        width: 121,
-                                        height: 38,
-                                        borderRadius: 24,
-                                        value: _classFilter,
-                                        items: const ['All Class', 'Class 12', 'Class 11', 'Class 10'],
-                                        onChanged: (value) => setState(() => _classFilter = value),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      _FilterDropdown(
-                                        width: 144,
-                                        height: 38,
-                                        borderRadius: 24,
-                                        value: _attendanceFilter,
-                                        items: const ['All Attendance', 'Above 90%', '70% - 90%', 'Below 70%'],
-                                        onChanged: (value) => setState(() => _attendanceFilter = value),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      _FilterDropdown(
-                                        width: 133,
-                                        height: 38,
-                                        borderRadius: 24,
-                                        value: _progressFilter,
-                                        items: const ['All Progress', 'Above 80%', '50% - 80%', 'Below 50%'],
-                                        onChanged: (value) => setState(() => _progressFilter = value),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      _FilterDropdown(
-                                        width: 120,
-                                        height: 38,
-                                        borderRadius: 24,
-                                        value: _levelFilter,
-                                        items: const ['All Levels', 'Top Performer', 'Average', 'Need Attention'],
-                                        onChanged: (value) => setState(() => _levelFilter = value),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 28),
-                                _StudentsTable(students: _students),
-                              ],
-                            ),
-                          ),
-                        ),
+                  SizedBox(
+                    width: 156,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        textStyle: AppTypography.button,
                       ),
+                      child: const Text('+ Add Student'),
                     ),
-                  ],
+                  ),
+                ],
+              )
+            else ...[
+              Text('Students', style: AppTypography.dashboardTitle),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    textStyle: AppTypography.button,
+                  ),
+                  child: const Text('+ Add Student'),
                 ),
               ),
+            ],
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              decoration: BoxDecoration(
+                color: AppColors.studentsCardBackground,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1.2),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: LayoutBuilder(
+                builder: (context, filterConstraints) {
+                  final double maxWidth = filterConstraints.maxWidth;
+                  const double spacing = 12;
+                  final bool narrow = maxWidth < 720;
+                  final bool medium = maxWidth < 960 && !narrow;
+
+                  double dropdownWidth;
+                  if (narrow) {
+                    dropdownWidth = maxWidth;
+                  } else if (medium) {
+                    dropdownWidth = ((maxWidth - spacing) / 2).clamp(160.0, 260.0);
+                  } else {
+                    dropdownWidth = 150;
+                  }
+
+                  final double searchWidth = narrow ? maxWidth : 360;
+
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: [
+                      SizedBox(
+                        width: searchWidth,
+                        child: _StudentSearchField(
+                          height: 38,
+                          width: searchWidth,
+                          borderRadius: 24,
+                        ),
+                      ),
+                      SizedBox(
+                        width: dropdownWidth,
+                        child: _FilterDropdown(
+                          height: 38,
+                          borderRadius: 24,
+                          value: _classFilter,
+                          items: const ['All Class', 'Class 12', 'Class 11', 'Class 10'],
+                          onChanged: (value) => setState(() => _classFilter = value),
+                        ),
+                      ),
+                      SizedBox(
+                        width: dropdownWidth,
+                        child: _FilterDropdown(
+                          height: 38,
+                          borderRadius: 24,
+                          value: _attendanceFilter,
+                          items: const ['All Attendance', 'Above 90%', '70% - 90%', 'Below 70%'],
+                          onChanged: (value) => setState(() => _attendanceFilter = value),
+                        ),
+                      ),
+                      SizedBox(
+                        width: dropdownWidth,
+                        child: _FilterDropdown(
+                          height: 38,
+                          borderRadius: 24,
+                          value: _progressFilter,
+                          items: const ['All Progress', 'Above 80%', '50% - 80%', 'Below 50%'],
+                          onChanged: (value) => setState(() => _progressFilter = value),
+                        ),
+                      ),
+                      SizedBox(
+                        width: dropdownWidth,
+                        child: _FilterDropdown(
+                          height: 38,
+                          borderRadius: 24,
+                          value: _levelFilter,
+                          items: const ['All Levels', 'Top Performer', 'Average', 'Need Attention'],
+                          onChanged: (value) => setState(() => _levelFilter = value),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+            _StudentsTable(
+              students: _students,
+              compact: isCompact,
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -252,7 +274,6 @@ class _StudentSearchField extends StatelessWidget {
 
 class _FilterDropdown extends StatelessWidget {
   const _FilterDropdown({
-    required this.width,
     required this.height,
     required this.value,
     required this.items,
@@ -260,7 +281,6 @@ class _FilterDropdown extends StatelessWidget {
     this.borderRadius = 14,
   });
 
-  final double width;
   final double height;
   final String value;
   final List<String> items;
@@ -270,7 +290,6 @@ class _FilterDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: width,
       height: height,
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -305,73 +324,92 @@ class _FilterDropdown extends StatelessWidget {
 }
 
 class _StudentsTable extends StatelessWidget {
-  const _StudentsTable({required this.students});
+  const _StudentsTable({required this.students, this.compact = false});
 
   final List<StudentReport> students;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 1138,
-      decoration: BoxDecoration(
-        color: AppColors.studentsCardBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.studentsCardBorder),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 20,
-            offset: Offset(0, 12),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool useCompact = compact || constraints.maxWidth < 900;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.studentsCardBackground,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.studentsCardBorder),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.shadow,
+                blurRadius: 20,
+                offset: Offset(0, 12),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            height: 54,
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            decoration: BoxDecoration(
-              color: AppColors.studentsHeaderBackground,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-            ),
-            child: Row(
-              children: [
-                Text('Students', style: AppTypography.syllabusSectionHeading),
-                const Spacer(),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.studentsFilterBorder),
-                    color: AppColors.studentsFilterBackground,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: useCompact ? 20 : 28, vertical: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.studentsHeaderBackground,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text('Students', style: AppTypography.syllabusSectionHeading),
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.studentsFilterBorder),
+                        color: AppColors.studentsFilterBackground,
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        child: Text('All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (useCompact)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+                  child: Column(
+                    children: [
+                      for (int i = 0; i < students.length; i++) ...[
+                        _StudentCompactCard(student: students[i]),
+                        if (i != students.length - 1) const SizedBox(height: 16),
+                      ],
+                    ],
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    child: Text('All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                  child: Column(
+                    children: [
+                      _TableHeader(),
+                      const SizedBox(height: 18),
+                      for (int i = 0; i < students.length; i++) ...[
+                        _StudentRowView(student: students[i]),
+                        if (i != students.length - 1)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 18),
+                            child: Divider(height: 1, color: AppColors.studentsTableDivider),
+                          ),
+                      ],
+                    ],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
-            child: Column(
-              children: [
-                _TableHeader(),
-                const SizedBox(height: 18),
-                for (int i = 0; i < students.length; i++) ...[
-                  _StudentRowView(student: students[i]),
-                  if (i != students.length - 1)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 18),
-                      child: Divider(height: 1, color: AppColors.studentsTableDivider),
-                    ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -403,6 +441,85 @@ class _HeaderCell extends StatelessWidget {
     return Expanded(
       flex: flex,
       child: Text(label, style: AppTypography.studentsTableHeader),
+    );
+  }
+}
+
+class _StudentCompactCard extends StatelessWidget {
+  const _StudentCompactCard({required this.student});
+
+  final StudentReport student;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle labelStyle = AppTypography.classCardMeta.copyWith(
+      color: AppColors.textMuted,
+      fontSize: 13,
+    );
+    final TextStyle valueStyle = AppTypography.studentsTableCell.copyWith(
+      fontWeight: FontWeight.w600,
+    );
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.studentsCardBorder.withValues(alpha: 0.6)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(student.name, style: AppTypography.sectionTitle.copyWith(fontSize: 18)),
+            const SizedBox(height: 12),
+            _MetaRow(label: 'Class', value: student.className, labelStyle: labelStyle, valueStyle: valueStyle),
+            const SizedBox(height: 6),
+            _MetaRow(
+              label: 'Attendance',
+              value: '${(student.attendance * 100).round()}%',
+              labelStyle: labelStyle,
+              valueStyle: valueStyle,
+            ),
+            const SizedBox(height: 6),
+            _MetaRow(
+              label: 'Progress',
+              value: '${(student.progress * 100).round()}%',
+              labelStyle: labelStyle,
+              valueStyle: valueStyle,
+            ),
+            const SizedBox(height: 12),
+            _PerformanceLabel(performance: student.performance),
+            const SizedBox(height: 8),
+            _StatusChip(status: student.status),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MetaRow extends StatelessWidget {
+  const _MetaRow({
+    required this.label,
+    required this.value,
+    required this.labelStyle,
+    required this.valueStyle,
+  });
+
+  final String label;
+  final String value;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(width: 90, child: Text(label, style: labelStyle)),
+        const SizedBox(width: 8),
+        Expanded(child: Text(value, style: valueStyle)),
+      ],
     );
   }
 }

@@ -151,18 +151,19 @@ class _LoginScreenState extends State<LoginScreen> {
           final double maxWidth = constraints.maxWidth;
           final double horizontalPadding =
               maxWidth > desiredWidth ? (maxWidth - desiredWidth) / 2 : 16;
-          final double clampedSidePadding =
-              (horizontalPadding * 2).clamp(0.0, maxWidth);
-          final double availableWidth = maxWidth - clampedSidePadding;
+          final Size screenSize = MediaQuery.of(context).size;
+          final double topPadding = screenSize.height > 760 ? 120 : 64;
+          final double bottomPadding = screenSize.height > 760 ? 72 : 40;
+          final double availableWidth = (maxWidth - horizontalPadding * 2).clamp(0.0, maxWidth);
           final double cardWidth =
               availableWidth > 0 ? availableWidth.clamp(0.0, desiredWidth) : desiredWidth;
 
           return SingleChildScrollView(
             padding: EdgeInsets.only(
-              top: 160,
+              top: topPadding,
               left: horizontalPadding,
               right: horizontalPadding,
-              bottom: 48,
+              bottom: bottomPadding,
             ),
             child: Align(
               alignment: Alignment.topCenter,

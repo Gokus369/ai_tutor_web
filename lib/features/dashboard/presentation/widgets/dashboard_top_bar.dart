@@ -3,69 +3,88 @@ import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
 class DashboardTopBar extends StatelessWidget {
-  const DashboardTopBar({super.key});
+  const DashboardTopBar({super.key, this.onMenuPressed});
+
+  final VoidCallback? onMenuPressed;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 72,
-      padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 16),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(
-          bottom: BorderSide(color: AppColors.sidebarBorder, width: 1),
-        ),
-      ),
-      child: Row(
-        children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 388),
-            child: SizedBox(
-              height: 38,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
-                  filled: true,
-                  fillColor: AppColors.searchFieldBackground,
-                  contentPadding: EdgeInsets.zero,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(19),
-                    borderSide: const BorderSide(
-                      color: AppColors.searchFieldBorder,
-                      width: 0.6,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(19),
-                    borderSide: const BorderSide(
-                      color: AppColors.searchFieldBorder,
-                      width: 0.6,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(19),
-                    borderSide: const BorderSide(
-                      color: AppColors.searchFieldBorder,
-                      width: 0.6,
-                    ),
-                  ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isCompact = constraints.maxWidth < 680;
+        final bool hideSearch = constraints.maxWidth < 520;
+        final bool showMenuButton = onMenuPressed != null;
+
+        return Container(
+          height: 72,
+          padding: EdgeInsets.symmetric(
+            horizontal: isCompact ? 20 : 31,
+            vertical: 16,
+          ),
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            border: Border(
+              bottom: BorderSide(color: AppColors.sidebarBorder, width: 1),
+            ),
+          ),
+          child: Row(
+            children: [
+              if (showMenuButton) ...[
+                IconButton(
+                  onPressed: onMenuPressed,
+                  icon: const Icon(Icons.menu_rounded, color: AppColors.textPrimary),
                 ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: const [
-                _NotificationBell(),
-                SizedBox(width: 16),
-                _ProfileMenu(),
+                const SizedBox(width: 12),
               ],
-            ),
+              if (!hideSearch)
+                Flexible(
+                  child: SizedBox(
+                    height: 38,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
+                        filled: true,
+                        fillColor: AppColors.searchFieldBackground,
+                        contentPadding: EdgeInsets.zero,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(19),
+                          borderSide: const BorderSide(
+                            color: AppColors.searchFieldBorder,
+                            width: 0.6,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(19),
+                          borderSide: const BorderSide(
+                            color: AppColors.searchFieldBorder,
+                            width: 0.6,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(19),
+                          borderSide: const BorderSide(
+                            color: AppColors.searchFieldBorder,
+                            width: 0.6,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              else
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.search_rounded, color: AppColors.textPrimary),
+                ),
+              const Spacer(),
+              const _NotificationBell(),
+              const SizedBox(width: 16),
+              _ProfileMenu(compact: isCompact),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -119,7 +138,10 @@ class _NotificationBell extends StatelessWidget {
 }
 
 class _ProfileMenu extends StatelessWidget {
-  const _ProfileMenu();
+  const _ProfileMenu({required this.compact});
+
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<int>(
@@ -130,7 +152,11 @@ class _ProfileMenu extends StatelessWidget {
         PopupMenuItem(
           value: 0,
           child: ListTile(
-            leading: Icon(Icons.logout_rounded, size: 20, color: AppColors.quickActionOrange.withValues(alpha: 0.9)),
+            leading: Icon(
+              Icons.logout_rounded,
+              size: 20,
+              color: AppColors.quickActionOrange.withValues(alpha: 0.9),
+            ),
             title: Text(
               'Logout',
               style: AppTypography.bodySmall.copyWith(
@@ -181,17 +207,19 @@ class _ProfileMenu extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Moni Roy', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w700)),
-              Text('Admin', style: AppTypography.bodySmall.copyWith(fontSize: 12, color: AppColors.textMuted)),
-            ],
-          ),
-          const SizedBox(width: 12),
-          const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textPrimary),
+          if (!compact) ...[
+            const SizedBox(width: 14),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Moni Roy', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w700)),
+                Text('Admin', style: AppTypography.bodySmall.copyWith(fontSize: 12, color: AppColors.textMuted)),
+              ],
+            ),
+            const SizedBox(width: 12),
+            const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textPrimary),
+          ],
         ],
       ),
     );

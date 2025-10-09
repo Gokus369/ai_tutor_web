@@ -7,46 +7,75 @@ class UpcomingTasksTable extends StatelessWidget {
   const UpcomingTasksTable({
     super.key,
     required this.tasks,
+    this.compact = false,
   });
 
   final List<UpcomingTask> tasks;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(28, 28, 28, 18),
-      decoration: BoxDecoration(
-        color: AppColors.tableRowBackground,
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: AppColors.summaryCardBorder, width: 1),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 18,
-            offset: Offset(0, 10),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool useCompact = compact || constraints.maxWidth < 640;
+
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            useCompact ? 20 : 28,
+            useCompact ? 24 : 28,
+            useCompact ? 20 : 28,
+            useCompact ? 20 : 18,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Text('Upcoming Tasks', style: AppTypography.sectionTitle),
-              const Spacer(),
-              _StatusFilter(),
+          decoration: BoxDecoration(
+            color: AppColors.tableRowBackground,
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: AppColors.summaryCardBorder, width: 1),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.shadow,
+                blurRadius: 18,
+                offset: Offset(0, 10),
+              ),
             ],
           ),
-          const SizedBox(height: 20),
-          _TableHeader(),
-          const SizedBox(height: 6),
-          for (int i = 0; i < tasks.length; i++) ...[
-            _TaskRow(tasks[i]),
-            if (i != tasks.length - 1)
-              const Divider(height: 1, thickness: 0.6, color: AppColors.tableRowDivider),
-          ],
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Upcoming Tasks',
+                      style: AppTypography.sectionTitle,
+                    ),
+                  ),
+                  _StatusFilter(),
+                ],
+              ),
+              const SizedBox(height: 20),
+              if (useCompact)
+                Column(
+                  children: [
+                    for (int i = 0; i < tasks.length; i++) ...[
+                      _CompactTaskCard(tasks[i]),
+                      if (i != tasks.length - 1) const SizedBox(height: 12),
+                    ],
+                  ],
+                )
+              else ...[
+                _TableHeader(),
+                const SizedBox(height: 6),
+                for (int i = 0; i < tasks.length; i++) ...[
+                  _TaskRow(tasks[i]),
+                  if (i != tasks.length - 1)
+                    const Divider(height: 1, thickness: 0.6, color: AppColors.tableRowDivider),
+                ],
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -228,6 +257,86 @@ class _StatusChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(label, style: AppTypography.statusChip(textColor)),
+    );
+  }
+}
+
+class _CompactTaskCard extends StatelessWidget {
+  const _CompactTaskCard(this.task);
+
+  final UpcomingTask task;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle labelStyle = AppTypography.tableCell.copyWith(
+      color: AppColors.textMuted,
+      fontSize: 13,
+    );
+    final TextStyle valueStyle = AppTypography.tableCell.copyWith(
+      color: AppColors.textPrimary,
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    );
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.tableRowDivider.withValues(alpha: 0.8), width: 0.8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(task.task, style: AppTypography.sectionTitle.copyWith(fontSize: 16)),
+                ),
+                _StatusChip(status: task.status),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _MetaRow(label: 'Class', value: task.className, labelStyle: labelStyle, valueStyle: valueStyle),
+            const SizedBox(height: 6),
+            _MetaRow(label: 'Date', value: _formatDate(task.date), labelStyle: labelStyle, valueStyle: valueStyle),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final String day = date.day.toString().padLeft(2, '0');
+    final String month = date.month.toString().padLeft(2, '0');
+    final String year = date.year.toString();
+    return '$day-$month-$year';
+  }
+}
+
+class _MetaRow extends StatelessWidget {
+  const _MetaRow({
+    required this.label,
+    required this.value,
+    required this.labelStyle,
+    required this.valueStyle,
+  });
+
+  final String label;
+  final String value;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(width: 64, child: Text(label, style: labelStyle)),
+        const SizedBox(width: 12),
+        Expanded(child: Text(value, style: valueStyle)),
+      ],
     );
   }
 }
