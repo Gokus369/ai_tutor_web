@@ -8,6 +8,7 @@ import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/classes/presentation/classes_screen.dart';
 import 'features/legal/presentation/privacy_policy_screen.dart';
 import 'features/legal/presentation/terms_of_use_screen.dart';
+import 'features/reports/presentation/reports_screen.dart';
 import 'features/settings/presentation/settings_screen.dart';
 import 'features/students/presentation/students_screen.dart';
 import 'features/syllabus/presentation/syllabus_screen.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.classes: (_) => const ClassesScreen(),
         AppRoutes.syllabus: (_) => const SyllabusScreen(),
         AppRoutes.students: (_) => const StudentsScreen(),
+        AppRoutes.reports: (_) => const ReportsScreen(),
         AppRoutes.settings: (_) => const SettingsScreen(),
         AppRoutes.termsOfUse: (_) => const TermsOfUseScreen(),
         AppRoutes.privacyPolicy: (_) => const PrivacyPolicyScreen(),
