@@ -1,9 +1,7 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_card.dart';
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_top_bar.dart';
-import 'package:ai_tutor_web/shared/styles/app_colors.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
@@ -57,56 +55,45 @@ class ClassesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return DashboardShell(
+      activeRoute: AppRoutes.classes,
+      builder: (context, shell) {
+        final double width = shell.contentWidth;
+        const double spacing = 24;
+
+        final int columns;
+        if (width >= 1080) {
+          columns = 3;
+        } else if (width >= 720) {
+          columns = 2;
+        } else {
+          columns = 1;
+        }
+
+        final double cardWidth =
+            columns == 1 ? width : (width - spacing * (columns - 1)) / columns;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const DashboardSidebar(activeRoute: AppRoutes.classes),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.dashboardGradientTop, AppColors.dashboardGradientBottom],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const DashboardTopBar(),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 32),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: SizedBox(
-                            width: 1201,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Classes', style: AppTypography.dashboardTitle),
-                                const SizedBox(height: 28),
-                                Wrap(
-                                  spacing: 60,
-                                  runSpacing: 28,
-                                  children: _classes.map((classInfo) => ClassCard(info: classInfo)).toList(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+            Text('Classes', style: AppTypography.dashboardTitle),
+            const SizedBox(height: 24),
+            Wrap(
+              spacing: spacing,
+              runSpacing: 24,
+              children: _classes
+                  .map(
+                    (classInfo) => SizedBox(
+                      width: cardWidth,
+                      child: ClassCard(info: classInfo),
                     ),
-                  ],
-                ),
-              ),
+                  )
+                  .toList(),
             ),
+            SizedBox(height: shell.isMobile ? 16 : 0),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }

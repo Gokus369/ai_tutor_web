@@ -58,8 +58,6 @@ class _SignupScreenState extends State<SignupScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           const double desiredWidth = 558;
-          const double desiredHeight = 1060;
-
           final double maxWidth = constraints.maxWidth;
           final double horizontalPadding =
               maxWidth > desiredWidth ? (maxWidth - desiredWidth) / 2 : 16;
@@ -68,20 +66,22 @@ class _SignupScreenState extends State<SignupScreen> {
           final double availableWidth = maxWidth - clampedSidePadding;
           final double cardWidth =
               availableWidth > 0 ? availableWidth.clamp(0.0, desiredWidth) : desiredWidth;
+          final Size screenSize = MediaQuery.of(context).size;
+          final double topPadding = screenSize.height > 820 ? 120 : 72;
+          final double bottomPadding = screenSize.height > 820 ? 72 : 40;
 
           return SingleChildScrollView(
             padding: EdgeInsets.only(
-              top: 160,
+              top: topPadding,
               left: horizontalPadding,
               right: horizontalPadding,
-              bottom: 48,
+              bottom: bottomPadding,
             ),
             child: Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                  width: cardWidth,
-                  height: desiredHeight,
+                constraints: BoxConstraints(
+                  maxWidth: cardWidth,
                 ),
                 child: DecoratedBox(
                   decoration: BoxDecoration(

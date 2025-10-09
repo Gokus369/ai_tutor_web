@@ -10,32 +10,36 @@ class SyllabusProgressPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 452,
-      padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
-      decoration: BoxDecoration(
-        color: AppColors.syllabusBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.syllabusCardBorder),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 20,
-            offset: Offset(0, 10),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double horizontalPadding = constraints.maxWidth < 360 ? 20 : 28;
+        return Container(
+          padding: EdgeInsets.fromLTRB(horizontalPadding, 24, horizontalPadding, 24),
+          decoration: BoxDecoration(
+            color: AppColors.syllabusBackground,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.syllabusCardBorder),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.shadow,
+                blurRadius: 20,
+                offset: Offset(0, 10),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Progress Overview', style: AppTypography.syllabusSectionHeading),
-          const SizedBox(height: 20),
-          for (int i = 0; i < entries.length; i++) ...[
-            _ProgressTile(entry: entries[i]),
-            if (i != entries.length - 1) const SizedBox(height: 18),
-          ],
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Progress Overview', style: AppTypography.syllabusSectionHeading),
+              const SizedBox(height: 20),
+              for (int i = 0; i < entries.length; i++) ...[
+                _ProgressTile(entry: entries[i]),
+                if (i != entries.length - 1) const SizedBox(height: 18),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }

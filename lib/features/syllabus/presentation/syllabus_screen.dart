@@ -1,10 +1,9 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_top_bar.dart';
 import 'package:ai_tutor_web/features/syllabus/domain/models/syllabus_progress.dart';
 import 'package:ai_tutor_web/features/syllabus/domain/models/syllabus_subject.dart';
 import 'package:ai_tutor_web/features/syllabus/presentation/widgets/syllabus_progress_panel.dart';
 import 'package:ai_tutor_web/features/syllabus/presentation/widgets/syllabus_subject_card.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -96,90 +95,91 @@ class _SyllabusScreenState extends State<SyllabusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return DashboardShell(
+      activeRoute: AppRoutes.syllabus,
+      builder: (context, shell) {
+        final double width = shell.contentWidth;
+        final bool showSidePanel = width >= 1080;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const DashboardSidebar(activeRoute: AppRoutes.syllabus),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.dashboardGradientTop, AppColors.dashboardGradientBottom],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const DashboardTopBar(),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 31, vertical: 32),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: SizedBox(
-                            width: 1200,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Syllabus', style: AppTypography.dashboardTitle),
-                                const SizedBox(height: 24),
-                                Row(
-                                  children: [
-                                    const SizedBox(width: 568, child: _SearchField()),
-                                    const Spacer(),
-                                    SizedBox(width: 163, height: 50, child: _AddSubjectButton()),
-                                  ],
-                                ),
-                                const SizedBox(height: 18),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: SizedBox(width: 180, height: 44, child: _ClassSelector()),
-                                ),
-                                const SizedBox(height: 28),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      width: 716,
-                                      child: Column(
-                                        children: [
-                                          for (int i = 0; i < _subjects.length; i++) ...[
-                                            SyllabusSubjectCard(
-                                              subject: _subjects[i],
-                                              expanded: i == _expandedIndex,
-                                              onToggle: () {
-                                                setState(() {
-                                                  _expandedIndex = i == _expandedIndex ? -1 : i;
-                                                });
-                                              },
-                                            ),
-                                            if (i != _subjects.length - 1) const SizedBox(height: 20),
-                                          ],
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 32),
-                                    SyllabusProgressPanel(entries: _progressEntries),
-                                  ],
-                                ),
-                              ],
-                            ),
+            Text('Syllabus', style: AppTypography.dashboardTitle),
+            const SizedBox(height: 20),
+            if (width >= 720)
+              Row(
+                children: const [
+                  Expanded(flex: 3, child: _SearchField()),
+                  SizedBox(width: 20),
+                  SizedBox(width: 163, height: 48, child: _AddSubjectButton()),
+                ],
+              )
+            else ...const [
+              _SearchField(),
+              SizedBox(height: 12),
+              SizedBox(width: double.infinity, height: 48, child: _AddSubjectButton()),
+            ],
+            const SizedBox(height: 18),
+            if (width >= 720)
+              Align(
+                alignment: Alignment.centerRight,
+                child: SizedBox(width: 200, height: 44, child: _ClassSelector()),
+              )
+            else
+              SizedBox(width: double.infinity, height: 44, child: _ClassSelector()),
+            const SizedBox(height: 28),
+            if (showSidePanel)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        for (int i = 0; i < _subjects.length; i++) ...[
+                          SyllabusSubjectCard(
+                            subject: _subjects[i],
+                            expanded: i == _expandedIndex,
+                            onToggle: () {
+                              setState(() {
+                                _expandedIndex = i == _expandedIndex ? -1 : i;
+                              });
+                            },
                           ),
-                        ),
-                      ),
+                          if (i != _subjects.length - 1) const SizedBox(height: 20),
+                        ],
+                      ],
                     ),
+                  ),
+                  const SizedBox(width: 28),
+                  SizedBox(
+                    width: 360,
+                    child: SyllabusProgressPanel(entries: _progressEntries),
+                  ),
+                ],
+              )
+            else ...[
+              Column(
+                children: [
+                  for (int i = 0; i < _subjects.length; i++) ...[
+                    SyllabusSubjectCard(
+                      subject: _subjects[i],
+                      expanded: i == _expandedIndex,
+                      onToggle: () {
+                        setState(() {
+                          _expandedIndex = i == _expandedIndex ? -1 : i;
+                        });
+                      },
+                    ),
+                    if (i != _subjects.length - 1) const SizedBox(height: 20),
                   ],
-                ),
+                ],
               ),
-            ),
+              const SizedBox(height: 24),
+              SyllabusProgressPanel(entries: _progressEntries),
+            ],
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
