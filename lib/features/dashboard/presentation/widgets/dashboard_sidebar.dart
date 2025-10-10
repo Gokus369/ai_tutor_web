@@ -4,28 +4,69 @@ import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
 class DashboardSidebar extends StatelessWidget {
-  const DashboardSidebar({
-    super.key,
-    required this.activeRoute,
-  });
+  const DashboardSidebar({super.key, required this.activeRoute});
 
   final String activeRoute;
 
   static final List<_SidebarItemData> _items = [
-    _SidebarItemData(label: 'Dashboard', icon: Icons.dashboard_outlined, route: AppRoutes.dashboard),
-    _SidebarItemData(label: 'Classes', icon: Icons.school_outlined, route: AppRoutes.classes),
-    _SidebarItemData(label: 'Students', icon: Icons.group_outlined, route: AppRoutes.students),
-    _SidebarItemData(label: 'Syllabus', icon: Icons.list_alt_outlined, route: AppRoutes.syllabus),
-    _SidebarItemData(label: 'Lessons Planner', icon: Icons.calendar_month_outlined),
-    _SidebarItemData(label: 'Attendance', icon: Icons.fact_check_outlined),
+    _SidebarItemData(
+      label: 'Dashboard',
+      icon: Icons.dashboard_outlined,
+      route: AppRoutes.dashboard,
+    ),
+    _SidebarItemData(
+      label: 'Classes',
+      icon: Icons.school_outlined,
+      route: AppRoutes.classes,
+    ),
+    _SidebarItemData(
+      label: 'Students',
+      icon: Icons.group_outlined,
+      route: AppRoutes.students,
+    ),
+    _SidebarItemData(
+      label: 'Syllabus',
+      icon: Icons.list_alt_outlined,
+      route: AppRoutes.syllabus,
+    ),
+    _SidebarItemData(
+      label: 'Lessons Planner',
+      icon: Icons.calendar_month_outlined,
+      route: AppRoutes.lessons,
+    ),
+    _SidebarItemData(
+      label: 'Attendance',
+      icon: Icons.fact_check_outlined,
+      route: AppRoutes.attendance,
+    ),
     _SidebarItemData(label: 'Progress', icon: Icons.show_chart_outlined),
-    _SidebarItemData(label: 'Media Management', icon: Icons.perm_media_outlined),
-    _SidebarItemData(label: 'Instructor Cohort', icon: Icons.people_alt_outlined),
-    _SidebarItemData(label: 'Assessments', icon: Icons.assignment_turned_in_outlined),
-    _SidebarItemData(label: 'AI Tutor', icon: Icons.smart_toy_outlined, route: AppRoutes.aiTutor),
-    _SidebarItemData(label: 'Notifications', icon: Icons.notifications_outlined),
-    _SidebarItemData(label: 'Reports', icon: Icons.bar_chart_rounded, route: AppRoutes.reports),
-    _SidebarItemData(label: 'Settings', icon: Icons.settings_outlined, route: AppRoutes.settings),
+    _SidebarItemData(
+      label: 'Media Management',
+      icon: Icons.perm_media_outlined,
+    ),
+    _SidebarItemData(
+      label: 'Instructor Cohort',
+      icon: Icons.people_alt_outlined,
+    ),
+    _SidebarItemData(
+      label: 'Assessments',
+      icon: Icons.assignment_turned_in_outlined,
+    ),
+    _SidebarItemData(label: 'AI Tutor', icon: Icons.smart_toy_outlined),
+    _SidebarItemData(
+      label: 'Notifications',
+      icon: Icons.notifications_outlined,
+    ),
+    _SidebarItemData(
+      label: 'Reports',
+      icon: Icons.bar_chart_rounded,
+      route: AppRoutes.reports,
+    ),
+    _SidebarItemData(
+      label: 'Settings',
+      icon: Icons.settings_outlined,
+      route: AppRoutes.settings,
+    ),
   ];
 
   @override
@@ -59,7 +100,9 @@ class DashboardSidebar extends StatelessWidget {
                       ? null
                       : () {
                           if (data.route == activeRoute) return;
-                          Navigator.of(context).pushReplacementNamed(data.route!);
+                          Navigator.of(
+                            context,
+                          ).pushReplacementNamed(data.route!);
                         },
                 );
               },
@@ -74,11 +117,7 @@ class DashboardSidebar extends StatelessWidget {
 }
 
 class _SidebarItem extends StatefulWidget {
-  const _SidebarItem({
-    required this.data,
-    required this.active,
-    this.onTap,
-  });
+  const _SidebarItem({required this.data, required this.active, this.onTap});
 
   final _SidebarItemData data;
   final bool active;
@@ -97,8 +136,8 @@ class _SidebarItemState extends State<_SidebarItem> {
     final Color background = widget.active
         ? AppColors.primary
         : highlighted
-            ? AppColors.primary.withValues(alpha: 0.08)
-            : Colors.transparent;
+        ? AppColors.primary.withValues(alpha: 0.08)
+        : Colors.transparent;
 
     final TextStyle baseStyle = AppTypography.sidebarItem;
     final TextStyle textStyle = widget.active
@@ -110,8 +149,8 @@ class _SidebarItemState extends State<_SidebarItem> {
     final Color iconColor = widget.active
         ? Colors.white
         : highlighted
-            ? AppColors.primary
-            : AppColors.sidebarIcon;
+        ? AppColors.primary
+        : AppColors.sidebarIcon;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -126,7 +165,10 @@ class _SidebarItemState extends State<_SidebarItem> {
         child: ListTile(
           dense: true,
           minLeadingWidth: 28,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 6,
+          ),
           leading: Icon(widget.data.icon, color: iconColor, size: 22),
           title: Text(widget.data.label, style: textStyle),
           onTap: widget.onTap,
@@ -137,11 +179,7 @@ class _SidebarItemState extends State<_SidebarItem> {
 }
 
 class _SidebarItemData {
-  const _SidebarItemData({
-    required this.label,
-    required this.icon,
-    this.route,
-  });
+  const _SidebarItemData({required this.label, required this.icon, this.route});
 
   final String label;
   final IconData icon;

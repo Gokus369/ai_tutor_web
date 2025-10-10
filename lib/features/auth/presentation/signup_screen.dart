@@ -306,7 +306,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.of(context)
-                                      .pushReplacementNamed(AppRoutes.logigitn),
+                                      .pushReplacementNamed(AppRoutes.login),
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: Size.zero,
