@@ -6,6 +6,7 @@ import 'auth_repository.dart';
 import 'features/auth/presentation/signup_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/classes/presentation/classes_screen.dart';
+import 'features/ai_tutor/presentation/ai_tutor_screen.dart';
 import 'features/legal/presentation/privacy_policy_screen.dart';
 import 'features/legal/presentation/terms_of_use_screen.dart';
 import 'features/reports/presentation/reports_screen.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.classes: (_) => const ClassesScreen(),
         AppRoutes.syllabus: (_) => const SyllabusScreen(),
         AppRoutes.students: (_) => const StudentsScreen(),
+        AppRoutes.aiTutor: (_) => const AiTutorScreen(),
         AppRoutes.reports: (_) => const ReportsScreen(),
         AppRoutes.settings: (_) => const SettingsScreen(),
         AppRoutes.termsOfUse: (_) => const TermsOfUseScreen(),
