@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('AttendanceSummaryCard displays ratios and counts', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
+       MaterialApp(
         home: Scaffold(
           body: AttendanceSummaryCard(
             date: DateTime(2025, 9, 2),
