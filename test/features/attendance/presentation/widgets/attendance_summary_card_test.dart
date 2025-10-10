@@ -7,7 +7,7 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
-          body: AttendanceSummaryCard(
+          body: const AttendanceSummaryCard(
             date: DateTime(2025, 9, 2),
             totalStudents: 50,
             presentCount: 40,
