@@ -11,6 +11,8 @@ class AppRoutes {
   static const String aiTutor = '/ai-tutor';
   static const String lessons = '/lessons';
   static const String attendance = '/attendance';
+  static const String assessments = '/assessments';
+  static const String progress = '/progress';
   static const String reports = '/reports';
   static const String settings = '/settings';
   static const String termsOfUse = '/terms-of-use';

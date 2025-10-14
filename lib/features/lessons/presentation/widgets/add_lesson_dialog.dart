@@ -93,7 +93,7 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
                           width: fieldWidth(250),
                           label: 'Subject',
                           child: DropdownButtonFormField<String>(
-                            value: hasSubjects ? _selectedSubject : null,
+                            initialValue: hasSubjects ? _selectedSubject : null,
                             items: subjectItems,
                             onChanged: hasSubjects
                                 ? (value) =>
@@ -101,8 +101,9 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
                                 : null,
                             validator: (value) {
                               if (!hasSubjects) return 'No subjects available';
-                              if (value == null || value.isEmpty)
+                              if (value == null || value.isEmpty) {
                                 return 'Select a subject';
+                              }
                               return null;
                             },
                             icon: const Icon(
@@ -132,8 +133,9 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
                               hint: 'Enter your Topic',
                             ),
                             validator: (value) {
-                              if ((value ?? '').trim().isEmpty)
+                              if ((value ?? '').trim().isEmpty) {
                                 return 'Enter a topic';
+                              }
                               return null;
                             },
                           ),
@@ -147,8 +149,9 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
                               hint: 'Enter your Lesson Title',
                             ),
                             validator: (value) {
-                              if ((value ?? '').trim().isEmpty)
+                              if ((value ?? '').trim().isEmpty) {
                                 return 'Enter a lesson title';
+                              }
                               return null;
                             },
                           ),

@@ -39,7 +39,11 @@ class DashboardSidebar extends StatelessWidget {
       icon: Icons.fact_check_outlined,
       route: AppRoutes.attendance,
     ),
-    _SidebarItemData(label: 'Progress', icon: Icons.show_chart_outlined),
+    _SidebarItemData(
+      label: 'Progress',
+      icon: Icons.show_chart_outlined,
+      route: AppRoutes.progress,
+    ),
     _SidebarItemData(
       label: 'Media Management',
       icon: Icons.perm_media_outlined,
@@ -51,6 +55,7 @@ class DashboardSidebar extends StatelessWidget {
     _SidebarItemData(
       label: 'Assessments',
       icon: Icons.assignment_turned_in_outlined,
+      route: AppRoutes.assessments,
     ),
     _SidebarItemData(label: 'AI Tutor', icon: Icons.smart_toy_outlined),
     _SidebarItemData(

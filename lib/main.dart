@@ -1,7 +1,6 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-
 import 'auth_repository.dart';
 import 'features/auth/presentation/signup_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
@@ -9,6 +8,8 @@ import 'features/classes/presentation/classes_screen.dart';
 import 'features/ai_tutor/presentation/ai_tutor_screen.dart';
 import 'features/attendance/presentation/attendance_screen.dart';
 import 'features/lessons/presentation/lessons_planner_screen.dart';
+import 'features/progress/presentation/progress_screen.dart';
+import 'features/assessments/presentation/assessments_screen.dart';
 import 'features/legal/presentation/privacy_policy_screen.dart';
 import 'features/legal/presentation/terms_of_use_screen.dart';
 import 'features/reports/presentation/reports_screen.dart';
@@ -43,6 +44,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.aiTutor: (_) => const AiTutorScreen(),
         AppRoutes.lessons: (_) => const LessonsPlannerScreen(),
         AppRoutes.attendance: (_) => const AttendanceScreen(),
+        AppRoutes.progress: (_) => ProgressScreen(),
+        AppRoutes.assessments: (_) => AssessmentsScreen(),
         AppRoutes.reports: (_) => const ReportsScreen(),
         AppRoutes.settings: (_) => const SettingsScreen(),
         AppRoutes.termsOfUse: (_) => const TermsOfUseScreen(),

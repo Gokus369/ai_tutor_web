@@ -71,7 +71,7 @@ class AttendanceFiltersBar extends StatelessWidget {
             return SizedBox(
               width: dropdownWidth,
               child: DropdownButtonFormField<String>(
-                value: value,
+                initialValue: value,
                 isExpanded: true,
                 decoration: _decoration(hint: hint),
                 icon: const Icon(

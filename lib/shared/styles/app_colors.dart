@@ -60,6 +60,8 @@ class AppColors {
   static const Color statusCompletedText = Color(0xFFFFFFFF);
   static const Color statusPendingBackground = Color(0xFFFCBE2D);
   static const Color statusPendingText = Color(0xFF404040);
+  static const Color statusScheduledBackground = Color(0xFF165DFB);
+  static const Color statusScheduledText = Color(0xFFFFFFFF);
   static const Color statusErrorBackground = Color(0xFFFF4343);
   static const Color statusErrorText = Color(0xFFFFFFFF);
 
@@ -133,4 +135,13 @@ class AppColors {
   static const Color studentsPerformanceAttention = Color(0xFFFF2B2B);
   static const Color studentsStatusActive = Color(0xFF00B69B);
   static const Color studentsStatusInactive = Color(0xFF121417);
+
+  static const Color progressCardBorder = Color(0xFFD2EBF7);
+  static const Color progressSectionBorder = Color(0xFFB4DCEF);
+  static const Color progressSectionBackground = Color(0xFFF3FAFD);
+  static const Color progressSecondaryBackground = Color(0xFFF7FBFD);
+  static const Color progressModuleBorder = Color(0xFFC9E3F3);
+  static const Color progressChipBackground = Color(0xFFE8F4F8);
+  static const Color progressChipBorder = Color(0xFFB1DAED);
+  static const Color progressMetricTrack = Color(0xFFE2EFF6);
 }
