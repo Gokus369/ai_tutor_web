@@ -57,7 +57,11 @@ class DashboardSidebar extends StatelessWidget {
       icon: Icons.assignment_turned_in_outlined,
       route: AppRoutes.assessments,
     ),
-    _SidebarItemData(label: 'AI Tutor', icon: Icons.smart_toy_outlined),
+    _SidebarItemData(
+      label: 'AI Tutor',
+      icon: Icons.smart_toy_outlined,
+      route: AppRoutes.aiTutor,
+    ),
     _SidebarItemData(
       label: 'Notifications',
       icon: Icons.notifications_outlined,

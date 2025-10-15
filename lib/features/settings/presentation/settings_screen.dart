@@ -1,11 +1,16 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
+import 'package:ai_tutor_web/features/settings/data/settings_demo_data.dart';
+import 'package:ai_tutor_web/features/settings/domain/models/settings_models.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  SettingsScreen({super.key, SettingsData? data})
+      : data = data ?? SettingsDemoData.build();
+
+  final SettingsData data;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -14,36 +19,92 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
 
+  void _toggleNotifications(bool value) {
+    setState(() => _notificationsEnabled = value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return DashboardShell(
       activeRoute: AppRoutes.settings,
       builder: (context, shell) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Settings', style: AppTypography.dashboardTitle),
-            const SizedBox(height: 24),
-            _SettingsCard(
-              notificationsEnabled: _notificationsEnabled,
-              onToggleNotifications: (value) =>
-                  setState(() => _notificationsEnabled = value),
-            ),
-          ],
+        return SettingsView(
+          data: widget.data,
+          notificationsEnabled: _notificationsEnabled,
+          onToggleNotifications: _toggleNotifications,
+          onEditProfile: () {},
+          onNavigate: (_) {},
         );
       },
     );
   }
 }
 
-class _SettingsCard extends StatelessWidget {
-  const _SettingsCard({
+@visibleForTesting
+class SettingsView extends StatelessWidget {
+  const SettingsView({
+    super.key,
+    required this.data,
     required this.notificationsEnabled,
     required this.onToggleNotifications,
+    required this.onEditProfile,
+    required this.onNavigate,
   });
 
+  final SettingsData data;
   final bool notificationsEnabled;
   final ValueChanged<bool> onToggleNotifications;
+  final VoidCallback onEditProfile;
+  final ValueChanged<SettingsItem> onNavigate;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double contentWidth = constraints.maxWidth >= 1200 ? 1200 : constraints.maxWidth;
+        return Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: contentWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Settings', style: AppTypography.dashboardTitle),
+                const SizedBox(height: 24),
+                SettingsCard(
+                  profile: data.profile,
+                  sections: data.sections,
+                  notificationsEnabled: notificationsEnabled,
+                  onToggleNotifications: onToggleNotifications,
+                  onEditProfile: onEditProfile,
+                  onNavigate: onNavigate,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SettingsCard extends StatelessWidget {
+  const SettingsCard({
+    super.key,
+    required this.profile,
+    required this.sections,
+    required this.notificationsEnabled,
+    required this.onToggleNotifications,
+    required this.onEditProfile,
+    required this.onNavigate,
+  });
+
+  final SettingsProfile profile;
+  final List<SettingsSection> sections;
+  final bool notificationsEnabled;
+  final ValueChanged<bool> onToggleNotifications;
+  final VoidCallback onEditProfile;
+  final ValueChanged<SettingsItem> onNavigate;
 
   @override
   Widget build(BuildContext context) {
@@ -68,60 +129,17 @@ class _SettingsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ProfileHeader(),
+          _ProfileHeader(profile: profile, onEditProfile: onEditProfile),
           const SizedBox(height: 32),
-          _SettingsSection(
-            title: 'Account Settings',
-            children: [
-              _SettingsTile(
-                icon: Icons.lock_outline,
-                label: 'Change Password',
-                onTap: () {},
-              ),
-              _SettingsTile(
-                icon: Icons.notifications_active_outlined,
-                label: 'Manage Notifications',
-                trailing: Switch.adaptive(
-                  value: notificationsEnabled,
-                  onChanged: onToggleNotifications,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 28),
-          _SettingsSection(
-            title: 'Preferences',
-            children: [
-              _SettingsTile(
-                icon: Icons.menu_book_outlined,
-                label: 'Academic Preferences',
-                onTap: () {},
-              ),
-            ],
-          ),
-          const SizedBox(height: 28),
-          _SettingsSection(
-            title: 'Info',
-            children: [
-              _SettingsTile(
-                icon: Icons.info_outline,
-                label: 'About Us',
-                onTap: () {},
-              ),
-              _SettingsTile(
-                icon: Icons.description_outlined,
-                label: 'Term & Conditions',
-                onTap: () {},
-              ),
-            ],
-          ),
-          const SizedBox(height: 28),
-          _SettingsTile(
-            icon: Icons.logout_rounded,
-            label: 'Logout',
-            onTap: () {},
-            accent: true,
-          ),
+          for (final section in sections) ...[
+            SettingsSectionWidget(
+              section: section,
+              notificationsEnabled: notificationsEnabled,
+              onToggleNotifications: onToggleNotifications,
+              onNavigate: onNavigate,
+            ),
+            const SizedBox(height: 28),
+          ],
         ],
       ),
     );
@@ -129,60 +147,48 @@ class _SettingsCard extends StatelessWidget {
 }
 
 class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({required this.profile, required this.onEditProfile});
+
+  final SettingsProfile profile;
+  final VoidCallback onEditProfile;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool isCompact = constraints.maxWidth < 720;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (isCompact) ...[
-              _ProfileDetails(),
+        final profileDetails = _ProfileDetails(profile: profile);
+        final editButton = SizedBox(
+          width: 163,
+          height: 50,
+          child: FilledButton(
+            onPressed: onEditProfile,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              textStyle: AppTypography.button.copyWith(fontSize: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            ),
+            child: const Text('Edit Profile'),
+          ),
+        );
+
+        if (isCompact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              profileDetails,
               const SizedBox(height: 24),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
-                  width: 163,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      textStyle: AppTypography.button.copyWith(fontSize: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                    child: const Text('Edit Profile'),
-                  ),
-                ),
-              ),
-            ] else
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const _ProfileDetails(),
-                  const Spacer(),
-                  SizedBox(
-                    width: 163,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        textStyle: AppTypography.button.copyWith(fontSize: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-                      child: const Text('Edit Profile'),
-                    ),
-                  ),
-                ],
-              ),
+              editButton,
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(child: profileDetails),
+            editButton,
           ],
         );
       },
@@ -191,76 +197,43 @@ class _ProfileHeader extends StatelessWidget {
 }
 
 class _ProfileDetails extends StatelessWidget {
-  const _ProfileDetails();
+  const _ProfileDetails({required this.profile});
+
+  final SettingsProfile profile;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          width: 96,
-          height: 96,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            border: Border.all(color: AppColors.sidebarBorder, width: 1.2),
-            boxShadow: const [
-              BoxShadow(
-                color: AppColors.shadow,
-                blurRadius: 50,
-                offset: Offset(0, 10),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(50),
-            child: Image.network(
-              'https://i.pravatar.cc/150?img=47',
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                color: AppColors.summaryTileBackground,
-                alignment: Alignment.center,
-                child: Text(
-                  'MR',
-                  style: AppTypography.sectionTitle.copyWith(
-                    fontSize: 24,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
+        CircleAvatar(
+          radius: 36,
+          backgroundColor: profile.avatarColor.withValues(alpha: 0.12),
+          child: Text(
+            profile.name.substring(0, 1),
+            style: AppTypography.dashboardTitle.copyWith(
+              fontSize: 28,
+              color: profile.avatarColor,
             ),
           ),
         ),
-        const SizedBox(width: 24),
+        const SizedBox(width: 20),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Moni Roy',
-              style: AppTypography.sectionTitle.copyWith(fontSize: 24),
+              profile.name,
+              style: AppTypography.sectionTitle.copyWith(fontSize: 22),
             ),
             const SizedBox(height: 6),
             Text(
-              'moni.roy123@gmail.com',
-              style: AppTypography.bodySmall.copyWith(
-                fontSize: 14,
-                color: AppColors.textMuted,
-              ),
+              profile.role,
+              style: AppTypography.bodySmall.copyWith(fontSize: 14, color: AppColors.textMuted),
             ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.accentGreen.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Text(
-                'Teacher',
-                style: AppTypography.bodySmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.accentGreen,
-                ),
-              ),
+            const SizedBox(height: 4),
+            Text(
+              profile.email,
+              style: AppTypography.bodySmall.copyWith(fontSize: 13, color: AppColors.grey),
             ),
           ],
         ),
@@ -269,29 +242,51 @@ class _ProfileDetails extends StatelessWidget {
   }
 }
 
-class _SettingsSection extends StatelessWidget {
-  const _SettingsSection({required this.title, required this.children});
+class SettingsSectionWidget extends StatelessWidget {
+  const SettingsSectionWidget({
+    super.key,
+    required this.section,
+    required this.notificationsEnabled,
+    required this.onToggleNotifications,
+    required this.onNavigate,
+  });
 
-  final String title;
-  final List<Widget> children;
+  final SettingsSection section;
+  final bool notificationsEnabled;
+  final ValueChanged<bool> onToggleNotifications;
+  final ValueChanged<SettingsItem> onNavigate;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: AppTypography.sectionTitle.copyWith(fontSize: 18),
-        ),
-        const SizedBox(height: 18),
-        Column(
-          children: [
-            for (int i = 0; i < children.length; i++) ...[
-              if (i > 0) const SizedBox(height: 16),
-              children[i],
+        Text(section.title, style: AppTypography.sectionTitle.copyWith(fontSize: 18)),
+        const SizedBox(height: 16),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.sidebarBorder),
+          ),
+          child: Column(
+            children: [
+              for (int i = 0; i < section.items.length; i++) ...[
+                if (i > 0)
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: AppColors.sidebarBorder,
+                  ),
+                _SettingsTile(
+                  item: section.items[i],
+                  notificationsEnabled: notificationsEnabled,
+                  onToggleNotifications: onToggleNotifications,
+                  onNavigate: onNavigate,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ],
     );
@@ -300,77 +295,55 @@ class _SettingsSection extends StatelessWidget {
 
 class _SettingsTile extends StatelessWidget {
   const _SettingsTile({
-    required this.icon,
-    required this.label,
-    this.onTap,
-    this.trailing,
-    this.accent = false,
+    required this.item,
+    required this.notificationsEnabled,
+    required this.onToggleNotifications,
+    required this.onNavigate,
   });
 
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-  final Widget? trailing;
-  final bool accent;
+  final SettingsItem item;
+  final bool notificationsEnabled;
+  final ValueChanged<bool> onToggleNotifications;
+  final ValueChanged<SettingsItem> onNavigate;
 
   @override
   Widget build(BuildContext context) {
-    final Color baseBackground = Colors.white;
-    final Color borderColor = accent
-        ? AppColors.accentPink.withValues(alpha: 0.4)
-        : AppColors.sidebarBorder.withValues(alpha: 0.8);
-    final Color iconBackground = accent
-        ? AppColors.accentPink.withValues(alpha: 0.14)
-        : AppColors.searchFieldBackground;
-    final Color iconColor = accent ? AppColors.accentPink : AppColors.primary;
-    final TextStyle textStyle = AppTypography.bodySmall.copyWith(
-      fontSize: 16,
-      fontWeight: FontWeight.w600,
-      color: accent ? AppColors.accentPink : AppColors.textPrimary,
-    );
+    final bool isToggle = item.kind == SettingsItemKind.toggle;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          height: 92,
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          decoration: BoxDecoration(
-            color: baseBackground,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: borderColor),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: iconBackground,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                alignment: Alignment.center,
-                child: Icon(icon, color: iconColor, size: 26),
-              ),
-              const SizedBox(width: 22),
-              Expanded(
-                child: Text(
-                  label,
-                  style: textStyle,
+    return InkWell(
+      onTap: isToggle ? null : _handleTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        child: Row(
+          children: [
+            Icon(item.icon,
+                color: item.destructive ? AppColors.accentOrange : AppColors.primary),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                item.label,
+                style: AppTypography.bodySmall.copyWith(
+                  fontSize: 15,
+                  fontWeight: item.destructive ? FontWeight.w700 : FontWeight.w600,
+                  color: item.destructive ? AppColors.accentOrange : AppColors.textPrimary,
                 ),
               ),
-              trailing ??
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppColors.iconMuted,
-                    size: 28,
-                  ),
-            ],
-          ),
+            ),
+            if (isToggle)
+              Switch.adaptive(
+                value: notificationsEnabled,
+                onChanged: onToggleNotifications,
+              )
+            else
+              const Icon(Icons.chevron_right_rounded, color: AppColors.iconMuted),
+          ],
         ),
       ),
     );
+  }
+
+  void _handleTap() {
+    onNavigate(item);
   }
 }

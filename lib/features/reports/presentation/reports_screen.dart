@@ -1,80 +1,169 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
+import 'package:ai_tutor_web/features/reports/data/reports_demo_data.dart';
+import 'package:ai_tutor_web/features/reports/domain/models/reports_models.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
 class ReportsScreen extends StatefulWidget {
-  const ReportsScreen({super.key});
+  ReportsScreen({super.key, ReportsData? data}) : data = data ?? ReportsDemoData.build();
+
+  final ReportsData data;
 
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
-  final List<String> _classes = const ['Class 12', 'Class 11', 'Class 10', 'Class 9'];
-  String _selectedClass = 'Class 10';
+  late ReportsData _data = widget.data;
+  late String _selectedClass = widget.data.initialClass;
 
-  final List<_SubjectProgressData> _subjects = const [
-    _SubjectProgressData('Mathematics', 0.85),
-    _SubjectProgressData('Physics', 0.72),
-    _SubjectProgressData('Chemistry', 0.64),
-    _SubjectProgressData('Biology', 0.83),
-    _SubjectProgressData('Social Studies', 0.92),
-    _SubjectProgressData('English', 0.56),
-  ];
+  @override
+  void didUpdateWidget(covariant ReportsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data) {
+      _data = widget.data;
+      _selectedClass = _data.initialClass;
+    }
+  }
+
+  void _onClassChanged(String value) {
+    setState(() => _selectedClass = value);
+  }
 
   @override
   Widget build(BuildContext context) {
     return DashboardShell(
       activeRoute: AppRoutes.reports,
       builder: (context, shell) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text('Reports', style: AppTypography.dashboardTitle),
-                ),
-                _ClassSelector(
-                  classes: _classes,
-                  value: _selectedClass,
-                  onChanged: (value) => setState(() => _selectedClass = value),
-                ),
-                const SizedBox(width: 16),
-                SizedBox(
-                  width: 147,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      textStyle: AppTypography.button.copyWith(fontSize: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                    child: const Text('Export Report'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 28),
-            _MetricCardsRow(),
-            const SizedBox(height: 28),
-            _SubjectProgressPanel(subjects: _subjects),
-          ],
+        return ReportsView(
+          data: _data,
+          selectedClass: _selectedClass,
+          onClassChanged: _onClassChanged,
+          onExportPressed: () {},
         );
       },
     );
   }
 }
 
-class _ClassSelector extends StatelessWidget {
-  const _ClassSelector({
+@visibleForTesting
+class ReportsView extends StatelessWidget {
+  const ReportsView({
+    super.key,
+    required this.data,
+    required this.selectedClass,
+    required this.onClassChanged,
+    required this.onExportPressed,
+  });
+
+  final ReportsData data;
+  final String selectedClass;
+  final ValueChanged<String> onClassChanged;
+  final VoidCallback onExportPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double contentWidth = constraints.maxWidth >= 1200 ? 1200 : constraints.maxWidth;
+        final bool compact = contentWidth < 960;
+        final EdgeInsets panelPadding = compact
+            ? const EdgeInsets.symmetric(horizontal: 24, vertical: 24)
+            : const EdgeInsets.symmetric(horizontal: 30, vertical: 30);
+
+        return Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: contentWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _ReportsHeader(
+                  data: data,
+                  selectedClass: selectedClass,
+                  onClassChanged: onClassChanged,
+                  onExportPressed: onExportPressed,
+                ),
+                const SizedBox(height: 28),
+                ReportsMetricsSection(metrics: data.metrics),
+                const SizedBox(height: 28),
+                ReportsSubjectsPanel(subjects: data.subjects, padding: panelPadding),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ReportsHeader extends StatelessWidget {
+  const _ReportsHeader({
+    required this.data,
+    required this.selectedClass,
+    required this.onClassChanged,
+    required this.onExportPressed,
+  });
+
+  final ReportsData data;
+  final String selectedClass;
+  final ValueChanged<String> onClassChanged;
+  final VoidCallback onExportPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool narrow = MediaQuery.sizeOf(context).width < 720;
+    final dropdown = ReportsClassSelector(
+      classes: data.classOptions,
+      value: selectedClass,
+      onChanged: onClassChanged,
+    );
+
+    final exportButton = SizedBox(
+      width: 147,
+      height: 50,
+      child: FilledButton(
+        onPressed: onExportPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          textStyle: AppTypography.button.copyWith(fontSize: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        ),
+        child: const Text('Export Report'),
+      ),
+    );
+
+    if (narrow) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Reports', style: AppTypography.dashboardTitle),
+          const SizedBox(height: 18),
+          dropdown,
+          const SizedBox(height: 12),
+          exportButton,
+        ],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: Text('Reports', style: AppTypography.dashboardTitle)),
+        dropdown,
+        const SizedBox(width: 16),
+        exportButton,
+      ],
+    );
+  }
+}
+
+class ReportsClassSelector extends StatelessWidget {
+  const ReportsClassSelector({
+    super.key,
     required this.classes,
     required this.value,
     required this.onChanged,
@@ -87,7 +176,7 @@ class _ClassSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 152,
+      width: 172,
       child: InputDecorator(
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
@@ -104,7 +193,7 @@ class _ClassSelector extends StatelessWidget {
           child: DropdownButton<String>(
             value: value,
             icon: const Icon(Icons.expand_more_rounded, color: AppColors.iconMuted),
-            isDense: true,
+            isExpanded: true,
             onChanged: (selected) {
               if (selected == null) return;
               onChanged(selected);
@@ -130,51 +219,31 @@ class _ClassSelector extends StatelessWidget {
   }
 }
 
-class _MetricCardsRow extends StatelessWidget {
+class ReportsMetricsSection extends StatelessWidget {
+  const ReportsMetricsSection({super.key, required this.metrics});
+
+  final List<ReportMetric> metrics;
+
   @override
   Widget build(BuildContext context) {
-    final metrics = [
-      _MetricCardData(
-        title: 'Syllabus Completion',
-        value: '65%',
-        icon: Icons.menu_book_outlined,
-        iconBackground: AppColors.accentPurple.withValues(alpha: 0.12),
-        iconColor: AppColors.accentPurple,
-      ),
-      _MetricCardData(
-        title: 'Pass Rate',
-        value: '75%',
-        icon: Icons.trending_up_rounded,
-        iconBackground: AppColors.accentGreen.withValues(alpha: 0.16),
-        iconColor: AppColors.accentGreen,
-      ),
-      _MetricCardData(
-        title: 'Needs Attention',
-        value: '5',
-        icon: Icons.warning_amber_rounded,
-        iconBackground: AppColors.accentOrange.withValues(alpha: 0.16),
-        iconColor: AppColors.accentOrange,
-      ),
-    ];
-
     return LayoutBuilder(
       builder: (context, constraints) {
-        final bool wrap = constraints.maxWidth < 1020;
-        final children = metrics
-            .map(
-              (metric) => SizedBox(
-                width: wrap ? constraints.maxWidth : 360,
-                child: _MetricCard(data: metric),
-              ),
-            )
-            .toList();
+        final double maxWidth = constraints.maxWidth;
+        final bool wrap = maxWidth < 1080;
+        final List<Widget> cards = List.generate(metrics.length, (index) {
+          final metric = metrics[index];
+          return SizedBox(
+            width: wrap ? double.infinity : 340,
+            child: ReportsMetricCard(key: ValueKey('reports-metric-$index'), metric: metric),
+          );
+        });
 
         if (wrap) {
           return Column(
             children: [
-              for (int i = 0; i < children.length; i++) ...[
+              for (int i = 0; i < cards.length; i++) ...[
                 if (i > 0) const SizedBox(height: 16),
-                children[i],
+                cards[i],
               ],
             ],
           );
@@ -182,9 +251,9 @@ class _MetricCardsRow extends StatelessWidget {
 
         return Row(
           children: [
-            for (int i = 0; i < children.length; i++) ...[
+            for (int i = 0; i < cards.length; i++) ...[
               if (i > 0) const SizedBox(width: 20),
-              children[i],
+              cards[i],
             ],
           ],
         );
@@ -193,26 +262,10 @@ class _MetricCardsRow extends StatelessWidget {
   }
 }
 
-class _MetricCardData {
-  const _MetricCardData({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.iconBackground,
-    required this.iconColor,
-  });
+class ReportsMetricCard extends StatelessWidget {
+  const ReportsMetricCard({super.key, required this.metric});
 
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color iconBackground;
-  final Color iconColor;
-}
-
-class _MetricCard extends StatelessWidget {
-  const _MetricCard({required this.data});
-
-  final _MetricCardData data;
+  final ReportMetric metric;
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +292,7 @@ class _MetricCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  data.title,
+                  metric.title,
                   style: AppTypography.bodySmall.copyWith(
                     fontSize: 15,
                     color: AppColors.textMuted,
@@ -247,7 +300,7 @@ class _MetricCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  data.value,
+                  metric.value,
                   style: AppTypography.dashboardTitle.copyWith(fontSize: 28),
                 ),
               ],
@@ -257,11 +310,11 @@ class _MetricCard extends StatelessWidget {
             width: 54,
             height: 54,
             decoration: BoxDecoration(
-              color: data.iconBackground,
+              color: metric.iconBackground,
               borderRadius: BorderRadius.circular(18),
             ),
             alignment: Alignment.center,
-            child: Icon(data.icon, color: data.iconColor, size: 28),
+            child: Icon(metric.icon, color: metric.iconColor, size: 28),
           ),
         ],
       ),
@@ -269,15 +322,16 @@ class _MetricCard extends StatelessWidget {
   }
 }
 
-class _SubjectProgressPanel extends StatelessWidget {
-  const _SubjectProgressPanel({required this.subjects});
+class ReportsSubjectsPanel extends StatelessWidget {
+  const ReportsSubjectsPanel({super.key, required this.subjects, required this.padding});
 
-  final List<_SubjectProgressData> subjects;
+  final List<SubjectProgress> subjects;
+  final EdgeInsets padding;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(32, 32, 32, 36),
+      padding: padding,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFFE4F0F5), Color(0xFFF5FBFD)],
@@ -297,16 +351,13 @@ class _SubjectProgressPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Subject Progress',
-            style: AppTypography.sectionTitle.copyWith(fontSize: 20),
-          ),
+          Text('Subject Progress', style: AppTypography.sectionTitle.copyWith(fontSize: 20)),
           const SizedBox(height: 24),
           Column(
             children: [
-              for (int index = 0; index < subjects.length; index++) ...[
-                if (index > 0) const SizedBox(height: 20),
-                _SubjectProgressTile(data: subjects[index]),
+              for (int i = 0; i < subjects.length; i++) ...[
+                if (i > 0) const SizedBox(height: 20),
+                SubjectProgressTile(data: subjects[i]),
               ],
             ],
           ),
@@ -316,23 +367,17 @@ class _SubjectProgressPanel extends StatelessWidget {
   }
 }
 
-class _SubjectProgressData {
-  const _SubjectProgressData(this.subject, this.progress);
+class SubjectProgressTile extends StatelessWidget {
+  const SubjectProgressTile({super.key, required this.data});
 
-  final String subject;
-  final double progress;
-}
-
-class _SubjectProgressTile extends StatelessWidget {
-  const _SubjectProgressTile({required this.data});
-
-  final _SubjectProgressData data;
+  final SubjectProgress data;
 
   @override
   Widget build(BuildContext context) {
-    final double percentage = (data.progress * 100).clamp(0, 100).roundToDouble();
+    final double percentage = (data.progress.clamp(0, 1) * 100).roundToDouble();
 
     return Container(
+      key: ValueKey('reports-subject-${data.subject}'),
       height: 72,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
@@ -364,7 +409,7 @@ class _SubjectProgressTile extends StatelessWidget {
                       value: data.progress.clamp(0, 1),
                       minHeight: 10,
                       backgroundColor: AppColors.searchFieldBorder.withValues(alpha: 0.3),
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
                     ),
                   ),
                 ),

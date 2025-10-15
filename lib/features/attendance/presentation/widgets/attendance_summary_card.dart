@@ -45,7 +45,7 @@ class AttendanceSummaryCard extends StatelessWidget {
         border: Border.all(color: AppColors.summaryCardBorder),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withOpacity(0.16),
+            color: AppColors.shadow.withValues(alpha: 0.16),
             blurRadius: 24,
             offset: const Offset(0, 16),
           ),
@@ -82,7 +82,7 @@ class AttendanceSummaryCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 _SummaryHighlightChip(
                   label: attendanceLabel,
-                  background: AppColors.accentGreen.withOpacity(0.18),
+                  background: AppColors.accentGreen.withValues(alpha: 0.18),
                   textColor: AppColors.accentGreen,
                 ),
                 const SizedBox(height: 12),
@@ -150,7 +150,7 @@ class _SummaryStatusRow extends StatelessWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, size: 18, color: color),
@@ -182,7 +182,7 @@ class _SummaryCountBadge extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 32, minHeight: 28),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

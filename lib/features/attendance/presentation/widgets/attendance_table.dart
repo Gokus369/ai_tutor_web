@@ -25,7 +25,7 @@ class AttendanceTable extends StatelessWidget {
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withOpacity(0.14),
+            color: AppColors.shadow.withValues(alpha: 0.14),
             blurRadius: 30,
             offset: const Offset(0, 18),
           ),
@@ -294,7 +294,7 @@ class _AttendanceStatusPill extends StatelessWidget {
     final List<BoxShadow>? shadow = selected
         ? [
             BoxShadow(
-              color: activeColor.withOpacity(0.32),
+              color: activeColor.withValues(alpha: 0.32),
               blurRadius: 18,
               offset: const Offset(0, 10),
             ),

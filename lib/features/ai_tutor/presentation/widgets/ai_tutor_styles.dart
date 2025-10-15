@@ -7,33 +7,35 @@ class AiTutorStyles {
   AiTutorStyles._();
 
   static BoxDecoration panelDecoration() {
+    final Color borderColor = AppColors.sidebarBorder.withValues(alpha: 0.65);
     return BoxDecoration(
       gradient: const LinearGradient(
-        colors: [Color(0xFFE1EEF3), Color(0xFFF6FBFD)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
+        colors: [Color(0xFFE6F1F6), Color(0xFFF7FBFD)],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
       ),
-      borderRadius: BorderRadius.circular(28),
-      border: Border.all(color: AppColors.sidebarBorder),
+      borderRadius: BorderRadius.circular(36),
+      border: Border.all(color: borderColor, width: 1),
       boxShadow: const [
         BoxShadow(
-          color: AppColors.shadow,
-          blurRadius: 22,
-          offset: Offset(0, 16),
+          color: Color(0x1A2B3034),
+          blurRadius: 24,
+          offset: Offset(0, 18),
         ),
       ],
     );
   }
 
   static BoxDecoration sectionCard() {
+    final Color borderColor = AppColors.sidebarBorder.withValues(alpha: 0.7);
     return BoxDecoration(
       color: AppColors.white,
-      borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: AppColors.sidebarBorder),
+      borderRadius: BorderRadius.circular(26),
+      border: Border.all(color: borderColor, width: 1),
       boxShadow: const [
         BoxShadow(
-          color: Color(0x14000000),
-          blurRadius: 12,
+          color: Color(0x112B3034),
+          blurRadius: 18,
           offset: Offset(0, 12),
         ),
       ],
@@ -42,7 +44,7 @@ class AiTutorStyles {
 
   static InputBorder inputBorder() {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(14),
       borderSide: const BorderSide(color: AppColors.sidebarBorder),
     );
   }
