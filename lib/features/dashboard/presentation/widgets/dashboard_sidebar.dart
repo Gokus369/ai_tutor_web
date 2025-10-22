@@ -65,6 +65,7 @@ class DashboardSidebar extends StatelessWidget {
     _SidebarItemData(
       label: 'Notifications',
       icon: Icons.notifications_outlined,
+      route: AppRoutes.notifications,
     ),
     _SidebarItemData(
       label: 'Reports',

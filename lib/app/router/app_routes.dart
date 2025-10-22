@@ -15,6 +15,7 @@ class AppRoutes {
   static const String progress = '/progress';
   static const String reports = '/reports';
   static const String settings = '/settings';
+  static const String notifications = '/notifications';
   static const String termsOfUse = '/terms-of-use';
   static const String privacyPolicy = '/privacy-policy';
 }

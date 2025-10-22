@@ -13,6 +13,7 @@ import 'features/progress/presentation/progress_screen.dart';
 import 'features/assessments/presentation/assessments_screen.dart';
 import 'features/legal/presentation/privacy_policy_screen.dart';
 import 'features/legal/presentation/terms_of_use_screen.dart';
+import 'features/notifications/presentation/notifications_screen.dart';
 import 'features/reports/presentation/reports_screen.dart';
 import 'features/settings/presentation/settings_screen.dart';
 import 'features/students/presentation/students_screen.dart';
@@ -45,10 +46,12 @@ class MyApp extends StatelessWidget {
         AppRoutes.aiTutor: (_) => const AiTutorScreen(),
         AppRoutes.lessons: (_) => const LessonsPlannerScreen(),
         AppRoutes.attendance: (_) => const AttendanceScreen(),
-        AppRoutes.progress: (_) => ProgressScreen(data: ProgressDemoData.build()),
+        AppRoutes.progress: (_) =>
+            ProgressScreen(data: ProgressDemoData.build()),
         AppRoutes.assessments: (_) => AssessmentsScreen(),
+        AppRoutes.notifications: (_) => NotificationsScreen(),
         AppRoutes.reports: (_) => ReportsScreen(),
-        AppRoutes.settings: (_) =>  SettingsScreen(),
+        AppRoutes.settings: (_) => SettingsScreen(),
         AppRoutes.termsOfUse: (_) => const TermsOfUseScreen(),
         AppRoutes.privacyPolicy: (_) => const PrivacyPolicyScreen(),
       },
