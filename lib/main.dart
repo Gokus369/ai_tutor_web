@@ -18,6 +18,8 @@ import 'features/reports/presentation/reports_screen.dart';
 import 'features/settings/presentation/settings_screen.dart';
 import 'features/students/presentation/students_screen.dart';
 import 'features/syllabus/presentation/syllabus_screen.dart';
+import 'features/media/presentation/media_management_screen.dart';
+import 'features/instructor_cohort/presentation/instructor_cohort_screen.dart';
 import 'screens/login_screen.dart';
 
 void main() {
@@ -48,6 +50,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.attendance: (_) => const AttendanceScreen(),
         AppRoutes.progress: (_) =>
             ProgressScreen(data: ProgressDemoData.build()),
+        AppRoutes.mediaManagement: (_) => const MediaManagementScreen(),
+        AppRoutes.instructorCohort: (_) => const InstructorCohortScreen(),
         AppRoutes.assessments: (_) => AssessmentsScreen(),
         AppRoutes.notifications: (_) => NotificationsScreen(),
         AppRoutes.reports: (_) => ReportsScreen(),

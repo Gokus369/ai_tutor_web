@@ -47,10 +47,12 @@ class DashboardSidebar extends StatelessWidget {
     _SidebarItemData(
       label: 'Media Management',
       icon: Icons.perm_media_outlined,
+      route: AppRoutes.mediaManagement,
     ),
     _SidebarItemData(
       label: 'Instructor Cohort',
       icon: Icons.people_alt_outlined,
+      route: AppRoutes.instructorCohort,
     ),
     _SidebarItemData(
       label: 'Assessments',
