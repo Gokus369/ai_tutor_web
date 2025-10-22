@@ -2,6 +2,7 @@ import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/notifications/domain/models/notification_filters.dart';
 import 'package:ai_tutor_web/features/notifications/domain/models/notification_item.dart';
 import 'package:ai_tutor_web/features/notifications/domain/services/notification_filter_service.dart';
+import 'package:ai_tutor_web/features/notifications/presentation/widgets/create_notification_dialog.dart';
 import 'package:ai_tutor_web/features/notifications/presentation/widgets/notification_filters_bar.dart';
 import 'package:ai_tutor_web/features/notifications/presentation/widgets/notifications_table.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
@@ -60,10 +61,6 @@ final List<NotificationItem> _seedNotifications = List.unmodifiable([
     status: NotificationStatus.completed,
   ),
 ]);
-
-const SnackBar _createNotificationSnackBar = SnackBar(
-  content: Text('Create notification action tapped'),
-);
 
 class NotificationsScreen extends StatefulWidget {
   NotificationsScreen({
@@ -160,6 +157,69 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     _updateFilters((_) => NotificationFilters.initial());
   }
 
+  Future<void> _showCreateNotificationDialog(BuildContext context) async {
+    final List<String> recipients = _buildRecipientOptions();
+    final messenger = ScaffoldMessenger.of(context);
+
+    final CreateNotificationRequest? result =
+        await showDialog<CreateNotificationRequest>(
+      context: context,
+      builder: (dialogContext) => CreateNotificationDialog(
+        recipientOptions: recipients,
+        initialRecipient: _filters.className,
+        initialType: _filters.type ?? NotificationType.assignment,
+      ),
+    );
+
+    if (!mounted || result == null) return;
+
+    setState(() {
+      _allNotifications.insert(
+        0,
+        NotificationItem(
+          title: result.title,
+          type: result.type,
+          recipient: result.recipient,
+          scheduledFor: DateTime.now(),
+          status: NotificationStatus.scheduled,
+        ),
+      );
+    });
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('Notification "${result.title}" created'),
+      ),
+    );
+  }
+
+  List<String> _buildRecipientOptions() {
+    final List<String> options = [];
+    final Set<String> seen = {};
+
+    for (final option in widget.filterOptions.classroomOptions) {
+      final String candidate =
+          (option.value ?? option.label).trim();
+      if (candidate.isEmpty || seen.contains(candidate)) continue;
+      seen.add(candidate);
+      options.add(candidate);
+    }
+
+    final String? currentSelection = _filters.className?.trim();
+    if (currentSelection != null &&
+        currentSelection.isNotEmpty &&
+        !seen.contains(currentSelection)) {
+      options.insert(0, currentSelection);
+      seen.add(currentSelection);
+    }
+
+    if (options.isEmpty) {
+      options.add('All Students');
+    }
+
+    return options;
+  }
+
   @override
   Widget build(BuildContext context) {
     return DashboardShell(
@@ -180,11 +240,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 Text('Notifications', style: AppTypography.dashboardTitle),
                 const Spacer(),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      _createNotificationSnackBar,
-                    );
-                  },
+                  onPressed: () => _showCreateNotificationDialog(context),
                   icon: const Icon(Icons.add, size: 20),
                   label: const Text('Create Notifications'),
                   style: ElevatedButton.styleFrom(
