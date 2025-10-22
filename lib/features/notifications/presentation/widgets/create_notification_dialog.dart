@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:ai_tutor_web/features/notifications/domain/models/notification_item.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
@@ -43,7 +45,8 @@ class _CreateNotificationDialogState extends State<CreateNotificationDialog> {
     _titleController = TextEditingController();
     _messageController = TextEditingController();
     _selectedType = widget.initialType;
-    _selectedRecipient = widget.initialRecipient ??
+    _selectedRecipient =
+        widget.initialRecipient ??
         (widget.recipientOptions.isNotEmpty
             ? widget.recipientOptions.first
             : '');
@@ -73,173 +76,136 @@ class _CreateNotificationDialogState extends State<CreateNotificationDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final EdgeInsets contentPadding =
-        const EdgeInsets.symmetric(horizontal: 52, vertical: 36);
+    final EdgeInsets contentPadding = const EdgeInsets.symmetric(
+      horizontal: 52,
+      vertical: 36,
+    );
 
     return Dialog(
       insetPadding: const EdgeInsets.all(24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: ConstrainedBox(
-        constraints:
-            const BoxConstraints.tightFor(width: CreateNotificationDialog._dialogWidth),
+        constraints: const BoxConstraints(
+          maxWidth: CreateNotificationDialog._dialogWidth,
+        ),
         child: Padding(
           padding: contentPadding,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: CreateNotificationDialog._titleWidth,
-                  child: Text(
-                    'Create Notifications',
-                    style: AppTypography.sectionTitle,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 28),
-                _LabeledField(
-                  label: 'Title',
-                  child: _SizedField(
-                    width: CreateNotificationDialog._inputWidth,
-                    height: CreateNotificationDialog._inputHeight,
-                    child: TextFormField(
-                      controller: _titleController,
-                      validator: _nonEmptyValidator,
-                      decoration: _inputDecoration('Enter Notification Title'),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: CreateNotificationDialog._titleWidth,
+                    child: Text(
+                      'Create Notifications',
+                      style: AppTypography.sectionTitle,
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                _LabeledField(
-                  label: 'Message',
-                  child: _SizedField(
-                    width: CreateNotificationDialog._inputWidth,
-                    height: CreateNotificationDialog._messageHeight,
-                    child: TextFormField(
-                      controller: _messageController,
-                      validator: _nonEmptyValidator,
-                      maxLines: null,
-                      expands: true,
-                      decoration: _inputDecoration('Enter Notification Message')
-                          .copyWith(contentPadding: const EdgeInsets.all(16)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: CreateNotificationDialog._inputWidth,
-                  height: CreateNotificationDialog._messageHeight,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: CreateNotificationDialog._halfInputWidth,
-                        child: _LabeledField(
-                          label: 'Category',
-                          child: _SizedField(
-                            width: CreateNotificationDialog._halfInputWidth,
-                            height: CreateNotificationDialog._inputHeight,
-                            child: DropdownButtonFormField<NotificationType>(
-                              key: ValueKey(_selectedType),
-                              initialValue: _selectedType,
-                              decoration: _inputDecoration(null).copyWith(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 20,
-                                ),
-                              ),
-                              items: NotificationType.values
-                                  .map(
-                                    (type) => DropdownMenuItem(
-                                      value: type,
-                                      child: Text(type.label),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() => _selectedType = value);
-                                }
-                              },
-                            ),
-                          ),
+                  const SizedBox(height: 28),
+                  _LabeledField(
+                    label: 'Title',
+                    child: _SizedField(
+                      width: CreateNotificationDialog._inputWidth,
+                      height: CreateNotificationDialog._inputHeight,
+                      child: TextFormField(
+                        controller: _titleController,
+                        validator: _nonEmptyValidator,
+                        decoration: _inputDecoration(
+                          'Enter Notification Title',
                         ),
                       ),
-                      const SizedBox(width: 17),
-                      SizedBox(
-                        width: CreateNotificationDialog._halfInputWidth,
-                        child: _LabeledField(
-                          label: 'Recipients',
-                          child: _SizedField(
-                            width: CreateNotificationDialog._halfInputWidth,
-                            height: CreateNotificationDialog._inputHeight,
-                            child: DropdownButtonFormField<String>(
-                              key: ValueKey(_selectedRecipient),
-                              initialValue: _selectedRecipient,
-                              decoration: _inputDecoration(null).copyWith(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 20,
-                                ),
-                              ),
-                              items: widget.recipientOptions
-                                  .map(
-                                    (recipient) => DropdownMenuItem(
-                                      value: recipient,
-                                      child: Text(recipient),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() => _selectedRecipient = value);
-                                }
-                              },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _LabeledField(
+                    label: 'Message',
+                    child: _SizedField(
+                      width: CreateNotificationDialog._inputWidth,
+                      height: CreateNotificationDialog._messageHeight,
+                      child: TextFormField(
+                        controller: _messageController,
+                        validator: _nonEmptyValidator,
+                        maxLines: null,
+                        expands: true,
+                        decoration: _inputDecoration(
+                          'Enter Notification Message',
+                        ).copyWith(contentPadding: const EdgeInsets.all(16)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _CategoryRecipientFields(
+                    maxWidth: CreateNotificationDialog._inputWidth,
+                    selectedType: _selectedType,
+                    onTypeChanged: (value) =>
+                        setState(() => _selectedType = value),
+                    selectedRecipient: _selectedRecipient,
+                    onRecipientChanged: (value) =>
+                        setState(() => _selectedRecipient = value),
+                    recipientOptions: widget.recipientOptions,
+                    decoration: _inputDecoration(null).copyWith(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _SizedField(
+                        width: CreateNotificationDialog._buttonWidth,
+                        height: CreateNotificationDialog._buttonHeight,
+                        child: OutlinedButton(
+                          onPressed: _handleCancel,
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: AppColors.primary.withValues(alpha: 0.7),
+                            ),
+                            foregroundColor: AppColors.primary,
+                            textStyle: AppTypography.button.copyWith(
+                              color: AppColors.primary,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 14,
                             ),
                           ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                      _SizedField(
+                        width: CreateNotificationDialog._buttonWidth,
+                        height: CreateNotificationDialog._buttonHeight,
+                        child: ElevatedButton(
+                          onPressed: _handleSubmit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            textStyle: AppTypography.button,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 14,
+                            ),
+                          ),
+                          child: const Text('Send Now'),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _SizedField(
-                      width: CreateNotificationDialog._buttonWidth,
-                      height: CreateNotificationDialog._buttonHeight,
-                      child: OutlinedButton(
-                        onPressed: _handleCancel,
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primary),
-                          foregroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text('Cancel'),
-                      ),
-                    ),
-                    _SizedField(
-                      width: CreateNotificationDialog._buttonWidth,
-                      height: CreateNotificationDialog._buttonHeight,
-                      child: ElevatedButton(
-                        onPressed: _handleSubmit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text('Send Now'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -289,11 +255,120 @@ class CreateNotificationRequest {
   final String recipient;
 }
 
-class _LabeledField extends StatelessWidget {
-  const _LabeledField({
-    required this.label,
-    required this.child,
+class _CategoryRecipientFields extends StatelessWidget {
+  const _CategoryRecipientFields({
+    required this.maxWidth,
+    required this.selectedType,
+    required this.onTypeChanged,
+    required this.selectedRecipient,
+    required this.onRecipientChanged,
+    required this.recipientOptions,
+    required this.decoration,
   });
+
+  final double maxWidth;
+  final NotificationType selectedType;
+  final ValueChanged<NotificationType> onTypeChanged;
+  final String selectedRecipient;
+  final ValueChanged<String> onRecipientChanged;
+  final List<String> recipientOptions;
+  final InputDecoration decoration;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SizedField(
+      width: maxWidth,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double availableWidth = constraints.maxWidth;
+          const double gap = 17;
+          final bool horizontal =
+              availableWidth >=
+              (CreateNotificationDialog._halfInputWidth * 2) + gap;
+
+          Widget buildCategory({double? width}) {
+            return SizedBox(
+              width: width,
+              child: _AdaptiveDropdownField<NotificationType>(
+                label: 'Category',
+                height: CreateNotificationDialog._inputHeight,
+                fieldKey: ValueKey(selectedType),
+                initialValue: selectedType,
+                decoration: decoration,
+                items: NotificationType.values
+                    .map(
+                      (type) => DropdownMenuItem(
+                        value: type,
+                        child: Text(type.label),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    onTypeChanged(value);
+                  }
+                },
+              ),
+            );
+          }
+
+          Widget buildRecipient({double? width}) {
+            return SizedBox(
+              width: width,
+              child: _AdaptiveDropdownField<String>(
+                label: 'Recipients',
+                height: CreateNotificationDialog._inputHeight,
+                fieldKey: ValueKey(selectedRecipient),
+                initialValue: selectedRecipient,
+                decoration: decoration,
+                items: recipientOptions
+                    .map(
+                      (recipient) => DropdownMenuItem(
+                        value: recipient,
+                        child: Text(recipient),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    onRecipientChanged(value);
+                  }
+                },
+              ),
+            );
+          }
+
+          if (!horizontal) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                buildCategory(),
+                const SizedBox(height: 20),
+                buildRecipient(),
+              ],
+            );
+          }
+
+          final double maxFieldWidth = CreateNotificationDialog._halfInputWidth;
+          final double usableWidth = math.max(0, availableWidth - gap);
+          final double fieldWidth = math.min(maxFieldWidth, usableWidth / 2);
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildCategory(width: fieldWidth),
+              const SizedBox(width: gap),
+              buildRecipient(width: fieldWidth),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({required this.label, required this.child});
 
   final String label;
   final Widget child;
@@ -303,10 +378,7 @@ class _LabeledField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTypography.formLabel,
-        ),
+        Text(label, style: AppTypography.formLabel),
         const SizedBox(height: 8),
         child,
       ],
@@ -315,22 +387,64 @@ class _LabeledField extends StatelessWidget {
 }
 
 class _SizedField extends StatelessWidget {
-  const _SizedField({
-    required this.width,
-    required this.height,
-    required this.child,
-  });
+  const _SizedField({this.width, this.height, required this.child});
 
-  final double width;
-  final double height;
+  final double? width;
+  final double? height;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: child,
+    Widget result = child;
+
+    if (height != null) {
+      result = SizedBox(height: height, child: result);
+    }
+
+    if (width != null) {
+      result = ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: width!),
+        child: result,
+      );
+    }
+
+    return result;
+  }
+}
+
+class _AdaptiveDropdownField<T> extends StatelessWidget {
+  const _AdaptiveDropdownField({
+    required this.label,
+    required this.height,
+    required this.initialValue,
+    required this.decoration,
+    required this.items,
+    required this.onChanged,
+    this.fieldKey,
+  });
+
+  final String label;
+  final double height;
+  final T initialValue;
+  final InputDecoration decoration;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+  final Key? fieldKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return _LabeledField(
+      label: label,
+      child: _SizedField(
+        height: height,
+        child: DropdownButtonFormField<T>(
+          key: fieldKey,
+          initialValue: initialValue,
+          decoration: decoration,
+          items: items,
+          onChanged: onChanged,
+        ),
+      ),
     );
   }
 }

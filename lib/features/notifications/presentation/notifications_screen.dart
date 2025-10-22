@@ -225,32 +225,58 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return DashboardShell(
       activeRoute: AppRoutes.notifications,
       builder: (context, shell) {
-        final bool isCompactFilters = shell.contentWidth < 980;
+        final double width = shell.contentWidth;
+        final bool isCompactFilters = width < 980;
+        final bool stackHeader = width < 640;
         final notifications = _filterService.apply(
           source: _allNotifications,
           filters: _filters,
         );
         final filterOptions = widget.filterOptions;
+        final Widget createButton = SizedBox(
+          height: shell.isDesktop ? 48 : 44,
+          child: ElevatedButton.icon(
+            onPressed: () => _showCreateNotificationDialog(context),
+            icon: const Icon(Icons.add, size: 20),
+            label: Text(
+              'Create Notifications',
+              style: AppTypography.button,
+            ),
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(
+                horizontal: shell.isDesktop ? 28 : 20,
+              ),
+              minimumSize: const Size(0, 44),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+        );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Text('Notifications', style: AppTypography.dashboardTitle),
-                const Spacer(),
-                ElevatedButton.icon(
-                  onPressed: () => _showCreateNotificationDialog(context),
-                  icon: const Icon(Icons.add, size: 20),
-                  label: const Text('Create Notifications'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    minimumSize: const Size(0, 44),
+            if (stackHeader) ...[
+              Text('Notifications', style: AppTypography.dashboardTitle),
+              const SizedBox(height: 16),
+              createButton,
+            ] else
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Notifications',
+                      style: AppTypography.dashboardTitle,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
+                  createButton,
+                ],
+              ),
+            const SizedBox(height: 24),
             NotificationFiltersBar(
               isCompact: isCompactFilters,
               searchController: _searchController,
