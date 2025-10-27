@@ -48,4 +48,13 @@ void main() {
 
     expect(find.text('Assign Quiz'), findsWidgets);
   });
+
+  testWidgets('tapping Add Lesson opens dialog', (tester) async {
+    await _pumpDashboard(tester);
+
+    await tester.tap(find.widgetWithText(QuickActionButton, 'Add Lesson'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('New Lesson'), findsOneWidget);
+  });
 }

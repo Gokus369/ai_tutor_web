@@ -4,6 +4,7 @@ import 'package:ai_tutor_web/features/dashboard/domain/models/dashboard_summary.
 import 'package:ai_tutor_web/features/dashboard/domain/models/quick_action.dart';
 import 'package:ai_tutor_web/features/dashboard/domain/models/upcoming_task.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/dashboard_demo_data.dart';
+import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_lesson_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/assign_quiz_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_quick_actions.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_summary_section.dart';
@@ -82,22 +83,17 @@ class DashboardScreen extends StatelessWidget {
             onTap: () => _showSendAnnouncementDialog(context),
           );
         case QuickActionType.addLesson:
-        default:
           return QuickAction(
             label: action.label,
             icon: action.icon,
             color: action.color,
             type: action.type,
-            onTap: () => _showInfo(context, 'Add lesson coming soon'),
+            onTap: () => _showAddLessonDialog(context),
           );
+        default:
+          return action;
       }
     }).toList();
-  }
-
-  void _showInfo(BuildContext context, String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _showCreateClassDialog(BuildContext context) async {
@@ -146,6 +142,24 @@ class DashboardScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Quiz "${result.title}" assigned to ${result.assignTo}'),
+      ),
+    );
+  }
+
+  Future<void> _showAddLessonDialog(BuildContext context) async {
+    final AddLessonRequest? result = await showDialog<AddLessonRequest>(
+      context: context,
+      builder: (_) => AddLessonDialog(
+        subjectOptions: DashboardDemoData.quizSubjects,
+        classOptions: DashboardDemoData.quizClasses,
+      ),
+    );
+
+    if (result == null || !context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Lesson "${result.lessonTitle}" added for ${result.className}'),
       ),
     );
   }
