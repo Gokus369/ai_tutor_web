@@ -1,4 +1,4 @@
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/logout_confirmation_dialog.dart';
+import 'package:ai_tutor_web/features/dashboard/presentation/widgets/confirmation_dialog.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -258,22 +258,48 @@ class _ProfileMenu extends StatelessWidget {
   }
 
   Future<void> _handleSelection(BuildContext context, int value) async {
-    switch (value) {
-      case 0:
-        final bool? confirmed = await showDialog<bool>(
-          context: context,
-          builder: (_) => const LogoutConfirmationDialog(),
+    if (value == 0) {
+      final bool? confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => const ConfirmationDialog(
+          title: 'Logout',
+          message: 'Are you sure want to logout this account?',
+          confirmLabel: 'Logout',
+          confirmColor: AppColors.accentPink,
+        ),
+      );
+
+      if (confirmed == true && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Logged out successfully')),
         );
-        if (confirmed == true && context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Logged out successfully')),
-          );
-        }
-        break;
-      default:
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Feature coming soon')));
+      }
+      return;
+    }
+
+    if (value == 1) {
+      final bool? confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => const ConfirmationDialog(
+          title: 'Delete Account',
+          message: 'Are you sure want to delete this account?',
+          confirmLabel: 'Delete',
+          confirmColor: AppColors.accentPink,
+        ),
+      );
+
+      if (confirmed == true && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account deleted (placeholder)')),
+        );
+      }
+      return;
+    }
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Feature coming soon')),
+      );
     }
   }
 }

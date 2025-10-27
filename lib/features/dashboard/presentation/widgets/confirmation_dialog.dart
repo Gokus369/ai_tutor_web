@@ -2,8 +2,21 @@ import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
-class LogoutConfirmationDialog extends StatelessWidget {
-  const LogoutConfirmationDialog({super.key});
+class ConfirmationDialog extends StatelessWidget {
+  const ConfirmationDialog({
+    super.key,
+    required this.title,
+    required this.message,
+    required this.confirmLabel,
+    required this.confirmColor,
+    this.cancelLabel = 'Cancel',
+  });
+
+  final String title;
+  final String message;
+  final String confirmLabel;
+  final Color confirmColor;
+  final String cancelLabel;
 
   static const double dialogWidth = 460;
   static const double buttonWidth = 163;
@@ -15,20 +28,19 @@ class LogoutConfirmationDialog extends StatelessWidget {
       insetPadding: const EdgeInsets.all(24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: ConstrainedBox(
-        constraints:
-            const BoxConstraints.tightFor(width: dialogWidth),
+        constraints: const BoxConstraints.tightFor(width: dialogWidth),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 36),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Logout',
+                title,
                 style: AppTypography.sectionTitle.copyWith(fontSize: 24),
               ),
               const SizedBox(height: 24),
               Text(
-                'Are you sure want to logout this account?',
+                message,
                 style: AppTypography.bodySmall.copyWith(
                   fontSize: 16,
                   color: AppColors.textPrimary,
@@ -36,8 +48,10 @@ class LogoutConfirmationDialog extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 36),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 20,
+                runSpacing: 16,
                 children: [
                   SizedBox(
                     width: buttonWidth,
@@ -51,24 +65,23 @@ class LogoutConfirmationDialog extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Cancel'),
+                      child: Text(cancelLabel),
                     ),
                   ),
-                  const SizedBox(width: 20),
                   SizedBox(
                     width: buttonWidth,
                     height: buttonHeight,
                     child: ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(true),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accentPink,
+                        backgroundColor: confirmColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 0,
                       ),
-                      child: const Text('Logout'),
+                      child: Text(confirmLabel),
                     ),
                   ),
                 ],

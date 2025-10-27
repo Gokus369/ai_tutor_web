@@ -435,6 +435,7 @@ class _DropdownField extends StatelessWidget {
           height: AssignQuizDialog.dropdownHeight,
           child: DropdownButtonFormField<String>(
             initialValue: value,
+            isExpanded: true,
             items: options
                 .map(
                   (option) =>
