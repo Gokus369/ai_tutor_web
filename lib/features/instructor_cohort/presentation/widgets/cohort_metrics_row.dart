@@ -22,13 +22,17 @@ class CohortMetricsRow extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double maxWidth = constraints.maxWidth;
-        final double targetWidth = isCompact ? maxWidth : _cardWidth;
-        final int cardsPerRow = isCompact
-            ? (maxWidth / (_cardWidth + _spacing)).floor().clamp(
-                1,
-                metrics.length,
-              )
+        final bool shouldWrap = isCompact || maxWidth < (_cardWidth * metrics.length);
+        final int cardsPerRow = shouldWrap
+            ? (maxWidth / (_cardWidth + _spacing)).floor().clamp(1, metrics.length)
             : metrics.length;
+
+        final double totalSpacing =
+            _spacing * (cardsPerRow > 0 ? cardsPerRow - 1 : 0);
+        final double availableForCards =
+            (maxWidth - totalSpacing).clamp(0, double.infinity);
+        final double responsiveWidth =
+            (availableForCards / cardsPerRow).clamp(180, _cardWidth);
 
         return Wrap(
           spacing: _spacing,
@@ -36,9 +40,7 @@ class CohortMetricsRow extends StatelessWidget {
           children: [
             for (final metric in metrics)
               SizedBox(
-                width: isCompact
-                    ? (maxWidth / cardsPerRow) - _spacing
-                    : _cardWidth,
+                width: shouldWrap ? responsiveWidth : _cardWidth,
                 height: _cardHeight,
                 child: _MetricCard(metric: metric),
               ),

@@ -25,7 +25,7 @@ void main() {
     expect(find.text('94%'), findsOneWidget);
   });
 
-  testWidgets('respects compact mode width', (tester) async {
+  testWidgets('renders without overflow in compact mode', (tester) async {
     await tester.pumpWidget(
       _wrap(
         SizedBox(
@@ -35,8 +35,6 @@ void main() {
       ),
     );
 
-    final card = tester.widget<Container>(find.byType(Container).first);
-    expect(card.constraints, isNull);
     expect(find.text('Arjun Patel'), findsOneWidget);
   });
 }

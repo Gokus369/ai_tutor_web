@@ -1,3 +1,4 @@
+import 'package:ai_tutor_web/features/dashboard/presentation/widgets/logout_confirmation_dialog.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,10 @@ class DashboardTopBar extends StatelessWidget {
               if (showMenuButton) ...[
                 IconButton(
                   onPressed: onMenuPressed,
-                  icon: const Icon(Icons.menu_rounded, color: AppColors.textPrimary),
+                  icon: const Icon(
+                    Icons.menu_rounded,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 const SizedBox(width: 12),
               ],
@@ -43,7 +47,10 @@ class DashboardTopBar extends StatelessWidget {
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: 'Search',
-                        prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: AppColors.iconMuted,
+                        ),
                         filled: true,
                         fillColor: AppColors.searchFieldBackground,
                         contentPadding: EdgeInsets.zero,
@@ -75,7 +82,10 @@ class DashboardTopBar extends StatelessWidget {
               else
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(Icons.search_rounded, color: AppColors.textPrimary),
+                  icon: const Icon(
+                    Icons.search_rounded,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               const Spacer(),
               const _NotificationBell(),
@@ -96,7 +106,11 @@ class _NotificationBell extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Icon(Icons.notifications_none_rounded, size: 28, color: AppColors.primary),
+        Icon(
+          Icons.notifications_none_rounded,
+          size: 28,
+          color: AppColors.primary,
+        ),
         Positioned(
           top: -6,
           right: -8,
@@ -147,7 +161,7 @@ class _ProfileMenu extends StatelessWidget {
     return PopupMenuButton<int>(
       offset: const Offset(0, 52),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      onSelected: (_) {},
+      onSelected: (value) => _handleSelection(context, value),
       itemBuilder: (context) => [
         PopupMenuItem(
           value: 0,
@@ -169,7 +183,11 @@ class _ProfileMenu extends StatelessWidget {
         PopupMenuItem(
           value: 1,
           child: ListTile(
-            leading: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.redAccent),
+            leading: const Icon(
+              Icons.delete_outline_rounded,
+              size: 20,
+              color: Colors.redAccent,
+            ),
             title: Text(
               'Delete Account',
               style: AppTypography.bodySmall.copyWith(
@@ -213,15 +231,49 @@ class _ProfileMenu extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Moni Roy', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w700)),
-                Text('Admin', style: AppTypography.bodySmall.copyWith(fontSize: 12, color: AppColors.textMuted)),
+                Text(
+                  'Moni Roy',
+                  style: AppTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  'Admin',
+                  style: AppTypography.bodySmall.copyWith(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
+                ),
               ],
             ),
             const SizedBox(width: 12),
-            const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textPrimary),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: AppColors.textPrimary,
+            ),
           ],
         ],
       ),
     );
+  }
+
+  Future<void> _handleSelection(BuildContext context, int value) async {
+    switch (value) {
+      case 0:
+        final bool? confirmed = await showDialog<bool>(
+          context: context,
+          builder: (_) => const LogoutConfirmationDialog(),
+        );
+        if (confirmed == true && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Logged out successfully')),
+          );
+        }
+        break;
+      default:
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Feature coming soon')));
+    }
   }
 }

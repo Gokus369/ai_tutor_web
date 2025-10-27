@@ -3,7 +3,9 @@ import 'package:ai_tutor_web/features/classes/domain/class_filters.dart';
 import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_filters_bar.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_grid.dart';
+import 'package:ai_tutor_web/features/classes/presentation/widgets/create_class_dialog.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
@@ -87,6 +89,37 @@ class _ClassesScreenState extends State<ClassesScreen> {
 
   void _handleSearchChanged() => setState(() {});
 
+  Future<void> _openCreateClassDialog() async {
+    final List<String> boardChoices = _boardOptions
+        .where((option) => option != _boardOptions.first)
+        .toList();
+
+    final CreateClassRequest? result = await showDialog<CreateClassRequest>(
+      context: context,
+      builder: (context) => CreateClassDialog(boardOptions: boardChoices),
+    );
+
+    if (result == null) return;
+
+    setState(() {
+      _classes.insert(
+        0,
+        ClassInfo(
+          name: result.className,
+          board: result.board,
+          studentCount: 0,
+          subjectSummary: 'No subjects added yet',
+          syllabusProgress: 0,
+        ),
+      );
+    });
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Class "${result.className}" created')),
+    );
+  }
+
   List<ClassInfo> get _filteredClasses {
     return filterClasses(
       _classes,
@@ -108,7 +141,31 @@ class _ClassesScreenState extends State<ClassesScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Classes', style: AppTypography.dashboardTitle),
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Classes', style: AppTypography.dashboardTitle),
+                ),
+                SizedBox(
+                  height: 44,
+                  child: ElevatedButton.icon(
+                    onPressed: _openCreateClassDialog,
+                    icon: const Icon(Icons.add, size: 20),
+                    label: Text('New Class', style: AppTypography.button),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             ClassFiltersBar(
               isCompact: isCompact,
               boardOptions: _boardOptions,

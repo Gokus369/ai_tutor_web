@@ -51,5 +51,18 @@ void main() {
     );
 
     expect(find.byType(Wrap), findsOneWidget);
+    final cardWidths = tester.widgetList<SizedBox>(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is SizedBox &&
+            widget.height != null &&
+            widget.height!.toStringAsFixed(0) == '110',
+      ),
+    );
+
+    expect(cardWidths, isNotEmpty);
+    final width = cardWidths.first.width!;
+    expect(width, lessThanOrEqualTo(262));
+    expect(width, greaterThanOrEqualTo(180));
   });
 }
