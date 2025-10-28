@@ -37,42 +37,58 @@ class ClassDetailsDemoData {
   static final List<ClassStudentRow> students = [
     const ClassStudentRow(
       name: 'Rowan Hahn',
-      rollNo: '1',
-      attendance: '92%',
-      progress: '85%',
-      performance: 'Top Performer',
+      rollNo: 1,
+      attendancePercent: 92,
+      progressPercent: 85,
+      performance: StudentPerformance.topPerformer,
       status: StudentStatus.active,
     ),
     const ClassStudentRow(
       name: 'Giovanni Fields',
-      rollNo: '2',
-      attendance: '86%',
-      progress: '70%',
-      performance: 'Average',
+      rollNo: 2,
+      attendancePercent: 86,
+      progressPercent: 46,
+      performance: StudentPerformance.needAttention,
       status: StudentStatus.active,
     ),
     const ClassStudentRow(
       name: 'Rowen Holland',
-      rollNo: '3',
-      attendance: '91%',
-      progress: '65%',
-      performance: 'Need Attention',
+      rollNo: 3,
+      attendancePercent: 91,
+      progressPercent: 58,
+      performance: StudentPerformance.average,
       status: StudentStatus.active,
     ),
     const ClassStudentRow(
       name: 'Celeste Moore',
-      rollNo: '4',
-      attendance: '70%',
-      progress: '52%',
-      performance: 'Top Performer',
+      rollNo: 4,
+      attendancePercent: 70,
+      progressPercent: 52,
+      performance: StudentPerformance.topPerformer,
+      status: StudentStatus.active,
+    ),
+    const ClassStudentRow(
+      name: 'Matteo Nelson',
+      rollNo: 5,
+      attendancePercent: 65,
+      progressPercent: 79,
+      performance: StudentPerformance.average,
+      status: StudentStatus.active,
+    ),
+    const ClassStudentRow(
+      name: 'Elise Gill',
+      rollNo: 6,
+      attendancePercent: 73,
+      progressPercent: 90,
+      performance: StudentPerformance.topPerformer,
       status: StudentStatus.active,
     ),
     const ClassStudentRow(
       name: 'Gerardo Dillon',
-      rollNo: '5',
-      attendance: '89%',
-      progress: '33%',
-      performance: 'Need Attention',
+      rollNo: 7,
+      attendancePercent: 97,
+      progressPercent: 33,
+      performance: StudentPerformance.needAttention,
       status: StudentStatus.inactive,
     ),
   ];
@@ -154,21 +170,23 @@ class ClassStudentRow {
   const ClassStudentRow({
     required this.name,
     required this.rollNo,
-    required this.attendance,
-    required this.progress,
+    required this.attendancePercent,
+    required this.progressPercent,
     required this.performance,
     required this.status,
   });
 
   final String name;
-  final String rollNo;
-  final String attendance;
-  final String progress;
-  final String performance;
+  final int rollNo;
+  final int attendancePercent;
+  final int progressPercent;
+  final StudentPerformance performance;
   final StudentStatus status;
 }
 
 enum StudentStatus { active, inactive }
+
+enum StudentPerformance { topPerformer, average, needAttention }
 
 class SubjectProgress {
   SubjectProgress({
