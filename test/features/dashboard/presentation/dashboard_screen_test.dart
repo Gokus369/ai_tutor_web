@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Widget _wrap() {
+  Widget wrapApp() {
     return MaterialApp(theme: AppTheme.light(), home: const DashboardScreen());
   }
 
-  Future<void> _pumpDashboard(WidgetTester tester) async {
+  Future<void> pumpDashboard(WidgetTester tester) async {
     tester.binding.window.physicalSizeTestValue = const Size(1400, 1200);
     tester.binding.window.devicePixelRatioTestValue = 1;
     addTearDown(() {
@@ -17,11 +17,11 @@ void main() {
       tester.binding.window.clearDevicePixelRatioTestValue();
     });
 
-    await tester.pumpWidget(_wrap());
+    await tester.pumpWidget(wrapApp());
   }
 
   testWidgets('tapping Send Announcement opens dialog', (tester) async {
-    await _pumpDashboard(tester);
+    await pumpDashboard(tester);
 
     await tester.tap(
       find.widgetWithText(QuickActionButton, 'Send Announcement'),
@@ -32,7 +32,7 @@ void main() {
   });
 
   testWidgets('tapping Create Class opens dialog', (tester) async {
-    await _pumpDashboard(tester);
+    await pumpDashboard(tester);
 
     await tester.tap(find.widgetWithText(QuickActionButton, 'Create Class'));
     await tester.pumpAndSettle();
@@ -41,7 +41,7 @@ void main() {
   });
 
   testWidgets('tapping Assign Quiz opens dialog', (tester) async {
-    await _pumpDashboard(tester);
+    await pumpDashboard(tester);
 
     await tester.tap(find.widgetWithText(QuickActionButton, 'Assign Quiz'));
     await tester.pumpAndSettle();
@@ -50,7 +50,7 @@ void main() {
   });
 
   testWidgets('tapping Add Lesson opens dialog', (tester) async {
-    await _pumpDashboard(tester);
+    await pumpDashboard(tester);
 
     await tester.tap(find.widgetWithText(QuickActionButton, 'Add Lesson'));
     await tester.pumpAndSettle();

@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const classOptions = ['Class 10', 'Class 11'];
 
-  Widget _wrap(Widget child) {
+  Widget wrapWithApp(Widget child) {
     return MaterialApp(
       theme: AppTheme.light(),
       home: Scaffold(body: child),
@@ -19,7 +19,7 @@ void main() {
     String selected = classOptions.first;
 
     await tester.pumpWidget(
-      _wrap(
+      wrapWithApp(
         MediaManagementHeader(
           title: 'Media Management',
           classOptions: classOptions,
@@ -45,7 +45,7 @@ void main() {
 
   testWidgets('renders stacked layout when requested', (tester) async {
     await tester.pumpWidget(
-      _wrap(
+      wrapWithApp(
         MediaManagementHeader(
           title: 'Media Management',
           classOptions: classOptions,

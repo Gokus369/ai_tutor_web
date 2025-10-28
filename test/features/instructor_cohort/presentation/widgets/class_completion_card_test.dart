@@ -10,7 +10,7 @@ void main() {
     LearnerProgress(name: 'Arjun Patel', completionPercent: 88),
   ];
 
-  Widget _wrap(Widget child) {
+  Widget wrapWithApp(Widget child) {
     return MaterialApp(
       theme: AppTheme.light(),
       home: Scaffold(body: child),
@@ -18,7 +18,7 @@ void main() {
   }
 
   testWidgets('renders learner progress rows', (tester) async {
-    await tester.pumpWidget(_wrap(ClassCompletionCard(learners: learners)));
+    await tester.pumpWidget(wrapWithApp(ClassCompletionCard(learners: learners)));
 
     expect(find.text('Class Completion Progress'), findsOneWidget);
     expect(find.text('Priya Sharma'), findsOneWidget);
@@ -27,7 +27,7 @@ void main() {
 
   testWidgets('renders without overflow in compact mode', (tester) async {
     await tester.pumpWidget(
-      _wrap(
+      wrapWithApp(
         SizedBox(
           width: 320,
           child: ClassCompletionCard(learners: learners, isCompact: true),

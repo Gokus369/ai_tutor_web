@@ -1,25 +1,37 @@
 import 'package:ai_tutor_web/features/settings/data/settings_demo_data.dart';
-import 'package:ai_tutor_web/features/settings/domain/models/settings_models.dart';
 import 'package:ai_tutor_web/features/settings/presentation/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final data = SettingsDemoData.build(notificationsEnabled: true);
+  final data = SettingsDemoData.build();
 
   Future<void> pumpSettingsView(
     WidgetTester tester, {
     required bool notificationsEnabled,
     ValueChanged<bool>? onToggle,
   }) async {
+    final view = tester.view;
+    final Size originalSize = view.physicalSize;
+    final double originalPixelRatio = view.devicePixelRatio;
+
+    view.physicalSize = const Size(1400, 1000);
+    view.devicePixelRatio = 1.0;
+
+    addTearDown(() {
+      view.physicalSize = originalSize;
+      view.devicePixelRatio = originalPixelRatio;
+    });
     await tester.pumpWidget(
       MaterialApp(
-        home: SettingsView(
-          data: data,
-          notificationsEnabled: notificationsEnabled,
-          onToggleNotifications: onToggle ?? (_) {},
-          onEditProfile: () {},
-          onNavigate: (_) {},
+        home: Scaffold(
+          body: SettingsView(
+            data: data,
+            notificationsEnabled: notificationsEnabled,
+            onToggleNotifications: onToggle ?? (_) {},
+            onEditProfile: () {},
+            onNavigate: (_) {},
+          ),
         ),
       ),
     );

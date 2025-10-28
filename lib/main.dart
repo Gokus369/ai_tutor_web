@@ -3,8 +3,9 @@ import 'package:ai_tutor_web/app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'auth_repository.dart';
 import 'features/auth/presentation/signup_screen.dart';
-import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/classes/presentation/classes_screen.dart';
+import 'features/classes/presentation/class_details_screen.dart';
+import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/ai_tutor/presentation/ai_tutor_screen.dart';
 import 'features/attendance/presentation/attendance_screen.dart';
 import 'features/lessons/presentation/lessons_planner_screen.dart';
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.settings: (_) => SettingsScreen(),
         AppRoutes.termsOfUse: (_) => const TermsOfUseScreen(),
         AppRoutes.privacyPolicy: (_) => const PrivacyPolicyScreen(),
+        AppRoutes.classDetails: (_) => const ClassDetailsScreen(),
       },
     );
   }

@@ -8,7 +8,7 @@ void main() {
   const classOptions = ['All Class', 'Class 10'];
   const topicOptions = ['All Topics', 'Science'];
 
-  Widget _wrap(Widget child) {
+  Widget wrapWithApp(Widget child) {
     return MaterialApp(
       theme: AppTheme.light(),
       home: Scaffold(body: child),
@@ -17,7 +17,7 @@ void main() {
 
   testWidgets('renders stacked layout when compact', (tester) async {
     await tester.pumpWidget(
-      _wrap(
+      wrapWithApp(
         InstructorCohortHeader(
           title: 'Instructor Cohort',
           searchController: controller,
@@ -41,7 +41,7 @@ void main() {
 
   testWidgets('renders horizontal layout when space available', (tester) async {
     await tester.pumpWidget(
-      _wrap(
+      wrapWithApp(
         SizedBox(
           width: 1200,
           child: InstructorCohortHeader(

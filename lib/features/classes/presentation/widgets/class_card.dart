@@ -7,9 +7,11 @@ class ClassCard extends StatelessWidget {
   const ClassCard({
     super.key,
     required this.info,
+    this.onViewDetails,
   });
 
   final ClassInfo info;
+  final VoidCallback? onViewDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +70,7 @@ class ClassCard extends StatelessWidget {
                 textStyle: AppTypography.button.copyWith(color: AppColors.primary),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               ),
-              onPressed: () {},
+              onPressed: onViewDetails,
               child: const Text('View Details'),
             ),
           ),

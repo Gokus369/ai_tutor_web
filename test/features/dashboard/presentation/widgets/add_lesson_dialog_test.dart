@@ -7,7 +7,7 @@ void main() {
   const subjects = ['Mathematics', 'Science'];
   const classes = ['Class 10', 'Class 9'];
 
-  Widget _wrap(Widget child) {
+  Widget wrapWithApp(Widget child) {
     return MaterialApp(
       theme: AppTheme.light(),
       home: Scaffold(body: child),
@@ -25,7 +25,7 @@ void main() {
     AddLessonRequest? result;
 
     await tester.pumpWidget(
-      _wrap(
+      wrapWithApp(
         Builder(
           builder: (context) => ElevatedButton(
             onPressed: () async {

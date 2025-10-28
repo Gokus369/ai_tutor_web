@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Widget _wrap(Widget child) {
+  Widget wrapWithApp(Widget child) {
     return MaterialApp(
       theme: AppTheme.light(),
       home: Scaffold(body: child),
@@ -22,7 +22,7 @@ void main() {
     });
 
     await tester.pumpWidget(
-      _wrap(
+      wrapWithApp(
         Builder(
           builder: (context) => ElevatedButton(
             onPressed: () => showDialog<SendAnnouncementRequest>(

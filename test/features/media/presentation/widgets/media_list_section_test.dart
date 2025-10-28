@@ -15,7 +15,7 @@ void main() {
     ),
   ];
 
-  Widget _wrap(Widget child) {
+  Widget wrapWithApp(Widget child) {
     return MaterialApp(
       theme: AppTheme.light(),
       home: Scaffold(body: child),
@@ -28,7 +28,9 @@ void main() {
     MediaItem? tapped;
 
     await tester.pumpWidget(
-      _wrap(MediaListSection(media: media, onMenuTap: (item) => tapped = item)),
+      wrapWithApp(
+        MediaListSection(media: media, onMenuTap: (item) => tapped = item),
+      ),
     );
 
     expect(find.text('Uploaded Media (1)'), findsOneWidget);
@@ -41,7 +43,9 @@ void main() {
 
   testWidgets('hides description helper when compact', (tester) async {
     await tester.pumpWidget(
-      _wrap(MediaListSection(media: media, onMenuTap: (_) {}, isCompact: true)),
+      wrapWithApp(
+        MediaListSection(media: media, onMenuTap: (_) {}, isCompact: true),
+      ),
     );
 
     expect(find.text('Manage your latest lessons and resources'), findsNothing);

@@ -1,3 +1,4 @@
+import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_card.dart';
 import 'package:flutter/material.dart';
@@ -35,11 +36,16 @@ class ClassGrid extends StatelessWidget {
           .map(
             (info) => SizedBox(
               width: cardWidth,
-              child: ClassCard(info: info),
+              child: ClassCard(
+                info: info,
+                onViewDetails: () => Navigator.of(context).pushNamed(
+                  AppRoutes.classDetails,
+                  arguments: info,
+                ),
+              ),
             ),
           )
           .toList(),
     );
   }
 }
-

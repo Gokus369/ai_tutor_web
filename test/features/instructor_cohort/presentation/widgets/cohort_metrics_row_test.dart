@@ -23,7 +23,7 @@ void main() {
     ),
   ];
 
-  Widget _wrap(Widget child) {
+  Widget wrapWithApp(Widget child) {
     return MaterialApp(
       theme: AppTheme.light(),
       home: Scaffold(body: child),
@@ -32,7 +32,7 @@ void main() {
 
   testWidgets('renders metric cards', (tester) async {
     await tester.pumpWidget(
-      _wrap(CohortMetricsRow(metrics: metrics, isCompact: false)),
+      wrapWithApp(CohortMetricsRow(metrics: metrics, isCompact: false)),
     );
 
     expect(find.text('Class Completion'), findsOneWidget);
@@ -42,7 +42,7 @@ void main() {
 
   testWidgets('wraps cards when compact', (tester) async {
     await tester.pumpWidget(
-      _wrap(
+      wrapWithApp(
         SizedBox(
           width: 320,
           child: CohortMetricsRow(metrics: metrics, isCompact: true),
