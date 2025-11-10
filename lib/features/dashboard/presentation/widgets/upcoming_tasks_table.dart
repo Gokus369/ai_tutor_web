@@ -92,7 +92,7 @@ class _StatusFilter extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: SizedBox(
           height: 28,
-          width: 72,
+          width: 110,
           child: DropdownButton<String>(
             value: 'All',
             isExpanded: true,

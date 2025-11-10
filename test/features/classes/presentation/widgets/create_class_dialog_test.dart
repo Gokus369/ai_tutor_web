@@ -1,5 +1,5 @@
 import 'package:ai_tutor_web/app/theme/app_theme.dart';
-import 'package:ai_tutor_web/features/classes/presentation/widgets/create_class_dialog.dart';
+import 'package:ai_tutor_web/features/dashboard/presentation/widgets/create_class_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

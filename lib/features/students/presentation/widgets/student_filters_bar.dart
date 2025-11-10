@@ -107,7 +107,7 @@ class _SearchField extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          hintText: 'Search students by name or class...',
+          hintText: 'Search students by name, class...',
           prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
           filled: true,
           fillColor: AppColors.studentsSearchBackground,
@@ -183,4 +183,3 @@ class _FilterDropdown extends StatelessWidget {
     );
   }
 }
-

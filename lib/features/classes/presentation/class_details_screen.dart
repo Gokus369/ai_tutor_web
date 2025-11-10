@@ -7,15 +7,13 @@ import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
-const Color _studentsCardBackground = Color(0xFFFFFFFF);
-const Color _studentsHeaderBackground = Color(0xFFEAF2F7);
-const Color _studentsHeaderBorder = Color(0xFFD3E4F4);
 const Color _studentsRowDivider = Color(0xFFE3EDF7);
 const Color _studentsProgressTrack = Color(0xFFD8E5EF);
 const Color _studentsProgressValue = Color(0xFF1F5C6E);
 const Color _studentsStatusActive = Color(0xFF13B28A);
 const Color _studentsStatusInactive = Color(0xFF161A1D);
 const Color _studentsActionButtonBorder = Color(0xFFE1ECF5);
+const Color _syllabusCollapsedBorder = AppColors.studentsCardBorder;
 
 class ClassDetailsScreen extends StatefulWidget {
   const ClassDetailsScreen({super.key});
@@ -25,7 +23,9 @@ class ClassDetailsScreen extends StatefulWidget {
 }
 
 class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
-  final ValueNotifier<_DetailTab> _tab = ValueNotifier<_DetailTab>(_DetailTab.students);
+  final ValueNotifier<_DetailTab> _tab = ValueNotifier<_DetailTab>(
+    _DetailTab.students,
+  );
 
   @override
   void dispose() {
@@ -35,7 +35,8 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ClassInfo? info = ModalRoute.of(context)?.settings.arguments as ClassInfo?;
+    final ClassInfo? info =
+        ModalRoute.of(context)?.settings.arguments as ClassInfo?;
     final String className = info?.name ?? ClassDetailsDemoData.className;
 
     return DashboardShell(
@@ -55,7 +56,10 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                   availableWidth: width,
                 ),
                 const SizedBox(height: 24),
-                _TabSelector(selected: tab, onChanged: (value) => _tab.value = value),
+                _TabSelector(
+                  selected: tab,
+                  onChanged: (value) => _tab.value = value,
+                ),
                 const SizedBox(height: 24),
                 switch (tab) {
                   _DetailTab.students => const _StudentsView(),
@@ -81,12 +85,7 @@ class _Header extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Text(
-            className,
-            style: AppTypography.dashboardTitle,
-          ),
-        ),
+        Expanded(child: Text(className, style: AppTypography.dashboardTitle)),
       ],
     );
   }
@@ -107,13 +106,11 @@ class _TabSelector extends StatelessWidget {
       children: _DetailTab.values.map((tab) {
         final bool isActive = tab == selected;
         return ChoiceChip(
-          label: Text(
-            switch (tab) {
-              _DetailTab.students => 'Students',
-              _DetailTab.syllabus => 'Syllabus',
-              _DetailTab.assessments => 'Assessments',
-            },
-          ),
+          label: Text(switch (tab) {
+            _DetailTab.students => 'Students',
+            _DetailTab.syllabus => 'Syllabus',
+            _DetailTab.assessments => 'Assessments',
+          }),
           selected: isActive,
           onSelected: (_) => onChanged(tab),
           labelStyle: AppTypography.bodySmall.copyWith(
@@ -139,13 +136,15 @@ class _StudentsView extends StatefulWidget {
 }
 
 class _StudentsViewState extends State<_StudentsView> {
-  static const double _tableMinWidth = 1240;
+  static const double _tableMinWidth = 960;
   StudentStatus? _statusFilter;
 
   List<ClassStudentRow> get _students {
     final students = ClassDetailsDemoData.students;
     if (_statusFilter == null) return students;
-    return students.where((student) => student.status == _statusFilter).toList();
+    return students
+        .where((student) => student.status == _statusFilter)
+        .toList();
   }
 
   @override
@@ -187,13 +186,23 @@ class _StudentsViewState extends State<_StudentsView> {
             LayoutBuilder(
               builder: (context, constraints) {
                 Widget buildTable() {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const _StudentsHeader(),
-                      const SizedBox(height: 12),
-                      Column(
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x140F2236),
+                          blurRadius: 28,
+                          offset: Offset(0, 16),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(28),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          const _StudentsHeader(),
                           for (int index = 0; index < students.length; index++)
                             _StudentRow(
                               student: students[index],
@@ -201,7 +210,7 @@ class _StudentsViewState extends State<_StudentsView> {
                             ),
                         ],
                       ),
-                    ],
+                    ),
                   );
                 }
 
@@ -211,10 +220,7 @@ class _StudentsViewState extends State<_StudentsView> {
 
                 return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: _tableMinWidth,
-                    child: buildTable(),
-                  ),
+                  child: SizedBox(width: _tableMinWidth, child: buildTable()),
                 );
               },
             ),
@@ -232,12 +238,13 @@ class _StudentsHeader extends StatelessWidget {
     final TextStyle headerStyle = AppTypography.studentsTableHeader;
 
     return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: _studentsHeaderBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _studentsHeaderBorder),
+      height: 64,
+      padding: const EdgeInsets.symmetric(horizontal: 28),
+      decoration: const BoxDecoration(
+        color: Color(0xFFEFF4F8),
+        border: Border(
+          bottom: BorderSide(color: _studentsRowDivider, width: 1),
+        ),
       ),
       alignment: Alignment.centerLeft,
       child: Row(
@@ -250,7 +257,7 @@ class _StudentsHeader extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(flex: 28, child: Text('Progress %', style: headerStyle)),
           const SizedBox(width: 16),
-          SizedBox(width: 220, child: Text('Performance', style: headerStyle)),
+          SizedBox(width: 180, child: Text('Performance', style: headerStyle)),
           const SizedBox(width: 16),
           SizedBox(width: 120, child: Text('Status', style: headerStyle)),
           const SizedBox(width: 12),
@@ -272,9 +279,10 @@ class _StudentRow extends StatelessWidget {
     final TextStyle cellStyle = AppTypography.studentsTableCell;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+      height: 68,
+      padding: const EdgeInsets.symmetric(horizontal: 28),
       decoration: BoxDecoration(
-        color: _studentsCardBackground,
+        color: Colors.white,
         border: Border(
           bottom: BorderSide(
             color: showDivider ? _studentsRowDivider : Colors.transparent,
@@ -285,10 +293,7 @@ class _StudentRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
-            flex: 24,
-            child: Text(student.name, style: cellStyle),
-          ),
+          Expanded(flex: 24, child: Text(student.name, style: cellStyle)),
           const SizedBox(width: 16),
           SizedBox(
             width: 70,
@@ -325,7 +330,7 @@ class _StudentRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          const _StudentActionsButton(),
+          const SizedBox(width: 36, child: _StudentActionsButton()),
         ],
       ),
     );
@@ -343,31 +348,14 @@ class _StudentProgress extends StatelessWidget {
 
     return Row(
       children: [
-        Expanded(
-          child: Container(
-            height: 12,
-            decoration: BoxDecoration(
-              color: _studentsProgressTrack,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: FractionallySizedBox(
-                widthFactor: fraction,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _studentsProgressValue,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+        Expanded(child: _ProgressBar(value: fraction)),
         const SizedBox(width: 12),
         Text(
           '${progressPercent.clamp(0, 100)}%',
-          style: AppTypography.studentsTableCell,
+          style: AppTypography.studentsTableCell.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
@@ -428,13 +416,17 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool active = status == StudentStatus.active;
-    final Color background = active ? _studentsStatusActive : _studentsStatusInactive;
+    final Color background = active
+        ? _studentsStatusActive
+        : _studentsStatusInactive;
     final String label = active ? 'Active' : 'Inactive';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+      height: 27,
+      constraints: const BoxConstraints(minWidth: 93),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(14),
         color: background,
       ),
       alignment: Alignment.center,
@@ -469,7 +461,11 @@ class _StudentActionsButton extends StatelessWidget {
             ],
           ),
           alignment: Alignment.center,
-          child: const Icon(Icons.more_horiz, color: AppColors.iconMuted, size: 20),
+          child: const Icon(
+            Icons.more_horiz,
+            color: AppColors.iconMuted,
+            size: 20,
+          ),
         ),
       ),
     );
@@ -514,10 +510,7 @@ class _StudentsStatusFilter extends StatelessWidget {
           onChanged: onChanged,
           style: AppTypography.studentsTableCell,
           items: const [
-            DropdownMenuItem<StudentStatus?>(
-              value: null,
-              child: Text('All'),
-            ),
+            DropdownMenuItem<StudentStatus?>(value: null, child: Text('All')),
             DropdownMenuItem<StudentStatus?>(
               value: StudentStatus.active,
               child: Text('Active'),
@@ -533,12 +526,62 @@ class _StudentsStatusFilter extends StatelessWidget {
   }
 }
 
-class _SyllabusView extends StatelessWidget {
+class _SyllabusView extends StatefulWidget {
   const _SyllabusView();
 
   @override
+  State<_SyllabusView> createState() => _SyllabusViewState();
+}
+
+class _SyllabusViewState extends State<_SyllabusView> {
+  late String _expandedSubjectId;
+  late Map<String, Set<String>> _expandedModules;
+
+  @override
+  void initState() {
+    super.initState();
+    final subjects = ClassDetailsDemoData.syllabusSubjects;
+    _expandedSubjectId = subjects.isNotEmpty ? subjects.first.id : '';
+    _expandedModules = {
+      for (final subject in subjects)
+        subject.id:
+            subject.modules.isNotEmpty && subject.id == _expandedSubjectId
+            ? {subject.modules.first.id}
+            : <String>{},
+    };
+  }
+
+  void _handleSubjectToggle(String subjectId) {
+    setState(() {
+      _expandedSubjectId = subjectId;
+      final subject = ClassDetailsDemoData.syllabusSubjects.firstWhere(
+        (element) => element.id == subjectId,
+        orElse: () => ClassDetailsDemoData.syllabusSubjects.first,
+      );
+      if (subject.modules.isNotEmpty) {
+        final current = _expandedModules[subjectId];
+        if (current == null || current.isEmpty) {
+          _expandedModules[subjectId] = {subject.modules.first.id};
+        }
+      }
+    });
+  }
+
+  void _handleModuleToggle(String subjectId, String moduleId) {
+    setState(() {
+      final Set<String> current = _expandedModules[subjectId] ?? <String>{};
+      if (current.contains(moduleId)) {
+        current.remove(moduleId);
+      } else {
+        current.add(moduleId);
+      }
+      _expandedModules[subjectId] = {...current};
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final subjects = ClassDetailsDemoData.subjectProgress;
+    final subjects = ClassDetailsDemoData.syllabusSubjects;
     final overview = ClassDetailsDemoData.progressOverview;
 
     return Row(
@@ -546,34 +589,178 @@ class _SyllabusView extends StatelessWidget {
       children: [
         Expanded(
           flex: 2,
-          child: _ContentCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('Mathematics', style: AppTypography.sectionTitle),
-                const SizedBox(height: 16),
-                for (final subject in subjects) ...[
-                  _SubjectPanel(subject: subject),
-                  const SizedBox(height: 16),
-                ],
-              ],
-            ),
+          child: _SyllabusSubjectsCard(
+            subjects: subjects,
+            expandedSubjectId: _expandedSubjectId,
+            expandedModules: _expandedModules,
+            onSubjectChanged: _handleSubjectToggle,
+            onModuleToggle: _handleModuleToggle,
           ),
         ),
         const SizedBox(width: 24),
-        Expanded(
-          child: _ContentCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('Progress Overview', style: AppTypography.sectionTitle),
-                const SizedBox(height: 16),
-                for (final item in overview) ...[
-                  _ProgressOverviewRow(item: item),
-                  const SizedBox(height: 18),
-                ],
-              ],
+        Expanded(child: _ProgressOverviewCard(items: overview)),
+      ],
+    );
+  }
+}
+
+class _SyllabusSubjectsCard extends StatelessWidget {
+  const _SyllabusSubjectsCard({
+    required this.subjects,
+    required this.expandedSubjectId,
+    required this.expandedModules,
+    required this.onSubjectChanged,
+    required this.onModuleToggle,
+  });
+
+  final List<SyllabusSubject> subjects;
+  final String expandedSubjectId;
+  final Map<String, Set<String>> expandedModules;
+  final ValueChanged<String> onSubjectChanged;
+  final void Function(String subjectId, String moduleId) onModuleToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    if (subjects.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.studentsCardBorder),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          'No syllabus data available.',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (int index = 0; index < subjects.length; index++) ...[
+          _SubjectAccordion(
+            subject: subjects[index],
+            isExpanded: subjects[index].id == expandedSubjectId,
+            expandedModules:
+                expandedModules[subjects[index].id] ?? const <String>{},
+            onSubjectSelected: () => onSubjectChanged(subjects[index].id),
+            onModuleToggle: (moduleId) =>
+                onModuleToggle(subjects[index].id, moduleId),
+          ),
+          if (index != subjects.length - 1) const SizedBox(height: 16),
+        ],
+      ],
+    );
+  }
+}
+
+class _SubjectAccordion extends StatelessWidget {
+  const _SubjectAccordion({
+    required this.subject,
+    required this.isExpanded,
+    required this.expandedModules,
+    required this.onSubjectSelected,
+    required this.onModuleToggle,
+  });
+
+  final SyllabusSubject subject;
+  final bool isExpanded;
+  final Set<String> expandedModules;
+  final VoidCallback onSubjectSelected;
+  final ValueChanged<String> onModuleToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool hasModules = subject.modules.isNotEmpty;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: isExpanded
+                  ? AppColors.studentsCardBorder
+                  : _syllabusCollapsedBorder,
             ),
+            boxShadow: isExpanded
+                ? const [
+                    BoxShadow(
+                      color: Color(0x11000000),
+                      blurRadius: 18,
+                      offset: Offset(0, 8),
+                    ),
+                  ]
+                : const [],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 18,
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      subject.title,
+                      style: AppTypography.sectionTitle.copyWith(fontSize: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    _SyllabusStatusChip(status: subject.status),
+                    const Spacer(),
+                    if (hasModules)
+                      IconButton(
+                        onPressed: onSubjectSelected,
+                        icon: Icon(
+                          isExpanded
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              AnimatedCrossFade(
+                firstChild: const SizedBox.shrink(),
+                secondChild: Padding(
+                  padding: const EdgeInsets.only(
+                    top: 12,
+                    left: 24,
+                    right: 24,
+                    bottom: 20,
+                  ),
+                  child: Column(
+                    children: [
+                      for (int i = 0; i < subject.modules.length; i++) ...[
+                        _ModuleCard(
+                          module: subject.modules[i],
+                          isExpanded: expandedModules.contains(
+                            subject.modules[i].id,
+                          ),
+                          onToggle: () => onModuleToggle(subject.modules[i].id),
+                        ),
+                        if (i != subject.modules.length - 1)
+                          const SizedBox(height: 12),
+                      ],
+                    ],
+                  ),
+                ),
+                crossFadeState: isExpanded && hasModules
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 200),
+              ),
+            ],
           ),
         ),
       ],
@@ -581,40 +768,105 @@ class _SyllabusView extends StatelessWidget {
   }
 }
 
-class _SubjectPanel extends StatelessWidget {
-  const _SubjectPanel({required this.subject});
+class _SyllabusStatusChip extends StatelessWidget {
+  const _SyllabusStatusChip({required this.status});
 
-  final SubjectProgress subject;
+  final SyllabusStatus status;
 
   @override
   Widget build(BuildContext context) {
+    final bool completed = status == SyllabusStatus.completed;
+    final Color baseColor = completed
+        ? AppColors.quickActionGreen
+        : AppColors.accentOrange;
+    final String label = completed ? 'Completed' : 'Inprogress';
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.studentsCardBorder),
-        borderRadius: BorderRadius.circular(18),
+        color: baseColor,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: AppTypography.bodySmall.copyWith(
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
+
+class _ModuleCard extends StatelessWidget {
+  const _ModuleCard({
+    required this.module,
+    required this.isExpanded,
+    required this.onToggle,
+  });
+
+  final SyllabusModule module;
+  final bool isExpanded;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool hasTopics = module.topics.isNotEmpty;
+    return Container(
+      decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.studentsCardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Text(subject.subject, style: AppTypography.sectionTitle.copyWith(fontSize: 18)),
-              const Spacer(),
-              _StatusChip(
-                status: subject.overallProgress > 0.6
-                    ? StudentStatus.active
-                    : StudentStatus.inactive,
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    module.title,
+                    style: AppTypography.sectionTitle.copyWith(fontSize: 18),
+                  ),
+                ),
+                IconButton(
+                  onPressed: onToggle,
+                  icon: Icon(
+                    isExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          for (final topic in subject.topics) ...[
-            Text(topic.title, style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            _LinearProgress(value: topic.progress),
-            const SizedBox(height: 14),
+          if (isExpanded) ...[
+            const Divider(height: 1, color: AppColors.studentsCardBorder),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+              child: hasTopics
+                  ? Column(
+                      children: [
+                        for (int i = 0; i < module.topics.length; i++) ...[
+                          _ModuleTopicRow(topic: module.topics[i]),
+                          if (i != module.topics.length - 1)
+                            const SizedBox(height: 18),
+                        ],
+                      ],
+                    )
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Topics coming soon',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+            ),
           ],
         ],
       ),
@@ -622,55 +874,151 @@ class _SubjectPanel extends StatelessWidget {
   }
 }
 
-class _LinearProgress extends StatelessWidget {
-  const _LinearProgress({required this.value});
+class _ModuleTopicRow extends StatelessWidget {
+  const _ModuleTopicRow({required this.topic});
+
+  final SyllabusTopic topic;
+
+  @override
+  Widget build(BuildContext context) {
+    final int percent = (topic.progress * 100).round();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.studentsCardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  topic.title,
+                  style: AppTypography.bodySmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.more_horiz,
+                  color: AppColors.iconMuted,
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: _ProgressBar(value: topic.progress)),
+              const SizedBox(width: 12),
+              Text(
+                '$percent%',
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProgressOverviewCard extends StatelessWidget {
+  const _ProgressOverviewCard({required this.items});
+
+  final List<ProgressOverview> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.studentsCardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Progress Overview', style: AppTypography.sectionTitle),
+          const SizedBox(height: 16),
+          for (int i = 0; i < items.length; i++) ...[
+            _ProgressOverviewEntry(item: items[i]),
+            if (i != items.length - 1) const SizedBox(height: 18),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ProgressOverviewEntry extends StatelessWidget {
+  const _ProgressOverviewEntry({required this.item});
+
+  final ProgressOverview item;
+
+  @override
+  Widget build(BuildContext context) {
+    final int percent = (item.completion * 100).round();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                item.subject,
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            Text('$percent%', style: AppTypography.bodySmall),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _ProgressBar(value: item.completion),
+      ],
+    );
+  }
+}
+
+class _ProgressBar extends StatelessWidget {
+  const _ProgressBar({required this.value});
 
   final double value;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 12,
+      height: 10,
       decoration: BoxDecoration(
-        color: AppColors.classProgressTrack,
-        borderRadius: BorderRadius.circular(8),
+        color: _studentsProgressTrack,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Align(
         alignment: Alignment.centerLeft,
         child: FractionallySizedBox(
-          widthFactor: value.clamp(0, 1),
+          widthFactor: value.clamp(0.0, 1.0),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: AppColors.primary,
+              color: _studentsProgressValue,
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _ProgressOverviewRow extends StatelessWidget {
-  const _ProgressOverviewRow({required this.item});
-
-  final ProgressOverview item;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(item.subject, style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w700)),
-            const Spacer(),
-            Text('${(item.completion * 100).round()}%', style: AppTypography.bodySmall),
-          ],
-        ),
-        const SizedBox(height: 6),
-        _LinearProgress(value: item.completion),
-      ],
     );
   }
 }
@@ -724,7 +1072,8 @@ class _AssessmentCard extends StatelessWidget {
       AssessmentType.quiz => 'Quiz',
     };
 
-    final String dueLabel = 'Due: ${assessment.dueDate.day} ${_monthName(assessment.dueDate.month)}, ${assessment.dueDate.year}';
+    final String dueLabel =
+        'Due: ${assessment.dueDate.day} ${_monthName(assessment.dueDate.month)}, ${assessment.dueDate.year}';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -743,11 +1092,16 @@ class _AssessmentCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(assessment.title, style: AppTypography.sectionTitle.copyWith(fontSize: 18)),
+                    Text(
+                      assessment.title,
+                      style: AppTypography.sectionTitle.copyWith(fontSize: 18),
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       'Submitted: ${assessment.submittedCount}/${assessment.totalCount} students',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(dueLabel, style: AppTypography.bodySmall),
@@ -819,14 +1173,13 @@ class _ContentCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: _studentsCardBackground,
-        border: Border.all(color: AppColors.studentsCardBorder),
-        borderRadius: BorderRadius.circular(26),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(32),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 24,
-            offset: Offset(0, 12),
+            color: Color(0x140F2236),
+            blurRadius: 30,
+            offset: Offset(0, 18),
           ),
         ],
       ),

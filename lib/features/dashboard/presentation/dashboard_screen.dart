@@ -1,9 +1,9 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
-import 'package:ai_tutor_web/features/classes/presentation/widgets/create_class_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/domain/models/dashboard_summary.dart';
 import 'package:ai_tutor_web/features/dashboard/domain/models/quick_action.dart';
 import 'package:ai_tutor_web/features/dashboard/domain/models/upcoming_task.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/dashboard_demo_data.dart';
+import 'package:ai_tutor_web/features/dashboard/presentation/widgets/create_class_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_lesson_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/assign_quiz_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_quick_actions.dart';

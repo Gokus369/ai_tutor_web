@@ -93,41 +93,75 @@ class ClassDetailsDemoData {
     ),
   ];
 
-  static final List<SubjectProgress> subjectProgress = [
-    SubjectProgress(
-      subject: 'Mathematics',
-      overallProgress: 0.62,
-      topics: [
-        const TopicProgress('Linear Equations (10/16)', 0.62),
-        const TopicProgress('Function & Graphs (5/8)', 0.46),
-        const TopicProgress('Variables and Constants', 0.77),
+  static final List<SyllabusSubject> syllabusSubjects = [
+    SyllabusSubject(
+      id: 'math',
+      title: 'Mathematics',
+      status: SyllabusStatus.inProgress,
+      modules: [
+        SyllabusModule(
+          id: 'math-linear',
+          title: 'Linear Equations',
+          topics: const [
+            SyllabusTopic(
+              title: 'Chapter 1; Linear Equations (10/15 topics)',
+              progress: 0.62,
+            ),
+            SyllabusTopic(
+              title: 'Chapter 2; Function & Graphs (5/8 topics)',
+              progress: 0.46,
+            ),
+            SyllabusTopic(
+              title: 'Chapter 3; Variables and Constants (9/10 topics)',
+              progress: 0.77,
+            ),
+          ],
+        ),
+        const SyllabusModule(
+          id: 'math-geometry',
+          title: 'Geometry',
+          topics: [],
+        ),
+        const SyllabusModule(
+          id: 'math-algebra',
+          title: 'Algebra',
+          topics: [],
+        ),
       ],
     ),
-    SubjectProgress(
-      subject: 'Physics',
-      overallProgress: 0.55,
-      topics: [
-        const TopicProgress('Kinematics', 0.60),
-        const TopicProgress('Dynamics', 0.50),
+    const SyllabusSubject(
+      id: 'physics',
+      title: 'Physics',
+      status: SyllabusStatus.inProgress,
+      modules: [
+        SyllabusModule(id: 'physics-module', title: 'Electricity', topics: []),
       ],
     ),
-    SubjectProgress(
-      subject: 'English',
-      overallProgress: 0.48,
-      topics: [
-        const TopicProgress('Literature', 0.58),
-        const TopicProgress('Grammar', 0.38),
+    const SyllabusSubject(
+      id: 'english',
+      title: 'English',
+      status: SyllabusStatus.inProgress,
+      modules: [
+        SyllabusModule(id: 'english-module', title: 'Literature Review', topics: []),
+      ],
+    ),
+    const SyllabusSubject(
+      id: 'social-science',
+      title: 'Social Science',
+      status: SyllabusStatus.completed,
+      modules: [
+        SyllabusModule(id: 'ss-module', title: 'History', topics: []),
       ],
     ),
   ];
 
   static final List<ProgressOverview> progressOverview = [
     const ProgressOverview(subject: 'Mathematics', completion: 0.73),
-    const ProgressOverview(subject: 'Physics', completion: 0.59),
-    const ProgressOverview(subject: 'Biology', completion: 0.60),
+    const ProgressOverview(subject: 'Physics', completion: 0.58),
+    const ProgressOverview(subject: 'Biology', completion: 0.69),
     const ProgressOverview(subject: 'Chemistry', completion: 0.87),
     const ProgressOverview(subject: 'English', completion: 0.81),
-    const ProgressOverview(subject: 'Social Science', completion: 0.46),
+    const ProgressOverview(subject: 'Social Science', completion: 0.44),
   ];
 
   static final List<ClassAssessment> assessments = [
@@ -188,20 +222,36 @@ enum StudentStatus { active, inactive }
 
 enum StudentPerformance { topPerformer, average, needAttention }
 
-class SubjectProgress {
-  SubjectProgress({
-    required this.subject,
-    required this.overallProgress,
+class SyllabusSubject {
+  const SyllabusSubject({
+    required this.id,
+    required this.title,
+    required this.status,
+    required this.modules,
+  });
+
+  final String id;
+  final String title;
+  final SyllabusStatus status;
+  final List<SyllabusModule> modules;
+}
+
+enum SyllabusStatus { inProgress, completed }
+
+class SyllabusModule {
+  const SyllabusModule({
+    required this.id,
+    required this.title,
     required this.topics,
   });
 
-  final String subject;
-  final double overallProgress;
-  final List<TopicProgress> topics;
+  final String id;
+  final String title;
+  final List<SyllabusTopic> topics;
 }
 
-class TopicProgress {
-  const TopicProgress(this.title, this.progress);
+class SyllabusTopic {
+  const SyllabusTopic({required this.title, required this.progress});
 
   final String title;
   final double progress;

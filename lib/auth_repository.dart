@@ -26,7 +26,7 @@ abstract class AuthRepository {
 class MockAuthRepository implements AuthRepository {
   static const _demoEmail = 'demo@aitutor.app';
   static const _demoUser = 'demo';
-  static const _demoPass = 'Passw0rd!';
+  static const _demoPass = 'password1';
 
   final List<_MockAccount> _accounts = [
     _MockAccount(

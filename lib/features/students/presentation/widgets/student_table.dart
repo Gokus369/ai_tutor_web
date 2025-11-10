@@ -12,7 +12,7 @@ const List<Alignment> _kDesktopHeaderAlignment = [
   Alignment.center,
   Alignment.centerLeft,
   Alignment.centerLeft,
-  Alignment.center,
+  Alignment.centerRight,
 ];
 const List<Alignment> _kDesktopCellAlignment = _kDesktopHeaderAlignment;
 const List<String> _kDesktopHeaders = [
@@ -85,7 +85,7 @@ class _StudentDesktopTable extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
             decoration: BoxDecoration(
               color: AppColors.studentsHeaderBackground,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
@@ -110,49 +110,48 @@ class _StudentDesktopTable extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+            padding: const EdgeInsets.fromLTRB(32, 24, 32, 28),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      for (int i = 0; i < _kDesktopHeaders.length; i++) ...[
-                        Expanded(
-                          flex: _kDesktopColumnFlex[i],
-                          child: Align(
-                            alignment: _kDesktopHeaderAlignment[i],
-                            child: Text(_kDesktopHeaders[i], style: AppTypography.studentsTableHeader),
-                          ),
-                        ),
-                        if (i != _kDesktopHeaders.length - 1) ...[
-                          const SizedBox(width: _kColumnSpacing / 2),
-                          const _ColumnDivider(),
-                          const SizedBox(width: _kColumnSpacing / 2),
-                        ],
-                      ],
-                      const SizedBox(width: _kColumnSpacing / 2),
-                      const _ColumnDivider(),
-                      const SizedBox(width: _kColumnSpacing / 2),
-                      const SizedBox(width: _kActionsWidth),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 14),
+                const _DesktopHeaderRow(),
+                const SizedBox(height: 12),
+                const Divider(height: 1, color: AppColors.studentsTableDivider),
+                const SizedBox(height: 12),
                 for (int i = 0; i < students.length; i++) ...[
                   _DesktopRow(student: students[i]),
                   if (i != students.length - 1)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
-                      child: Divider(height: 1, color: AppColors.studentsTableDivider),
-                    ),
+                    const Divider(height: 1, color: AppColors.studentsTableDivider),
                 ],
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DesktopHeaderRow extends StatelessWidget {
+  const _DesktopHeaderRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        for (int i = 0; i < _kDesktopHeaders.length; i++) ...[
+          Expanded(
+            flex: _kDesktopColumnFlex[i],
+            child: Align(
+              alignment: _kDesktopHeaderAlignment[i],
+              child: Text(_kDesktopHeaders[i], style: AppTypography.studentsTableHeader),
+            ),
+          ),
+          if (i != _kDesktopHeaders.length - 1) const SizedBox(width: _kColumnSpacing),
+        ],
+        const SizedBox(width: _kActionsWidth),
+      ],
     );
   }
 }
@@ -166,39 +165,21 @@ class _DesktopRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final cells = _buildCells();
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      child: Column(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (int i = 0; i < _kDesktopColumnFlex.length; i++) ...[
-                  Expanded(
-                    flex: _kDesktopColumnFlex[i],
-                    child: Align(
-                      alignment: _kDesktopCellAlignment[i],
-                      child: cells[i],
-                    ),
-                  ),
-                  if (i != _kDesktopColumnFlex.length - 1) ...[
-                    const SizedBox(width: _kColumnSpacing / 2),
-                    const _ColumnDivider(),
-                    const SizedBox(width: _kColumnSpacing / 2),
-                  ],
-                ],
-                const SizedBox(width: _kColumnSpacing / 2),
-                const _ColumnDivider(),
-                const SizedBox(width: _kColumnSpacing / 2),
-                const SizedBox(width: _kActionsWidth, child: _RowActions()),
-              ],
+          for (int i = 0; i < _kDesktopColumnFlex.length; i++) ...[
+            Expanded(
+              flex: _kDesktopColumnFlex[i],
+              child: Align(
+                alignment: _kDesktopCellAlignment[i],
+                child: cells[i],
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            height: 1,
-            color: AppColors.studentsTableDivider,
-          ),
+            if (i != _kDesktopColumnFlex.length - 1) const SizedBox(width: _kColumnSpacing),
+          ],
+          const SizedBox(width: _kActionsWidth, child: _RowActions()),
         ],
       ),
     );
@@ -394,11 +375,12 @@ class _StatusChip extends StatelessWidget {
     final String label = isActive ? 'Active' : 'Inactive';
 
     return Container(
-      height: 32,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
+      height: 27,
+      constraints: const BoxConstraints(minWidth: 93),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
       ),
       alignment: Alignment.center,
       child: Text(label, style: AppTypography.studentsStatusText),
@@ -417,22 +399,6 @@ class _RowActions extends StatelessWidget {
       splashRadius: 20,
       icon: const Icon(Icons.more_horiz, color: AppColors.iconMuted),
       onPressed: () {},
-    );
-  }
-}
-
-class _ColumnDivider extends StatelessWidget {
-  const _ColumnDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: double.infinity,
-      child: VerticalDivider(
-        width: 1,
-        thickness: 1,
-        color: AppColors.studentsTableDivider,
-      ),
     );
   }
 }

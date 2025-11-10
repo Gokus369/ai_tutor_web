@@ -3,7 +3,7 @@ import 'package:ai_tutor_web/features/classes/domain/class_filters.dart';
 import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_filters_bar.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_grid.dart';
-import 'package:ai_tutor_web/features/classes/presentation/widgets/create_class_dialog.dart';
+import 'package:ai_tutor_web/features/dashboard/presentation/widgets/create_class_dialog.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';

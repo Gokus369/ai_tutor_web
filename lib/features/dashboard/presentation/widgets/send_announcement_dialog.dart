@@ -127,7 +127,13 @@ class _SendAnnouncementDialogState extends State<SendAnnouncementDialog> {
                     },
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+                const Divider(
+                  height: 32,
+                  thickness: 1,
+                  color: AppColors.studentsCardBorder,
+                ),
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
