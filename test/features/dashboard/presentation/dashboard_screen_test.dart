@@ -10,11 +10,11 @@ void main() {
   }
 
   Future<void> pumpDashboard(WidgetTester tester) async {
-    tester.binding.window.physicalSizeTestValue = const Size(1400, 1200);
-    tester.binding.window.devicePixelRatioTestValue = 1;
+    tester.view.physicalSize = const Size(1400, 1200);
+    tester.view.devicePixelRatio = 1;
     addTearDown(() {
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
 
     await tester.pumpWidget(wrapApp());

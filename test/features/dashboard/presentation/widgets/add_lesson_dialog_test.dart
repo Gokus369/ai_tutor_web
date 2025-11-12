@@ -15,11 +15,11 @@ void main() {
   }
 
   testWidgets('requires lesson title', (tester) async {
-    tester.binding.window.physicalSizeTestValue = const Size(1400, 1000);
-    tester.binding.window.devicePixelRatioTestValue = 1;
+    tester.view.physicalSize = const Size(1400, 1000);
+    tester.view.devicePixelRatio = 1;
     addTearDown(() {
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
 
     AddLessonRequest? result;

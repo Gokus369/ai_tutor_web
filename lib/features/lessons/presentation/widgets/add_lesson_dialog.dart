@@ -93,16 +93,19 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
                           width: fieldWidth(250),
                           label: 'Subject',
                           child: DropdownButtonFormField<String>(
-                            value: hasSubjects ? _selectedSubject : null,
+                            initialValue: hasSubjects ? _selectedSubject : null,
                             items: subjectItems,
                             onChanged: hasSubjects
                                 ? (value) =>
                                       setState(() => _selectedSubject = value)
                                 : null,
                             validator: (value) {
-                              if (!hasSubjects) return 'No subjects available';
-                              if (value == null || value.isEmpty)
+                              if (!hasSubjects) {
+                                return 'No subjects available';
+                              }
+                              if (value == null || value.isEmpty) {
                                 return 'Select a subject';
+                              }
                               return null;
                             },
                             icon: const Icon(
@@ -132,8 +135,9 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
                               hint: 'Enter your Topic',
                             ),
                             validator: (value) {
-                              if ((value ?? '').trim().isEmpty)
+                              if ((value ?? '').trim().isEmpty) {
                                 return 'Enter a topic';
+                              }
                               return null;
                             },
                           ),
@@ -147,8 +151,9 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
                               hint: 'Enter your Lesson Title',
                             ),
                             validator: (value) {
-                              if ((value ?? '').trim().isEmpty)
+                              if ((value ?? '').trim().isEmpty) {
                                 return 'Enter a lesson title';
+                              }
                               return null;
                             },
                           ),
@@ -278,9 +283,13 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
   }
 
   void _handleSubmit() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     final subject = _selectedSubject;
-    if (subject == null || subject.isEmpty) return;
+    if (subject == null || subject.isEmpty) {
+      return;
+    }
     final lesson = LessonPlan(
       date: _selectedDate,
       className: widget.className,

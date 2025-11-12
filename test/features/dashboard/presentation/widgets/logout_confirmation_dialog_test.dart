@@ -13,11 +13,11 @@ void main() {
   }
 
   testWidgets('returns true when logout confirmed', (tester) async {
-    tester.binding.window.physicalSizeTestValue = const Size(1000, 800);
-    tester.binding.window.devicePixelRatioTestValue = 1;
+    tester.view.physicalSize = const Size(1000, 800);
+    tester.view.devicePixelRatio = 1;
     addTearDown(() {
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
 
     bool? result;
@@ -53,11 +53,11 @@ void main() {
   });
 
   testWidgets('returns false when cancel tapped', (tester) async {
-    tester.binding.window.physicalSizeTestValue = const Size(1000, 800);
-    tester.binding.window.devicePixelRatioTestValue = 1;
+    tester.view.physicalSize = const Size(1000, 800);
+    tester.view.devicePixelRatio = 1;
     addTearDown(() {
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
 
     bool? result;

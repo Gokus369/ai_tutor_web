@@ -14,11 +14,11 @@ void main() {
   const recipients = ['All Students', 'Class 10'];
 
   testWidgets('validates required fields before sending', (tester) async {
-    tester.binding.window.physicalSizeTestValue = const Size(1400, 1000);
-    tester.binding.window.devicePixelRatioTestValue = 1.0;
+    tester.view.physicalSize = const Size(1400, 1000);
+    tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
-      tester.binding.window.clearPhysicalSizeTestValue();
-      tester.binding.window.clearDevicePixelRatioTestValue();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
     });
 
     await tester.pumpWidget(
