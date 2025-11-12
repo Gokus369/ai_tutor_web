@@ -1,5 +1,7 @@
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/app_dialog_shell.dart';
+import 'package:ai_tutor_web/shared/widgets/app_form_fields.dart';
 import 'package:flutter/material.dart';
 
 class AssignQuizRequest {
@@ -143,202 +145,157 @@ class _AssignQuizDialogState extends State<AssignQuizDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.all(24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(
-          width: AssignQuizDialog.dialogWidth,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 32),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Text(
-                    'Assign Quiz',
-                    style: AppTypography.sectionTitle.copyWith(fontSize: 24),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Title',
-                  child: _TextField(
-                    controller: _titleController,
-                    hintText: 'Enter Quiz Title',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Title is required';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _TwoColumnRow(
-                  left: _DropdownField(
-                    label: 'Subject',
-                    value: _subject,
-                    options: widget.subjectOptions,
-                    onChanged: (value) => setState(() => _subject = value),
-                  ),
-                  right: _DropdownField(
-                    label: 'Topic',
-                    value: _topic,
-                    options: widget.topicOptions,
-                    onChanged: (value) => setState(() => _topic = value),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Instructions (Optional)',
-                  child: _MultilineField(
-                    controller: _messageController,
-                    hintText: 'e.g: Complete within 10 days.',
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _TwoColumnRow(
-                  left: _DropdownField(
-                    label: 'Assign To',
-                    value: _assignTo,
-                    options: widget.assignToOptions,
-                    onChanged: (value) => setState(() => _assignTo = value),
-                  ),
-                  right: _DropdownField(
-                    label: 'Class',
-                    value: _className,
-                    options: widget.classOptions,
-                    onChanged: (value) => setState(() => _className = value),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _TwoColumnRow(
-                  left: _DatePickerField(
-                    label: 'Start Date',
-                    date: _startDate,
-                    onTap: () => _pickDate(isStart: true),
-                  ),
-                  right: _DatePickerField(
-                    label: 'End Date',
-                    date: _endDate,
-                    onTap: () => _pickDate(isStart: false),
-                  ),
-                ),
-                const SizedBox(height: 28),
-                SizedBox(
-                  width: AssignQuizDialog.contentWidth,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Attach Questions',
-                        style: AppTypography.sectionTitle.copyWith(
-                          fontSize: 18,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _AttachmentCard(
-                              label: 'Generate via AI',
-                              icon: Icons.auto_awesome,
-                              selected: _attachmentType == AttachmentType.ai,
-                              onTap: () => setState(
-                                () => _attachmentType = AttachmentType.ai,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _AttachmentCard(
-                              label: 'Upload File',
-                              icon: Icons.upload_file,
-                              selected:
-                                  _attachmentType == AttachmentType.upload,
-                              onTap: () => setState(
-                                () => _attachmentType = AttachmentType.upload,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: AssignQuizDialog.contentWidth,
-                  child: Wrap(
-                    spacing: 24,
-                    runSpacing: 16,
-                    alignment: WrapAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: AssignQuizDialog.buttonWidth,
-                        height: AssignQuizDialog.buttonHeight,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.primary),
-                            foregroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                      ),
-                      SizedBox(
-                        width: AssignQuizDialog.buttonWidth,
-                        height: AssignQuizDialog.buttonHeight,
-                        child: ElevatedButton(
-                          onPressed: _submit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text('Assign'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    return AppDialogShell(
+      title: 'Assign Quiz',
+      width: AssignQuizDialog.dialogWidth,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AppLabeledField(
+              width: AssignQuizDialog.contentWidth,
+              label: 'Title',
+              child: AppTextFormField(
+                controller: _titleController,
+                hintText: 'Enter Quiz Title',
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Title is required';
+                  }
+                  return null;
+                },
+                height: AssignQuizDialog.fieldHeight,
+              ),
             ),
-          ),
+            const SizedBox(height: 24),
+            _TwoColumnRow(
+              left: AppLabeledField(
+                label: 'Subject',
+                child: AppDropdownFormField<String>(
+                  items: widget.subjectOptions,
+                  value: _subject,
+                  onChanged: (value) => setState(() => _subject = value),
+                  height: AssignQuizDialog.dropdownHeight,
+                ),
+              ),
+              right: AppLabeledField(
+                label: 'Topic',
+                child: AppDropdownFormField<String>(
+                  items: widget.topicOptions,
+                  value: _topic,
+                  onChanged: (value) => setState(() => _topic = value),
+                  height: AssignQuizDialog.dropdownHeight,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            AppLabeledField(
+              width: AssignQuizDialog.contentWidth,
+              label: 'Instructions (Optional)',
+              child: AppTextFormField(
+                controller: _messageController,
+                hintText: 'e.g: Complete within 10 days.',
+                height: 104,
+                expands: true,
+              ),
+            ),
+            const SizedBox(height: 24),
+            _TwoColumnRow(
+              left: AppLabeledField(
+                label: 'Assign To',
+                child: AppDropdownFormField<String>(
+                  items: widget.assignToOptions,
+                  value: _assignTo,
+                  onChanged: (value) => setState(() => _assignTo = value),
+                  height: AssignQuizDialog.dropdownHeight,
+                ),
+              ),
+              right: AppLabeledField(
+                label: 'Class',
+                child: AppDropdownFormField<String>(
+                  items: widget.classOptions,
+                  value: _className,
+                  onChanged: (value) => setState(() => _className = value),
+                  height: AssignQuizDialog.dropdownHeight,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            _TwoColumnRow(
+              left: AppLabeledField(
+                label: 'Start Date',
+                child: AppDateButton(
+                  label: formatCompactDate(_startDate),
+                  onTap: () => _pickDate(isStart: true),
+                  height: AssignQuizDialog.fieldHeight,
+                ),
+              ),
+              right: AppLabeledField(
+                label: 'End Date',
+                child: AppDateButton(
+                  label: formatCompactDate(_endDate),
+                  onTap: () => _pickDate(isStart: false),
+                  height: AssignQuizDialog.fieldHeight,
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: AssignQuizDialog.contentWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Attach Questions',
+                    style: AppTypography.sectionTitle.copyWith(fontSize: 18),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _AttachmentCard(
+                          label: 'Generate via AI',
+                          icon: Icons.auto_awesome,
+                          selected: _attachmentType == AttachmentType.ai,
+                          onTap: () => setState(
+                            () => _attachmentType = AttachmentType.ai,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _AttachmentCard(
+                          label: 'Upload File',
+                          icon: Icons.file_upload_outlined,
+                          selected: _attachmentType == AttachmentType.upload,
+                          onTap: () => setState(
+                            () => _attachmentType = AttachmentType.upload,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: AssignQuizDialog.contentWidth,
+              child: AppDialogActions(
+                primaryLabel: 'Assign',
+                onPrimaryPressed: _submit,
+                onCancel: () => Navigator.of(context).pop(),
+                buttonSize: const Size(
+                  AssignQuizDialog.buttonWidth,
+                  AssignQuizDialog.buttonHeight,
+                ),
+                mainAxisAlignment: MainAxisAlignment.start,
+              ),
+            ),
+          ],
         ),
-      ),
-    );
-  }
-}
-
-class _LabeledField extends StatelessWidget {
-  const _LabeledField({required this.label, required this.child});
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: AssignQuizDialog.contentWidth,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTypography.formLabel),
-          const SizedBox(height: 10),
-          child,
-        ],
       ),
     );
   }
@@ -361,143 +318,6 @@ class _TwoColumnRow extends StatelessWidget {
           Expanded(child: right),
         ],
       ),
-    );
-  }
-}
-
-class _TextField extends StatelessWidget {
-  const _TextField({
-    required this.controller,
-    required this.hintText,
-    required this.validator,
-  });
-
-  final TextEditingController controller;
-  final String hintText;
-  final FormFieldValidator<String> validator;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: AssignQuizDialog.fieldHeight,
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        decoration: _inputDecoration(hintText),
-      ),
-    );
-  }
-}
-
-class _MultilineField extends StatelessWidget {
-  const _MultilineField({required this.controller, required this.hintText});
-
-  final TextEditingController controller;
-  final String hintText;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 104,
-      child: TextFormField(
-        controller: controller,
-        maxLines: null,
-        expands: true,
-        decoration: _inputDecoration(
-          hintText,
-        ).copyWith(contentPadding: const EdgeInsets.all(16)),
-      ),
-    );
-  }
-}
-
-class _DropdownField extends StatelessWidget {
-  const _DropdownField({
-    required this.label,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final String label;
-  final String? value;
-  final List<String> options;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: AppTypography.formLabel),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: AssignQuizDialog.dropdownHeight,
-          child: DropdownButtonFormField<String>(
-            initialValue: value,
-            isExpanded: true,
-            items: options
-                .map(
-                  (option) =>
-                      DropdownMenuItem(value: option, child: Text(option)),
-                )
-                .toList(),
-            onChanged: onChanged,
-            decoration: _inputDecoration(''),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DatePickerField extends StatelessWidget {
-  const _DatePickerField({
-    required this.label,
-    required this.date,
-    required this.onTap,
-  });
-
-  final String label;
-  final DateTime date;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final formatted =
-        '${date.day.toString().padLeft(2, '0')} ${_monthName(date.month)} ${date.year}';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: AppTypography.formLabel),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: AssignQuizDialog.fieldHeight,
-          child: OutlinedButton(
-            onPressed: onTap,
-            style: OutlinedButton.styleFrom(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              side: const BorderSide(color: AppColors.studentsCardBorder),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: Row(
-              children: [
-                Text(formatted, style: AppTypography.bodySmall),
-                const Spacer(),
-                const Icon(
-                  Icons.calendar_today_outlined,
-                  size: 18,
-                  color: AppColors.iconMuted,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -551,42 +371,4 @@ class _AttachmentCard extends StatelessWidget {
       ),
     );
   }
-}
-
-String _monthName(int month) {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return months[month - 1];
-}
-
-InputDecoration _inputDecoration(String hint) {
-  return InputDecoration(
-    hintText: hint,
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
-    ),
-  );
 }

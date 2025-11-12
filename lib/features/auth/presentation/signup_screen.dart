@@ -6,6 +6,7 @@ import 'package:ai_tutor_web/features/auth/presentation/widgets/terms_and_policy
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key, required this.repository});
@@ -63,13 +64,17 @@ class _SignupScreenState extends State<SignupScreen> {
         builder: (context, constraints) {
           const double desiredWidth = 558;
           final double maxWidth = constraints.maxWidth;
-          final double horizontalPadding =
-              maxWidth > desiredWidth ? (maxWidth - desiredWidth) / 2 : 16;
-          final double clampedSidePadding =
-              (horizontalPadding * 2).clamp(0.0, maxWidth);
+          final double horizontalPadding = maxWidth > desiredWidth
+              ? (maxWidth - desiredWidth) / 2
+              : 16;
+          final double clampedSidePadding = (horizontalPadding * 2).clamp(
+            0.0,
+            maxWidth,
+          );
           final double availableWidth = maxWidth - clampedSidePadding;
-          final double cardWidth =
-              availableWidth > 0 ? availableWidth.clamp(0.0, desiredWidth) : desiredWidth;
+          final double cardWidth = availableWidth > 0
+              ? availableWidth.clamp(0.0, desiredWidth)
+              : desiredWidth;
           final Size screenSize = MediaQuery.of(context).size;
           final double topPadding = screenSize.height > 820 ? 120 : 72;
           final double bottomPadding = screenSize.height > 820 ? 72 : 40;
@@ -84,9 +89,7 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: cardWidth,
-                ),
+                constraints: BoxConstraints(maxWidth: cardWidth),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: AppColors.surface,
@@ -100,7 +103,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 40,
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -138,7 +144,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               if (email.isEmpty) {
                                 return 'Enter your email';
                               }
-                              final emailRegex = RegExp(r'^[\w\.\-]+@[\w\.\-]+\.[A-Za-z]{2,}$');
+                              final emailRegex = RegExp(
+                                r'^[\w\.\-]+@[\w\.\-]+\.[A-Za-z]{2,}$',
+                              );
                               if (!emailRegex.hasMatch(email)) {
                                 return 'Enter a valid email address';
                               }
@@ -160,8 +168,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                       : Icons.visibility_outlined,
                                   color: AppColors.iconMuted,
                                 ),
-                                onPressed: () =>
-                                    setState(() => _showPassword = !_showPassword),
+                                onPressed: () => setState(
+                                  () => _showPassword = !_showPassword,
+                                ),
                               ),
                             ),
                             validator: (value) {
@@ -172,7 +181,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               if (password.length < 8) {
                                 return 'Password must be at least 8 characters';
                               }
-                              final hasLetter = RegExp(r'[A-Za-z]').hasMatch(password);
+                              final hasLetter = RegExp(
+                                r'[A-Za-z]',
+                              ).hasMatch(password);
                               final hasDigit = RegExp(r'\d').hasMatch(password);
                               if (!hasLetter || !hasDigit) {
                                 return 'Include both letters and numbers';
@@ -196,7 +207,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                   color: AppColors.iconMuted,
                                 ),
                                 onPressed: () => setState(
-                                  () => _showConfirmPassword = !_showConfirmPassword,
+                                  () => _showConfirmPassword =
+                                      !_showConfirmPassword,
                                 ),
                               ),
                             ),
@@ -227,7 +239,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                   ),
                                 )
                                 .toList(),
-                            onChanged: (value) => setState(() => _selectedRole = value),
+                            onChanged: (value) =>
+                                setState(() => _selectedRole = value),
                           ),
                           const SizedBox(height: 18),
                           const FormFieldLabel(text: 'Education Board'),
@@ -245,7 +258,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                   ),
                                 )
                                 .toList(),
-                            onChanged: (value) => setState(() => _selectedBoard = value),
+                            onChanged: (value) =>
+                                setState(() => _selectedBoard = value),
                           ),
                           const SizedBox(height: 18),
                           const FormFieldLabel(text: 'School Name'),
@@ -263,7 +277,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                   ),
                                 )
                                 .toList(),
-                            onChanged: (value) => setState(() => _selectedSchool = value),
+                            onChanged: (value) =>
+                                setState(() => _selectedSchool = value),
                           ),
                           const SizedBox(height: 24),
                           TermsAndPolicyCheckbox(
@@ -271,24 +286,28 @@ class _SignupScreenState extends State<SignupScreen> {
                             onChanged: (value) =>
                                 setState(() => _acceptTerms = value ?? false),
                             onTermsTap: () =>
-                                Navigator.of(context).pushNamed(AppRoutes.termsOfUse),
+                                context.push(AppRoutes.termsOfUse),
                             onPrivacyTap: () =>
-                                Navigator.of(context).pushNamed(AppRoutes.privacyPolicy),
+                                context.push(AppRoutes.privacyPolicy),
                           ),
                           const SizedBox(height: 24),
                           SizedBox(
                             width: double.infinity,
                             height: 38,
                             child: ElevatedButton(
-                              onPressed:
-                                  (!_acceptTerms || _submitting) ? null : () => _onSubmit(),
+                              onPressed: (!_acceptTerms || _submitting)
+                                  ? null
+                                  : () => _onSubmit(),
                               child: _submitting
                                   ? const SizedBox(
                                       height: 18,
                                       width: 18,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
                                     )
                                   : const Text('Create Account'),
@@ -302,19 +321,23 @@ class _SignupScreenState extends State<SignupScreen> {
                               children: [
                                 Text(
                                   'Already have an account?',
-                                  style: AppTypography.bodySmall.copyWith(fontSize: 14),
+                                  style: AppTypography.bodySmall.copyWith(
+                                    fontSize: 14,
+                                  ),
                                 ),
                                 TextButton(
-                                  onPressed: () => Navigator.of(context)
-                                      .pushReplacementNamed(AppRoutes.login),
+                                  onPressed: () => context.go(AppRoutes.login),
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                   ),
                                   child: Text(
                                     'Login',
-                                    style: AppTypography.linkSmall.copyWith(fontSize: 14),
+                                    style: AppTypography.linkSmall.copyWith(
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -352,21 +375,18 @@ class _SignupScreenState extends State<SignupScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Welcome, ${user.displayName}!')),
-      );
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.dashboard,
-        (_) => false,
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Welcome, ${user.displayName}!')));
+      context.go(AppRoutes.dashboard);
     } catch (e) {
       if (!mounted) {
         return;
       }
       final message = e.toString().replaceFirst('Exception: ', '');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (mounted) {
         setState(() => _submitting = false);

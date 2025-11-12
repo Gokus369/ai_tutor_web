@@ -2,6 +2,7 @@ import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardSidebar extends StatelessWidget {
   const DashboardSidebar({super.key, required this.activeRoute});
@@ -112,9 +113,7 @@ class DashboardSidebar extends StatelessWidget {
                       ? null
                       : () {
                           if (data.route == activeRoute) return;
-                          Navigator.of(
-                            context,
-                          ).pushReplacementNamed(data.route!);
+                          context.go(data.route!);
                         },
                 );
               },

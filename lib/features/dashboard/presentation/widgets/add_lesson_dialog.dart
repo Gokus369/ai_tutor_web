@@ -1,5 +1,5 @@
-import 'package:ai_tutor_web/shared/styles/app_colors.dart';
-import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/app_dialog_shell.dart';
+import 'package:ai_tutor_web/shared/widgets/app_form_fields.dart';
 import 'package:flutter/material.dart';
 
 class AddLessonRequest {
@@ -112,361 +112,118 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.all(24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(
-          width: AddLessonDialog.dialogWidth,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 32),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
-                  child: Text(
-                    'New Lesson',
-                    style: AppTypography.sectionTitle.copyWith(fontSize: 24),
+    return AppDialogShell(
+      title: 'New Lesson',
+      width: AddLessonDialog.dialogWidth,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: AddLessonDialog.contentWidth,
+              child: Row(
+                children: [
+                  AppLabeledField(
+                    width: AddLessonDialog.splitFieldWidth,
+                    label: 'Subject',
+                    child: AppDropdownFormField<String>(
+                      items: widget.subjectOptions,
+                      value: _subject,
+                      onChanged: (value) => setState(() => _subject = value),
+                      height: AddLessonDialog.fieldHeight,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: AddLessonDialog.splitFieldWidth,
-                      child: _DropdownField(
-                        label: 'Subject',
-                        value: _subject,
-                        options: widget.subjectOptions,
-                        onChanged: (value) => setState(() => _subject = value),
-                      ),
+                  const SizedBox(width: 16),
+                  AppLabeledField(
+                    width: AddLessonDialog.splitFieldWidth,
+                    label: 'Topic',
+                    child: AppTextFormField(
+                      controller: _topicController,
+                      hintText: 'Enter your Topic',
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Topic is required';
+                        }
+                        return null;
+                      },
+                      height: AddLessonDialog.fieldHeight,
                     ),
-                    SizedBox(
-                      width: AddLessonDialog.splitFieldWidth,
-                      child: _TextField(
-                        label: 'Topic',
-                        controller: _topicController,
-                        hintText: 'Enter your Topic',
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Topic is required';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: AddLessonDialog.contentWidth,
-                  child: _TextField(
-                    label: 'Lesson',
-                    controller: _lessonController,
-                    hintText: 'Enter your Lesson Title',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Lesson title is required';
-                      }
-                      return null;
-                    },
                   ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: AddLessonDialog.smallFieldWidth,
-                      child: _SmallDropdownField(
-                        label: 'Class',
-                        value: _className,
-                        options: widget.classOptions,
-                        onChanged: (value) =>
-                            setState(() => _className = value),
-                      ),
-                    ),
-                    SizedBox(
-                      width: AddLessonDialog.smallFieldWidth,
-                      child: _SmallDateField(
-                        label: 'Start Date',
-                        child: _DateButton(
-                          date: _startDate,
-                          onTap: () => _pickDate(isStart: true),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: AddLessonDialog.smallFieldWidth,
-                      child: _SmallDateField(
-                        label: 'End Date',
-                        child: _DateButton(
-                          date: _endDate,
-                          onTap: () => _pickDate(isStart: false),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: AddLessonDialog.contentWidth,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: AddLessonDialog.buttonWidth,
-                        height: AddLessonDialog.buttonHeight,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.primary),
-                            foregroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                      ),
-                      SizedBox(
-                        width: AddLessonDialog.buttonWidth,
-                        height: AddLessonDialog.buttonHeight,
-                        child: ElevatedButton(
-                          onPressed: _submit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text('Add'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DropdownField extends StatelessWidget {
-  const _DropdownField({
-    required this.label,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final String label;
-  final String? value;
-  final List<String> options;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: AppTypography.formLabel),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: AddLessonDialog.fieldHeight,
-          child: DropdownButtonFormField<String>(
-            initialValue: value,
-            isExpanded: true,
-            items: options
-                .map(
-                  (option) =>
-                      DropdownMenuItem(value: option, child: Text(option)),
-                )
-                .toList(),
-            onChanged: onChanged,
-            decoration: _inputDecoration(''),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _TextField extends StatelessWidget {
-  const _TextField({
-    required this.label,
-    required this.controller,
-    required this.hintText,
-    required this.validator,
-  });
-
-  final String label;
-  final TextEditingController controller;
-  final String hintText;
-  final FormFieldValidator<String> validator;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: AppTypography.formLabel),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: AddLessonDialog.fieldHeight,
-          child: TextFormField(
-            controller: controller,
-            validator: validator,
-            decoration: _inputDecoration(hintText),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SmallDateField extends StatelessWidget {
-  const _SmallDateField({required this.label, required this.child});
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: AddLessonDialog.smallFieldWidth,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTypography.formLabel),
-          const SizedBox(height: 10),
-          SizedBox(height: AddLessonDialog.fieldHeight, child: child),
-        ],
-      ),
-    );
-  }
-}
-
-class _SmallDropdownField extends StatelessWidget {
-  const _SmallDropdownField({
-    required this.label,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final String label;
-  final String? value;
-  final List<String> options;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: AddLessonDialog.smallFieldWidth,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTypography.formLabel),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: AddLessonDialog.fieldHeight,
-            child: DropdownButtonFormField<String>(
-              initialValue: value,
-              isExpanded: true,
-              items: options
-                  .map(
-                    (option) =>
-                        DropdownMenuItem(value: option, child: Text(option)),
-                  )
-                  .toList(),
-              onChanged: onChanged,
-              decoration: _inputDecoration(''),
+            const SizedBox(height: 24),
+            AppLabeledField(
+              width: AddLessonDialog.contentWidth,
+              label: 'Lesson',
+              child: AppTextFormField(
+                controller: _lessonController,
+                hintText: 'Enter your Lesson Title',
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Lesson title is required';
+                  }
+                  return null;
+                },
+                height: AddLessonDialog.fieldHeight,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            SizedBox(
+              width: AddLessonDialog.contentWidth,
+              child: Row(
+                children: [
+                  AppLabeledField(
+                    width: AddLessonDialog.smallFieldWidth,
+                    label: 'Class',
+                    child: AppDropdownFormField<String>(
+                      items: widget.classOptions,
+                      value: _className,
+                      onChanged: (value) => setState(() => _className = value),
+                      height: AddLessonDialog.fieldHeight,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  AppLabeledField(
+                    width: AddLessonDialog.smallFieldWidth,
+                    label: 'Start Date',
+                    child: AppDateButton(
+                      label: formatCompactDate(_startDate),
+                      onTap: () => _pickDate(isStart: true),
+                      height: AddLessonDialog.fieldHeight,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  AppLabeledField(
+                    width: AddLessonDialog.smallFieldWidth,
+                    label: 'End Date',
+                    child: AppDateButton(
+                      label: formatCompactDate(_endDate),
+                      onTap: () => _pickDate(isStart: false),
+                      height: AddLessonDialog.fieldHeight,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: AddLessonDialog.contentWidth,
+              child: AppDialogActions(
+                primaryLabel: 'Add',
+                onPrimaryPressed: _submit,
+                onCancel: () => Navigator.of(context).pop(false),
+                buttonSize: const Size(
+                  AddLessonDialog.buttonWidth,
+                  AddLessonDialog.buttonHeight,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
-
-class _DateButton extends StatelessWidget {
-  const _DateButton({required this.date, required this.onTap});
-
-  final DateTime date;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final String label =
-        '${date.day.toString().padLeft(2, '0')} ${_monthName(date.month)} ${date.year}';
-
-    return OutlinedButton(
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        side: const BorderSide(color: AppColors.studentsCardBorder),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-      child: Row(
-        children: [
-          Expanded(child: Text(label, style: AppTypography.bodySmall)),
-          const Icon(
-            Icons.calendar_today_outlined,
-            size: 18,
-            color: AppColors.iconMuted,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-String _monthName(int month) {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return months[(month - 1).clamp(0, 11)];
-}
-
-InputDecoration _inputDecoration(String hint) {
-  return InputDecoration(
-    hintText: hint,
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
-    ),
-  );
 }

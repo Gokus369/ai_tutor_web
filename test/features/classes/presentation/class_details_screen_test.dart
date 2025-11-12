@@ -9,11 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('Class details screen shows summaries and tabs', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(),
-        routes: {AppRoutes.classDetails: (_) => const ClassDetailsScreen()},
-        initialRoute: AppRoutes.classDetails,
-      ),
+      MaterialApp(theme: AppTheme.light(), home: const ClassDetailsScreen()),
     );
 
     expect(find.text('Class 12'), findsOneWidget);
@@ -33,14 +29,15 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light(),
-        routes: {AppRoutes.classDetails: (_) => const ClassDetailsScreen()},
         home: Builder(
           builder: (context) => Scaffold(
             body: ClassCard(
               info: info,
-              onViewDetails: () => Navigator.of(context).pushNamed(
-                AppRoutes.classDetails,
-                arguments: info,
+              onViewDetails: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ClassDetailsScreen(initialInfo: info),
+                  settings: const RouteSettings(name: AppRoutes.classDetails),
+                ),
               ),
             ),
           ),

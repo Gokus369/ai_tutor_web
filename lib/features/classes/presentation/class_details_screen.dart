@@ -16,7 +16,9 @@ const Color _studentsActionButtonBorder = Color(0xFFE1ECF5);
 const Color _syllabusCollapsedBorder = AppColors.studentsCardBorder;
 
 class ClassDetailsScreen extends StatefulWidget {
-  const ClassDetailsScreen({super.key});
+  const ClassDetailsScreen({super.key, this.initialInfo});
+
+  final ClassInfo? initialInfo;
 
   @override
   State<ClassDetailsScreen> createState() => _ClassDetailsScreenState();
@@ -36,6 +38,7 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final ClassInfo? info =
+        widget.initialInfo ??
         ModalRoute.of(context)?.settings.arguments as ClassInfo?;
     final String className = info?.name ?? ClassDetailsDemoData.className;
 

@@ -1,5 +1,6 @@
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
-import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/app_dialog_shell.dart';
+import 'package:ai_tutor_web/shared/widgets/app_form_fields.dart';
 import 'package:flutter/material.dart';
 
 class SendAnnouncementRequest {
@@ -67,238 +68,82 @@ class _SendAnnouncementDialogState extends State<SendAnnouncementDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.all(24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(
-          width: SendAnnouncementDialog.dialogWidth,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 32),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Send Announcement',
-                  style: AppTypography.sectionTitle.copyWith(fontSize: 24),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Title',
-                  child: _TextField(
-                    controller: _titleController,
-                    hintText: 'Enter Notification Title',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Title is required';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Message',
-                  child: _MultilineField(
-                    controller: _messageController,
-                    hintText: 'Enter your Announcement Message...',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Message is required';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Recipients',
-                  child: _DropdownField(
-                    value: _selectedRecipient,
-                    options: widget.recipientOptions,
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _selectedRecipient = value);
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Divider(
-                  height: 32,
-                  thickness: 1,
-                  color: AppColors.studentsCardBorder,
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: SendAnnouncementDialog.buttonWidth,
-                      height: SendAnnouncementDialog.buttonHeight,
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primary),
-                          foregroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text('Cancel'),
-                      ),
-                    ),
-                    SizedBox(
-                      width: SendAnnouncementDialog.buttonWidth,
-                      height: SendAnnouncementDialog.buttonHeight,
-                      child: ElevatedButton(
-                        onPressed: _handleSubmit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text('Send'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+    return AppDialogShell(
+      title: 'Send Announcement',
+      width: SendAnnouncementDialog.dialogWidth,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            AppLabeledField(
+              width: SendAnnouncementDialog.contentWidth,
+              label: 'Title',
+              child: AppTextFormField(
+                controller: _titleController,
+                hintText: 'Enter Notification Title',
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Title is required';
+                  }
+                  return null;
+                },
+                height: SendAnnouncementDialog.fieldHeight,
+              ),
             ),
-          ),
+            const SizedBox(height: 24),
+            AppLabeledField(
+              width: SendAnnouncementDialog.contentWidth,
+              label: 'Message',
+              child: AppTextFormField(
+                controller: _messageController,
+                hintText: 'Enter your Announcement Message...',
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Message is required';
+                  }
+                  return null;
+                },
+                height: 135,
+                expands: true,
+              ),
+            ),
+            const SizedBox(height: 24),
+            AppLabeledField(
+              width: SendAnnouncementDialog.contentWidth,
+              label: 'Recipients',
+              child: AppDropdownFormField<String>(
+                items: widget.recipientOptions,
+                value: _selectedRecipient,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _selectedRecipient = value);
+                  }
+                },
+                height: SendAnnouncementDialog.dropdownHeight,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Divider(
+              height: 32,
+              thickness: 1,
+              color: AppColors.studentsCardBorder,
+            ),
+            const SizedBox(height: 8),
+            AppDialogActions(
+              primaryLabel: 'Send',
+              onPrimaryPressed: _handleSubmit,
+              onCancel: () => Navigator.of(context).pop(),
+              buttonSize: const Size(
+                SendAnnouncementDialog.buttonWidth,
+                SendAnnouncementDialog.buttonHeight,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-}
-
-class _LabeledField extends StatelessWidget {
-  const _LabeledField({required this.label, required this.child});
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: SendAnnouncementDialog.contentWidth,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTypography.formLabel),
-          const SizedBox(height: 10),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _TextField extends StatelessWidget {
-  const _TextField({
-    required this.controller,
-    required this.hintText,
-    required this.validator,
-  });
-
-  final TextEditingController controller;
-  final String hintText;
-  final FormFieldValidator<String> validator;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: SendAnnouncementDialog.fieldHeight,
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        decoration: _fieldDecoration(hintText),
-      ),
-    );
-  }
-}
-
-class _MultilineField extends StatelessWidget {
-  const _MultilineField({
-    required this.controller,
-    required this.hintText,
-    required this.validator,
-  });
-
-  final TextEditingController controller;
-  final String hintText;
-  final FormFieldValidator<String> validator;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 135,
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        maxLines: null,
-        expands: true,
-        decoration: _fieldDecoration(
-          hintText,
-        ).copyWith(contentPadding: const EdgeInsets.all(16)),
-      ),
-    );
-  }
-}
-
-class _DropdownField extends StatelessWidget {
-  const _DropdownField({
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final String value;
-  final List<String> options;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: SendAnnouncementDialog.dropdownHeight,
-      child: DropdownButtonFormField<String>(
-        initialValue: value,
-        items: options
-            .map(
-              (option) =>
-                  DropdownMenuItem<String>(value: option, child: Text(option)),
-            )
-            .toList(),
-        onChanged: onChanged,
-        decoration: _fieldDecoration(''),
-      ),
-    );
-  }
-}
-
-InputDecoration _fieldDecoration(String hint) {
-  return InputDecoration(
-    hintText: hint,
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
-    ),
-  );
 }

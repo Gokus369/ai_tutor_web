@@ -2,6 +2,7 @@ import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_card.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ClassGrid extends StatelessWidget {
   const ClassGrid({
@@ -26,8 +27,9 @@ class ClassGrid extends StatelessWidget {
       columns = 1;
     }
 
-    final double cardWidth =
-        columns == 1 ? contentWidth : (contentWidth - spacing * (columns - 1)) / columns;
+    final double cardWidth = columns == 1
+        ? contentWidth
+        : (contentWidth - spacing * (columns - 1)) / columns;
 
     return Wrap(
       spacing: spacing,
@@ -38,10 +40,8 @@ class ClassGrid extends StatelessWidget {
               width: cardWidth,
               child: ClassCard(
                 info: info,
-                onViewDetails: () => Navigator.of(context).pushNamed(
-                  AppRoutes.classDetails,
-                  arguments: info,
-                ),
+                onViewDetails: () =>
+                    context.push(AppRoutes.classDetails, extra: info),
               ),
             ),
           )
