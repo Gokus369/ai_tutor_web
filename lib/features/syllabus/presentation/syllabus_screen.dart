@@ -3,7 +3,7 @@ import 'package:ai_tutor_web/features/syllabus/domain/models/syllabus_progress.d
 import 'package:ai_tutor_web/features/syllabus/domain/models/syllabus_subject.dart';
 import 'package:ai_tutor_web/features/syllabus/presentation/widgets/syllabus_progress_panel.dart';
 import 'package:ai_tutor_web/features/syllabus/presentation/widgets/syllabus_subject_card.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -95,8 +95,10 @@ class _SyllabusScreenState extends State<SyllabusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.syllabus,
+      title: 'Syllabus',
+      titleSpacing: 20,
       builder: (context, shell) {
         final double width = shell.contentWidth;
         final bool showSidePanel = width >= 1080;
@@ -104,8 +106,6 @@ class _SyllabusScreenState extends State<SyllabusScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Syllabus', style: AppTypography.dashboardTitle),
-            const SizedBox(height: 20),
             if (width >= 720)
               Row(
                 children: const [

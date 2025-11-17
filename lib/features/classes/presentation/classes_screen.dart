@@ -4,7 +4,7 @@ import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_filters_bar.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_grid.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/create_class_dialog.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -133,39 +133,42 @@ class _ClassesScreenState extends State<ClassesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.classes,
+      title: 'Classes',
+      titleSpacing: 20,
+      headerBuilder: (context, shell) {
+        final bool isCompact = shell.contentWidth < 480;
+        return isCompact
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Classes', style: AppTypography.dashboardTitle),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 44,
+                    child: _NewClassButton(onPressed: _openCreateClassDialog),
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: Text('Classes', style: AppTypography.dashboardTitle),
+                  ),
+                  SizedBox(
+                    height: 44,
+                    child: _NewClassButton(onPressed: _openCreateClassDialog),
+                  ),
+                ],
+              );
+      },
       builder: (context, shell) {
         final bool isCompact = shell.contentWidth < 760;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text('Classes', style: AppTypography.dashboardTitle),
-                ),
-                SizedBox(
-                  height: 44,
-                  child: ElevatedButton.icon(
-                    onPressed: _openCreateClassDialog,
-                    icon: const Icon(Icons.add, size: 20),
-                    label: Text('New Class', style: AppTypography.button),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
             ClassFiltersBar(
               isCompact: isCompact,
               boardOptions: _boardOptions,
@@ -184,6 +187,30 @@ class _ClassesScreenState extends State<ClassesScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+class _NewClassButton extends StatelessWidget {
+  const _NewClassButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add, size: 20),
+      label: Text('New Class', style: AppTypography.button),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 0,
+      ),
     );
   }
 }

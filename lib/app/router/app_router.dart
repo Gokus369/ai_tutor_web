@@ -19,7 +19,7 @@ import 'package:ai_tutor_web/features/reports/presentation/reports_screen.dart';
 import 'package:ai_tutor_web/features/settings/presentation/settings_screen.dart';
 import 'package:ai_tutor_web/features/students/presentation/students_screen.dart';
 import 'package:ai_tutor_web/features/syllabus/presentation/syllabus_screen.dart';
-import 'package:ai_tutor_web/screens/login_screen.dart';
+import 'package:ai_tutor_web/features/auth/presentation/login_screen.dart';
 import 'package:ai_tutor_web/features/auth/presentation/signup_screen.dart';
 import 'package:go_router/go_router.dart';
 

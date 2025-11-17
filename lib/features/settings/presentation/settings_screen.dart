@@ -1,7 +1,7 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/settings/data/settings_demo_data.dart';
 import 'package:ai_tutor_web/features/settings/domain/models/settings_models.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -25,9 +25,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.settings,
-      builder: (context, shell) {
+      title: 'Settings',
+      alignContentToStart: true,
+      maxContentWidth: 1200,
+      builder: (_, __) {
         return SettingsView(
           data: widget.data,
           notificationsEnabled: _notificationsEnabled,
@@ -59,31 +62,13 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double contentWidth = constraints.maxWidth >= 1200 ? 1200 : constraints.maxWidth;
-        return Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox(
-            width: contentWidth,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Settings', style: AppTypography.dashboardTitle),
-                const SizedBox(height: 24),
-                SettingsCard(
-                  profile: data.profile,
-                  sections: data.sections,
-                  notificationsEnabled: notificationsEnabled,
-                  onToggleNotifications: onToggleNotifications,
-                  onEditProfile: onEditProfile,
-                  onNavigate: onNavigate,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+    return SettingsCard(
+      profile: data.profile,
+      sections: data.sections,
+      notificationsEnabled: notificationsEnabled,
+      onToggleNotifications: onToggleNotifications,
+      onEditProfile: onEditProfile,
+      onNavigate: onNavigate,
     );
   }
 }

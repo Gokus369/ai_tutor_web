@@ -3,7 +3,7 @@ import 'package:ai_tutor_web/features/students/domain/models/student_report.dart
 import 'package:ai_tutor_web/features/students/domain/student_filters.dart';
 import 'package:ai_tutor_web/features/students/presentation/widgets/student_filters_bar.dart';
 import 'package:ai_tutor_web/features/students/presentation/widgets/student_table.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -149,28 +149,33 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.students,
-      builder: (context, shell) {
+      title: 'Students',
+      titleSpacing: 20,
+      headerBuilder: (context, shell) {
         final bool isCompactHeader = shell.contentWidth < 640;
-
+        return _Header(
+          isCompact: isCompactHeader,
+          onAddStudent: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Add student tapped')),
+            );
+          },
+        );
+      },
+      builder: (context, shell) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Header(
-              isCompact: isCompactHeader,
-              onAddStudent: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Add student tapped')),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
                 color: AppColors.studentsCardBackground,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1.2),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                  width: 1.2,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.primary.withValues(alpha: 0.08),
@@ -192,9 +197,12 @@ class _StudentsScreenState extends State<StudentsScreen> {
                 selectedPerformance: _selectedPerformance,
                 searchController: _searchController,
                 onClassChanged: (value) => setState(() => _selectedClass = value),
-                onAttendanceChanged: (value) => setState(() => _selectedAttendance = value),
-                onProgressChanged: (value) => setState(() => _selectedProgress = value),
-                onPerformanceChanged: (value) => setState(() => _selectedPerformance = value),
+                onAttendanceChanged: (value) =>
+                    setState(() => _selectedAttendance = value),
+                onProgressChanged: (value) =>
+                    setState(() => _selectedProgress = value),
+                onPerformanceChanged: (value) =>
+                    setState(() => _selectedPerformance = value),
               ),
             ),
             const SizedBox(height: 24),

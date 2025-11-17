@@ -58,9 +58,10 @@ class AppDialogActions extends StatelessWidget {
     this.onCancel,
     this.cancelLabel = 'Cancel',
     this.buttonSize = const Size(163, 48),
-    this.mainAxisAlignment = MainAxisAlignment.spaceBetween,
+    this.mainAxisAlignment = MainAxisAlignment.start,
     this.primaryStyle,
     this.cancelStyle,
+    this.spacing = 16,
   });
 
   final String primaryLabel;
@@ -71,10 +72,12 @@ class AppDialogActions extends StatelessWidget {
   final MainAxisAlignment mainAxisAlignment;
   final ButtonStyle? primaryStyle;
   final ButtonStyle? cancelStyle;
+  final double spacing;
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: mainAxisAlignment,
       children: [
         SizedBox(
@@ -92,8 +95,9 @@ class AppDialogActions extends StatelessWidget {
                   ),
                 ),
             child: Text(cancelLabel),
-          ),
+            ),
         ),
+        SizedBox(width: spacing),
         SizedBox(
           width: buttonSize.width,
           height: buttonSize.height,

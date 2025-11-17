@@ -2,7 +2,7 @@ import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/class_details_demo_data.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_summary_section.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -42,8 +42,9 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
         ModalRoute.of(context)?.settings.arguments as ClassInfo?;
     final String className = info?.name ?? ClassDetailsDemoData.className;
 
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.classes,
+      title: className,
       builder: (context, shell) {
         final double width = shell.contentWidth;
         return ValueListenableBuilder<_DetailTab>(
@@ -52,8 +53,6 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _Header(className: className),
-                const SizedBox(height: 24),
                 DashboardSummarySection(
                   metrics: ClassDetailsDemoData.summaries,
                   availableWidth: width,
@@ -74,22 +73,6 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
           },
         );
       },
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({required this.className});
-
-  final String className;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(child: Text(className, style: AppTypography.dashboardTitle)),
-      ],
     );
   }
 }

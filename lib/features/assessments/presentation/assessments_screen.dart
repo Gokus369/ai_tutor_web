@@ -3,8 +3,7 @@ import 'package:ai_tutor_web/features/assessments/data/assessment_demo_data.dart
 import 'package:ai_tutor_web/features/assessments/domain/models/assessment_models.dart';
 import 'package:ai_tutor_web/features/assessments/presentation/widgets/assessments_summary_card.dart';
 import 'package:ai_tutor_web/features/assessments/presentation/widgets/assessments_table_section.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
-import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:flutter/material.dart';
 
 class AssessmentsScreen extends StatefulWidget {
@@ -79,41 +78,35 @@ class _AssessmentsScreenState extends State<AssessmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.assessments,
+      title: 'Assessments',
+      alignContentToStart: true,
+      maxContentWidth: 1200,
       builder: (context, shell) {
-        final double contentWidth = shell.contentWidth;
-        final double resolvedWidth = contentWidth >= 1200 ? 1200 : contentWidth;
-        final bool compact = resolvedWidth < 960;
+        final double effectiveWidth = shell.contentWidth.clamp(0.0, 1200.0);
+        final bool compact = effectiveWidth < 960;
 
-        return Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox(
-            width: resolvedWidth,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Assessments', style: AppTypography.dashboardTitle),
-                const SizedBox(height: 24),
-                AssessmentsSummaryCard(
-                  filters: widget.data.filters,
-                  activeView: _view,
-                  onViewChanged: _onViewChanged,
-                  onClassChanged: _onClassChanged,
-                  onStatusChanged: _onStatusChanged,
-                  onSubjectChanged: _onSubjectChanged,
-                  searchController: _searchController,
-                  onSearchChanged: _onSearchChanged,
-                ),
-                const SizedBox(height: 28),
-                AssessmentsTableSection(
-                  title: _sectionTitle(_view),
-                  section: _currentSection.copyWith(records: _filteredRecords),
-                  compact: compact,
-                ),
-              ],
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AssessmentsSummaryCard(
+              filters: widget.data.filters,
+              activeView: _view,
+              onViewChanged: _onViewChanged,
+              onClassChanged: _onClassChanged,
+              onStatusChanged: _onStatusChanged,
+              onSubjectChanged: _onSubjectChanged,
+              searchController: _searchController,
+              onSearchChanged: _onSearchChanged,
             ),
-          ),
+            const SizedBox(height: 28),
+            AssessmentsTableSection(
+              title: _sectionTitle(_view),
+              section: _currentSection.copyWith(records: _filteredRecords),
+              compact: compact,
+            ),
+          ],
         );
       },
     );

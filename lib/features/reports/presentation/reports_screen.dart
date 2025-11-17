@@ -1,7 +1,7 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/reports/data/reports_demo_data.dart';
 import 'package:ai_tutor_web/features/reports/domain/models/reports_models.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -34,14 +34,27 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.reports,
+      title: 'Reports',
+      alignContentToStart: true,
+      maxContentWidth: 1200,
+      headerBuilder: (context, shell) {
+        return _ReportsHeader(
+          data: _data,
+          selectedClass: _selectedClass,
+          onClassChanged: _onClassChanged,
+          onExportPressed: () {},
+          narrow: shell.contentWidth < 720,
+        );
+      },
       builder: (context, shell) {
         return ReportsView(
           data: _data,
           selectedClass: _selectedClass,
           onClassChanged: _onClassChanged,
           onExportPressed: () {},
+          showHeader: false,
         );
       },
     );
@@ -56,12 +69,14 @@ class ReportsView extends StatelessWidget {
     required this.selectedClass,
     required this.onClassChanged,
     required this.onExportPressed,
+    this.showHeader = true,
   });
 
   final ReportsData data;
   final String selectedClass;
   final ValueChanged<String> onClassChanged;
   final VoidCallback onExportPressed;
+  final bool showHeader;
 
   @override
   Widget build(BuildContext context) {
@@ -80,13 +95,16 @@ class ReportsView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ReportsHeader(
-                  data: data,
-                  selectedClass: selectedClass,
-                  onClassChanged: onClassChanged,
-                  onExportPressed: onExportPressed,
-                ),
-                const SizedBox(height: 28),
+                if (showHeader) ...[
+                  _ReportsHeader(
+                    data: data,
+                    selectedClass: selectedClass,
+                    onClassChanged: onClassChanged,
+                    onExportPressed: onExportPressed,
+                    narrow: contentWidth < 720,
+                  ),
+                  const SizedBox(height: 28),
+                ],
                 ReportsMetricsSection(metrics: data.metrics),
                 const SizedBox(height: 28),
                 ReportsSubjectsPanel(subjects: data.subjects, padding: panelPadding),
@@ -105,16 +123,17 @@ class _ReportsHeader extends StatelessWidget {
     required this.selectedClass,
     required this.onClassChanged,
     required this.onExportPressed,
+    required this.narrow,
   });
 
   final ReportsData data;
   final String selectedClass;
   final ValueChanged<String> onClassChanged;
   final VoidCallback onExportPressed;
+  final bool narrow;
 
   @override
   Widget build(BuildContext context) {
-    final bool narrow = MediaQuery.sizeOf(context).width < 720;
     final dropdown = ReportsClassSelector(
       classes: data.classOptions,
       value: selectedClass,

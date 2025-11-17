@@ -1,5 +1,5 @@
-import 'package:ai_tutor_web/shared/styles/app_colors.dart';
-import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/app_dialog_shell.dart';
+import 'package:ai_tutor_web/shared/widgets/app_form_fields.dart';
 import 'package:flutter/material.dart';
 
 class CreateClassRequest {
@@ -88,252 +88,74 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final EdgeInsets contentPadding = const EdgeInsets.symmetric(
-      horizontal: 36,
-      vertical: 32,
-    );
-
-    return Dialog(
-      insetPadding: const EdgeInsets.all(24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(
-          width: CreateClassDialog.dialogWidth,
-        ),
-        child: Padding(
-          padding: contentPadding,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'New Class',
-                  style: AppTypography.sectionTitle.copyWith(fontSize: 24),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Class Name',
-                  child: _TextField(
-                    controller: _classNameController,
-                    hintText: 'e.g., Class 10',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Class name is required';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Board',
-                  child: _DropdownField(
-                    value: _selectedBoard,
-                    options: widget.boardOptions,
-                    onChanged: (value) =>
-                        setState(() => _selectedBoard = value),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Section (Optional)',
-                  child: _TextField(
-                    controller: _sectionController,
-                    hintText: 'e.g., A',
-                    validator: (_) => null,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _LabeledField(
-                  label: 'Start Date',
-                  child: _DateField(date: _selectedDate, onPickDate: _pickDate),
-                ),
-                const SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      height: CreateClassDialog.buttonHeight,
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primary),
-                          foregroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(horizontal: 28),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text('Cancel'),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    SizedBox(
-                      height: CreateClassDialog.buttonHeight,
-                      child: ElevatedButton(
-                        onPressed: _handleSubmit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text('Create'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LabeledField extends StatelessWidget {
-  const _LabeledField({required this.label, required this.child});
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: CreateClassDialog.contentWidth,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTypography.formLabel),
-          const SizedBox(height: 12),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _TextField extends StatelessWidget {
-  const _TextField({
-    required this.controller,
-    required this.hintText,
-    required this.validator,
-  });
-
-  final TextEditingController controller;
-  final String hintText;
-  final FormFieldValidator<String> validator;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: CreateClassDialog.fieldHeight,
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        decoration: InputDecoration(
-          hintText: hintText,
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DropdownField extends StatelessWidget {
-  const _DropdownField({
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final String? value;
-  final List<String> options;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: CreateClassDialog.fieldHeight,
-      child: DropdownButtonFormField<String>(
-        initialValue: value,
-        items: options
-            .map(
-              (option) => DropdownMenuItem(value: option, child: Text(option)),
-            )
-            .toList(),
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.studentsCardBorder),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DateField extends StatelessWidget {
-  const _DateField({required this.date, required this.onPickDate});
-
-  final DateTime? date;
-  final VoidCallback onPickDate;
-
-  @override
-  Widget build(BuildContext context) {
-    final String label = date == null
-        ? 'Select start date'
-        : '${date!.day.toString().padLeft(2, '0')}/${date!.month.toString().padLeft(2, '0')}/${date!.year}';
-
-    return SizedBox(
-      height: CreateClassDialog.fieldHeight,
-      child: OutlinedButton(
-        onPressed: onPickDate,
-        style: OutlinedButton.styleFrom(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          side: const BorderSide(color: AppColors.studentsCardBorder),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: Row(
+    return AppDialogShell(
+      title: 'New Class',
+      width: CreateClassDialog.dialogWidth,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(label, style: AppTypography.bodySmall),
-            const Spacer(),
-            const Icon(
-              Icons.calendar_today_outlined,
-              size: 18,
-              color: AppColors.iconMuted,
+            AppLabeledField(
+              width: CreateClassDialog.contentWidth,
+              label: 'Class Name',
+              child: AppTextFormField(
+                controller: _classNameController,
+                hintText: 'e.g., Class 10',
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Class name is required';
+                  }
+                  return null;
+                },
+                height: CreateClassDialog.fieldHeight,
+              ),
+            ),
+            const SizedBox(height: 24),
+            AppLabeledField(
+              width: CreateClassDialog.contentWidth,
+              label: 'Board',
+              child: AppDropdownFormField<String>(
+                items: widget.boardOptions,
+                value: _selectedBoard,
+                onChanged: (value) => setState(() => _selectedBoard = value),
+                height: CreateClassDialog.fieldHeight,
+              ),
+            ),
+            const SizedBox(height: 24),
+            AppLabeledField(
+              width: CreateClassDialog.contentWidth,
+              label: 'Section (Optional)',
+              child: AppTextFormField(
+                controller: _sectionController,
+                hintText: 'e.g., A',
+                validator: (_) => null,
+                height: CreateClassDialog.fieldHeight,
+              ),
+            ),
+            const SizedBox(height: 24),
+            AppLabeledField(
+              width: CreateClassDialog.contentWidth,
+              label: 'Start Date',
+              child: AppDateButton(
+                label: _selectedDate == null
+                    ? 'Select start date'
+                    : formatCompactDate(_selectedDate!),
+                onTap: _pickDate,
+                height: CreateClassDialog.fieldHeight,
+              ),
+            ),
+            const SizedBox(height: 32),
+            Align(
+              alignment: Alignment.centerRight,
+              child: AppDialogActions(
+                primaryLabel: 'Create',
+                onPrimaryPressed: _handleSubmit,
+                onCancel: () => Navigator.of(context).pop(),
+                buttonSize: const Size(140, CreateClassDialog.buttonHeight),
+                mainAxisAlignment: MainAxisAlignment.end,
+              ),
             ),
           ],
         ),

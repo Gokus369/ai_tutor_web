@@ -4,7 +4,7 @@ import 'package:ai_tutor_web/features/instructor_cohort/domain/models/learner_pr
 import 'package:ai_tutor_web/features/instructor_cohort/presentation/widgets/class_completion_card.dart';
 import 'package:ai_tutor_web/features/instructor_cohort/presentation/widgets/cohort_metrics_row.dart';
 import 'package:ai_tutor_web/features/instructor_cohort/presentation/widgets/instructor_cohort_header.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -84,31 +84,34 @@ class _InstructorCohortScreenState extends State<InstructorCohortScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.instructorCohort,
+      title: 'Instructor Cohort',
+      headerBuilder: (context, shell) {
+        final bool isCompact = shell.contentWidth < 900;
+        return InstructorCohortHeader(
+          title: 'Instructor Cohort',
+          searchController: _searchController,
+          classOptions: _classOptions,
+          topicOptions: _topicOptions,
+          selectedClass: _selectedClass,
+          selectedTopic: _selectedTopic,
+          isCompact: isCompact,
+          onClassChanged: (value) => setState(() => _selectedClass = value),
+          onTopicChanged: (value) => setState(() => _selectedTopic = value),
+          onDownloadReport: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Download report tapped')),
+            );
+          },
+        );
+      },
       builder: (context, shell) {
         final bool isCompact = shell.contentWidth < 900;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            InstructorCohortHeader(
-              title: 'Instructor Cohort',
-              searchController: _searchController,
-              classOptions: _classOptions,
-              topicOptions: _topicOptions,
-              selectedClass: _selectedClass,
-              selectedTopic: _selectedTopic,
-              isCompact: isCompact,
-              onClassChanged: (value) => setState(() => _selectedClass = value),
-              onTopicChanged: (value) => setState(() => _selectedTopic = value),
-              onDownloadReport: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Download report tapped')),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
             CohortMetricsRow(metrics: _metrics, isCompact: isCompact),
             const SizedBox(height: 28),
             ClassCompletionCard(learners: _learners, isCompact: isCompact),

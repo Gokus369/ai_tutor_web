@@ -1,10 +1,11 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
+import 'package:ai_tutor_web/features/lessons/data/lessons_planner_demo_data.dart';
 import 'package:ai_tutor_web/features/lessons/domain/lesson_filters.dart';
 import 'package:ai_tutor_web/features/lessons/domain/models/lesson_plan.dart';
 import 'package:ai_tutor_web/features/lessons/presentation/widgets/add_lesson_dialog.dart';
 import 'package:ai_tutor_web/features/lessons/presentation/widgets/lesson_filters.dart';
 import 'package:ai_tutor_web/features/lessons/presentation/widgets/lessons_table.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
@@ -15,103 +16,21 @@ class LessonsPlannerScreen extends StatefulWidget {
   State<LessonsPlannerScreen> createState() => _LessonsPlannerScreenState();
 }
 
-const List<String> _classOptions = [
-  'All Classes',
-  'Class 12',
-  'Class 11',
-  'Class 10',
-];
-
-const List<String> _subjectOptions = [
-  'All Subjects',
-  'Mathematics',
-  'Science',
-  'English',
-  'History',
-];
-
-final List<LessonPlan> _seedPlans = [
-  LessonPlan(
-    date: DateTime(2025, 8, 31),
-    className: 'Class 12',
-    subject: 'Mathematics',
-    description: 'Chapter 1: Linear Equations',
-    topic: 'Linear Equations Introduction',
-    startTime: const TimeOfDay(hour: 9, minute: 0),
-    endTime: const TimeOfDay(hour: 10, minute: 0),
-    status: LessonStatus.pending,
-  ),
-  LessonPlan(
-    date: DateTime(2025, 8, 30),
-    className: 'Class 12',
-    subject: 'Mathematics',
-    description: 'Chapter 1: Linear Equations',
-    topic: 'Solving Word Problems',
-    startTime: const TimeOfDay(hour: 9, minute: 0),
-    endTime: const TimeOfDay(hour: 10, minute: 0),
-    status: LessonStatus.pending,
-  ),
-  LessonPlan(
-    date: DateTime(2025, 8, 28),
-    className: 'Class 11',
-    subject: 'Science',
-    description: 'Chapter 5: Matter in Our Surroundings',
-    topic: 'States of Matter',
-    startTime: const TimeOfDay(hour: 11, minute: 0),
-    endTime: const TimeOfDay(hour: 12, minute: 0),
-    status: LessonStatus.pending,
-  ),
-  LessonPlan(
-    date: DateTime(2025, 8, 27),
-    className: 'Class 11',
-    subject: 'English',
-    description: 'Chapter 3: Literature',
-    topic: 'Poetry Analysis Workshop',
-    startTime: const TimeOfDay(hour: 14, minute: 0),
-    endTime: const TimeOfDay(hour: 15, minute: 0),
-    status: LessonStatus.pending,
-  ),
-  LessonPlan(
-    date: DateTime(2025, 8, 26),
-    className: 'Class 10',
-    subject: 'Mathematics',
-    description: 'Chapter 2: Geometry',
-    topic: 'Geometry Review',
-    startTime: const TimeOfDay(hour: 11, minute: 0),
-    endTime: const TimeOfDay(hour: 12, minute: 0),
-    status: LessonStatus.completed,
-  ),
-  LessonPlan(
-    date: DateTime(2025, 8, 25),
-    className: 'Class 10',
-    subject: 'Mathematics',
-    description: 'Chapter 2: Geometry',
-    topic: 'Geometry Review',
-    startTime: const TimeOfDay(hour: 10, minute: 0),
-    endTime: const TimeOfDay(hour: 11, minute: 0),
-    status: LessonStatus.completed,
-  ),
-  LessonPlan(
-    date: DateTime(2025, 8, 24),
-    className: 'Class 10',
-    subject: 'English',
-    description: 'Chapter 3: Literature',
-    topic: 'Geometry Review',
-    startTime: const TimeOfDay(hour: 14, minute: 0),
-    endTime: const TimeOfDay(hour: 15, minute: 0),
-    status: LessonStatus.completed,
-  ),
-];
-
 class _LessonsPlannerScreenState extends State<LessonsPlannerScreen> {
   final TextEditingController _searchController = TextEditingController();
-  late List<LessonPlan> _plans = List.of(_seedPlans);
-  String _selectedClass = _classOptions.first;
-  String _selectedSubject = _subjectOptions.first;
+  late List<LessonPlan> _plans;
+  late String _selectedClass;
+  late String _selectedSubject;
+
+  List<String> get _classOptions => LessonsPlannerDemoData.classOptions;
+  List<String> get _subjectOptions => LessonsPlannerDemoData.subjectOptions;
 
   @override
   void initState() {
     super.initState();
+    _plans = List.of(LessonsPlannerDemoData.plans);
+    _selectedClass = LessonsPlannerDemoData.classOptions.first;
+    _selectedSubject = LessonsPlannerDemoData.subjectOptions.first;
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -132,16 +51,24 @@ class _LessonsPlannerScreenState extends State<LessonsPlannerScreen> {
         selectedClass: _selectedClass,
         selectedSubject: _selectedSubject,
         query: _searchController.text,
-        allClassLabel: _classOptions.first,
-        allSubjectLabel: _subjectOptions.first,
+        allClassLabel: LessonsPlannerDemoData.classOptions.first,
+        allSubjectLabel: LessonsPlannerDemoData.subjectOptions.first,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.lessons,
+      title: 'Lessons Planner',
+      headerBuilder: (context, shell) {
+        final bool isCompact = shell.contentWidth < 880;
+        return _Header(
+          isCompact: isCompact,
+          onAddLesson: _openAddLessonDialog,
+        );
+      },
       builder: (context, shell) {
         final bool isCompact = shell.contentWidth < 880;
         final bool isTablet = shell.isTablet || shell.contentWidth < 1100;
@@ -149,8 +76,6 @@ class _LessonsPlannerScreenState extends State<LessonsPlannerScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _Header(isCompact: isCompact, onAddLesson: _openAddLessonDialog),
-            const SizedBox(height: 24),
             LessonsFilters(
               isCompact: isCompact,
               isTablet: isTablet,

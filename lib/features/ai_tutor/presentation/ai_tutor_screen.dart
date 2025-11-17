@@ -3,7 +3,7 @@ import 'package:ai_tutor_web/features/ai_tutor/domain/models/ai_tutor_models.dar
 import 'package:ai_tutor_web/features/ai_tutor/presentation/widgets/ai_tutor_inputs.dart';
 import 'package:ai_tutor_web/features/ai_tutor/presentation/widgets/ai_tutor_section_card.dart';
 import 'package:ai_tutor_web/features/ai_tutor/presentation/widgets/ai_tutor_styles.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -66,8 +66,11 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.aiTutor,
+      title: 'AI Tutor',
+      alignContentToStart: true,
+      maxContentWidth: 1200,
       builder: (context, shell) {
         return AiTutorView(
           data: widget.data,
@@ -77,6 +80,7 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
           onResponseSpeedChanged: _setResponseSpeed,
           onContentStrictnessChanged: _setContentStrictness,
           onLanguageChanged: _setLanguage,
+          showTitle: false,
         );
       },
     );
@@ -94,6 +98,7 @@ class AiTutorView extends StatelessWidget {
     required this.onResponseSpeedChanged,
     required this.onContentStrictnessChanged,
     required this.onLanguageChanged,
+    this.showTitle = true,
   });
 
   final AiTutorData data;
@@ -103,6 +108,7 @@ class AiTutorView extends StatelessWidget {
   final ValueChanged<String> onResponseSpeedChanged;
   final ValueChanged<String> onContentStrictnessChanged;
   final ValueChanged<String> onLanguageChanged;
+  final bool showTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -126,8 +132,10 @@ class AiTutorView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('AI Tutor', style: AppTypography.dashboardTitle),
-                const SizedBox(height: 24),
+                if (showTitle) ...[
+                  Text('AI Tutor', style: AppTypography.dashboardTitle),
+                  const SizedBox(height: 24),
+                ],
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(horizontal: panelPadding, vertical: panelPadding),

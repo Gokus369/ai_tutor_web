@@ -3,8 +3,7 @@ import 'package:ai_tutor_web/features/progress/domain/models/progress_models.dar
 import 'package:ai_tutor_web/features/progress/presentation/widgets/progress_modules_view.dart';
 import 'package:ai_tutor_web/features/progress/presentation/widgets/progress_students_table.dart';
 import 'package:ai_tutor_web/features/progress/presentation/widgets/progress_summary_card.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
-import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:flutter/material.dart';
 
 class ProgressScreen extends StatefulWidget {
@@ -43,61 +42,55 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.progress,
+      title: 'Progress',
+      alignContentToStart: true,
+      maxContentWidth: 1200,
       builder: (context, shell) {
-        final double contentWidth = shell.contentWidth;
-        final double resolvedWidth = contentWidth >= 1200 ? 1200 : contentWidth;
-        final bool compact = resolvedWidth < 960;
+        final double effectiveWidth = shell.contentWidth.clamp(0.0, 1200.0);
+        final bool compact = effectiveWidth < 960;
 
-        return Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox(
-            width: resolvedWidth,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Progress', style: AppTypography.dashboardTitle),
-                const SizedBox(height: 24),
-                ProgressSummaryCard(
-                  summary: widget.data.summary,
-                  compact: compact,
-                  classOptions: widget.data.classOptions,
-                  selectedClass: _selectedClass,
-                  view: _activeView,
-                  onClassChanged: (value) {
-                    if (value == null) return;
-                    setState(() => _selectedClass = value);
-                  },
-                  onViewChanged: (view) {
-                    if (view == _activeView) return;
-                    setState(() {
-                      _activeView = view;
-                      if (view == ProgressView.modules) {
-                        _searchController.clear();
-                      }
-                    });
-                  },
-                  searchController: _searchController,
-                  onSearchChanged: _activeView == ProgressView.students
-                      ? (_) => setState(() {})
-                      : null,
-                ),
-                const SizedBox(height: 28),
-                if (_activeView == ProgressView.modules)
-                  ProgressModulesView(
-                    detail: widget.data.mathematics,
-                    additionalSubjects: widget.data.additionalSubjects,
-                    compact: compact,
-                  )
-                else
-                  ProgressStudentsTable(
-                    students: _filteredStudents,
-                    compact: compact,
-                  ),
-              ],
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ProgressSummaryCard(
+              summary: widget.data.summary,
+              compact: compact,
+              classOptions: widget.data.classOptions,
+              selectedClass: _selectedClass,
+              view: _activeView,
+              onClassChanged: (value) {
+                if (value == null) return;
+                setState(() => _selectedClass = value);
+              },
+              onViewChanged: (view) {
+                if (view == _activeView) return;
+                setState(() {
+                  _activeView = view;
+                  if (view == ProgressView.modules) {
+                    _searchController.clear();
+                  }
+                });
+              },
+              searchController: _searchController,
+              onSearchChanged: _activeView == ProgressView.students
+                  ? (_) => setState(() {})
+                  : null,
             ),
-          ),
+            const SizedBox(height: 28),
+            if (_activeView == ProgressView.modules)
+              ProgressModulesView(
+                detail: widget.data.mathematics,
+                additionalSubjects: widget.data.additionalSubjects,
+                compact: compact,
+              )
+            else
+              ProgressStudentsTable(
+                students: _filteredStudents,
+                compact: compact,
+              ),
+          ],
         );
       },
     );

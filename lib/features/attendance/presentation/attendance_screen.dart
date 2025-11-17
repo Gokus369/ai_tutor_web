@@ -4,8 +4,7 @@ import 'package:ai_tutor_web/features/attendance/presentation/widgets/attendance
 import 'package:ai_tutor_web/features/attendance/presentation/widgets/attendance_summary_card.dart';
 import 'package:ai_tutor_web/features/attendance/presentation/widgets/attendance_table.dart';
 import 'package:ai_tutor_web/features/lessons/presentation/utils/lesson_formatters.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
-import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:flutter/material.dart';
 
 const List<String> _classOptions = [
@@ -168,16 +167,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         .where((r) => r.status == AttendanceStatus.late)
         .length;
 
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.attendance,
+      title: 'Attendance',
+      titleSpacing: 20,
       builder: (context, shell) {
         final bool stackSummary = shell.contentWidth < 1040;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Attendance', style: AppTypography.dashboardTitle),
-            const SizedBox(height: 20),
             AttendanceFiltersBar(
               searchController: _searchController,
               dateController: _dateController,

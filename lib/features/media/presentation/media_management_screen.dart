@@ -3,7 +3,7 @@ import 'package:ai_tutor_web/features/media/domain/models/media_item.dart';
 import 'package:ai_tutor_web/features/media/presentation/widgets/media_management_header.dart';
 import 'package:ai_tutor_web/features/media/presentation/widgets/media_list.dart';
 import 'package:ai_tutor_web/features/media/presentation/widgets/media_upload_section.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:flutter/material.dart';
 
 class MediaManagementScreen extends StatefulWidget {
@@ -64,27 +64,30 @@ class _MediaManagementScreenState extends State<MediaManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.mediaManagement,
+      title: 'Media Management',
+      headerBuilder: (context, shell) {
+        final double width = shell.contentWidth;
+        final bool stackHeader = width < 720;
+        return MediaManagementHeader(
+          title: 'Media Management',
+          classOptions: _classOptions,
+          selectedClass: _selectedClass,
+          stacked: stackHeader,
+          onClassChanged: (value) => setState(() => _selectedClass = value),
+          onUploadNew: () {
+            _showSnackBar(context, 'Upload new media tapped');
+          },
+        );
+      },
       builder: (context, shell) {
         final double width = shell.contentWidth;
         final bool isNarrow = width < 880;
-        final bool stackHeader = width < 720;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            MediaManagementHeader(
-              title: 'Media Management',
-              classOptions: _classOptions,
-              selectedClass: _selectedClass,
-              stacked: stackHeader,
-              onClassChanged: (value) => setState(() => _selectedClass = value),
-              onUploadNew: () {
-                _showSnackBar(context, 'Upload new media tapped');
-              },
-            ),
-            const SizedBox(height: 24),
             MediaUploadSection(
               onUploadTap: () => _showSnackBar(context, 'Upload area tapped'),
               isCompact: isNarrow,

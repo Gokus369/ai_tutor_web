@@ -5,7 +5,7 @@ import 'package:ai_tutor_web/features/notifications/domain/services/notification
 import 'package:ai_tutor_web/features/notifications/presentation/widgets/create_notification_dialog.dart';
 import 'package:ai_tutor_web/features/notifications/presentation/widgets/notification_filters_bar.dart';
 import 'package:ai_tutor_web/features/notifications/presentation/widgets/notifications_table.dart';
-import 'package:ai_tutor_web/shared/layout/dashboard_shell.dart';
+import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -222,19 +222,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardShell(
+    return DashboardPage(
       activeRoute: AppRoutes.notifications,
-      builder: (context, shell) {
+      title: 'Notifications',
+      headerBuilder: (context, shell) {
         final double width = shell.contentWidth;
-        final bool isCompactFilters = width < 980;
         final bool stackHeader = width < 640;
-        final notifications = _filterService.apply(
-          source: _allNotifications,
-          filters: _filters,
+        final double buttonHeight = shell.isDesktop ? 48 : 44;
+        final EdgeInsets horizontalPadding = EdgeInsets.symmetric(
+          horizontal: shell.isDesktop ? 28 : 20,
         );
-        final filterOptions = widget.filterOptions;
         final Widget createButton = SizedBox(
-          height: shell.isDesktop ? 48 : 44,
+          height: buttonHeight,
           child: ElevatedButton.icon(
             onPressed: () => _showCreateNotificationDialog(context),
             icon: const Icon(Icons.add, size: 20),
@@ -246,9 +245,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               elevation: 0,
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(
-                horizontal: shell.isDesktop ? 28 : 20,
-              ),
+              padding: horizontalPadding,
               minimumSize: const Size(0, 44),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -257,26 +254,41 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         );
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (stackHeader) ...[
+        if (stackHeader) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               Text('Notifications', style: AppTypography.dashboardTitle),
               const SizedBox(height: 16),
               createButton,
-            ] else
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Notifications',
-                      style: AppTypography.dashboardTitle,
-                    ),
-                  ),
-                  createButton,
-                ],
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Notifications',
+                style: AppTypography.dashboardTitle,
               ),
-            const SizedBox(height: 24),
+            ),
+            createButton,
+          ],
+        );
+      },
+      builder: (context, shell) {
+        final double width = shell.contentWidth;
+        final bool isCompactFilters = width < 980;
+        final notifications = _filterService.apply(
+          source: _allNotifications,
+          filters: _filters,
+        );
+        final filterOptions = widget.filterOptions;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             NotificationFiltersBar(
               isCompact: isCompactFilters,
               searchController: _searchController,
