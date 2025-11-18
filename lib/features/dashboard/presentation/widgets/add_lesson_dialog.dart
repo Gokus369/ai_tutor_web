@@ -1,4 +1,5 @@
 import 'package:ai_tutor_web/shared/widgets/app_dialog_shell.dart';
+import 'package:ai_tutor_web/shared/widgets/app_dropdown_field.dart';
 import 'package:ai_tutor_web/shared/widgets/app_form_fields.dart';
 import 'package:flutter/material.dart';
 
@@ -97,17 +98,39 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final subject = _subject;
+    final className = _className;
+    if (_isPlaceholder(subject) || _isPlaceholder(className)) {
+      return;
+    }
 
     Navigator.of(context).pop(
       AddLessonRequest(
-        subject: _subject ?? '',
+        subject: subject!.trim(),
         topic: _topicController.text.trim(),
         lessonTitle: _lessonController.text.trim(),
-        className: _className ?? '',
+        className: className!.trim(),
         startDate: _startDate,
         endDate: _endDate,
       ),
     );
+  }
+
+  String? _validateSelection(String? value, {required String message}) {
+    if (_isPlaceholder(value)) {
+      return message;
+    }
+    return null;
+  }
+
+  bool _isPlaceholder(String? value) {
+    if (value == null) return true;
+    final normalized = value.trim().toLowerCase();
+    if (normalized.isEmpty) return true;
+    if (normalized == 'select' || normalized.startsWith('select ')) {
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -125,15 +148,16 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
               width: AddLessonDialog.contentWidth,
               child: Row(
                 children: [
-                  AppLabeledField(
-                    width: AddLessonDialog.splitFieldWidth,
+                  AppDropdownField<String>(
                     label: 'Subject',
-                    child: AppDropdownFormField<String>(
-                      items: widget.subjectOptions,
-                      value: _subject,
-                      onChanged: (value) => setState(() => _subject = value),
-                      height: AddLessonDialog.fieldHeight,
-                    ),
+                    items: widget.subjectOptions,
+                    value: _subject,
+                    onChanged: (value) => setState(() => _subject = value),
+                    validator: (value) =>
+                        _validateSelection(value, message: 'Select a subject'),
+                    width: AddLessonDialog.splitFieldWidth,
+                    height: AddLessonDialog.fieldHeight,
+                    decoration: AppFormDecorations.filled(),
                   ),
                   const SizedBox(width: 16),
                   AppLabeledField(
@@ -175,15 +199,16 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
               width: AddLessonDialog.contentWidth,
               child: Row(
                 children: [
-                  AppLabeledField(
-                    width: AddLessonDialog.smallFieldWidth,
+                  AppDropdownField<String>(
                     label: 'Class',
-                    child: AppDropdownFormField<String>(
-                      items: widget.classOptions,
-                      value: _className,
-                      onChanged: (value) => setState(() => _className = value),
-                      height: AddLessonDialog.fieldHeight,
-                    ),
+                    items: widget.classOptions,
+                    value: _className,
+                    onChanged: (value) => setState(() => _className = value),
+                    validator: (value) =>
+                        _validateSelection(value, message: 'Select a class'),
+                    width: AddLessonDialog.smallFieldWidth,
+                    height: AddLessonDialog.fieldHeight,
+                    decoration: AppFormDecorations.filled(),
                   ),
                   const SizedBox(width: 16),
                   AppLabeledField(

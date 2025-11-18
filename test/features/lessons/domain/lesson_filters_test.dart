@@ -31,11 +31,13 @@ void main() {
     String selectedClass = 'All Classes',
     String selectedSubject = 'All Subjects',
     String query = '',
+    LessonStatus? status,
   }) {
     return LessonFilterOptions(
       selectedClass: selectedClass,
       selectedSubject: selectedSubject,
       query: query,
+      selectedStatus: status,
     );
   }
 
@@ -63,5 +65,13 @@ void main() {
       options: buildOptions(query: 'matter'),
     );
     expect(results.single.subject, 'Science');
+  });
+
+  test('filter by status', () {
+    final results = filterLessons(
+      samplePlans,
+      options: buildOptions(status: LessonStatus.completed),
+    );
+    expect(results.single.status, LessonStatus.completed);
   });
 }

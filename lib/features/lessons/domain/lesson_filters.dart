@@ -7,6 +7,7 @@ class LessonFilterOptions {
     required this.query,
     this.allClassLabel = 'All Classes',
     this.allSubjectLabel = 'All Subjects',
+    this.selectedStatus,
   });
 
   final String selectedClass;
@@ -14,6 +15,7 @@ class LessonFilterOptions {
   final String query;
   final String allClassLabel;
   final String allSubjectLabel;
+  final LessonStatus? selectedStatus;
 }
 
 List<LessonPlan> filterLessons(
@@ -33,9 +35,10 @@ List<LessonPlan> filterLessons(
           plan.description,
           plan.className,
         ].any((value) => value.toLowerCase().contains(needle));
+    final bool statusMatches =
+        options.selectedStatus == null || plan.status == options.selectedStatus;
 
-    return classMatches && subjectMatches && queryMatches;
+    return classMatches && subjectMatches && queryMatches && statusMatches;
   }).toList()
     ..sort((a, b) => b.date.compareTo(a.date));
 }
-

@@ -1,5 +1,6 @@
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
-import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/app_dropdown_field.dart';
+import 'package:ai_tutor_web/shared/widgets/filter_panel.dart';
 import 'package:flutter/material.dart';
 
 class LessonsFilters extends StatelessWidget {
@@ -28,65 +29,34 @@ class LessonsFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dropdownSpacing = isTablet ? 16.0 : 20.0;
+    final dropdownWidth = isTablet ? 180.0 : 200.0;
+    final searchWidth = isTablet ? 320.0 : 360.0;
 
-    final dropdowns = [
-      Expanded(
-        child: _DropdownFilter(
-          label: 'Class',
-          value: selectedClass,
-          items: classOptions,
-          onChanged: onClassChanged,
-        ),
-      ),
-      SizedBox(width: dropdownSpacing),
-      Expanded(
-        child: _DropdownFilter(
-          label: 'Subject',
-          value: selectedSubject,
-          items: subjectOptions,
-          onChanged: onSubjectChanged,
-        ),
-      ),
-    ];
-
-    if (isCompact) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _SearchField(controller: searchController),
-          const SizedBox(height: 16),
-          Row(children: dropdowns),
-        ],
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return FilterPanel(
+      forceColumn: isCompact ? true : null,
+      breakpoint: isTablet ? 920 : 1024,
       children: [
-        Flexible(
-          flex: isTablet ? 2 : 3,
+        SizedBox(
+          width: searchWidth,
           child: _SearchField(controller: searchController),
         ),
-        SizedBox(width: dropdownSpacing),
-        Flexible(
-          flex: 1,
-          child: _DropdownFilter(
-            label: 'Class',
-            value: selectedClass,
-            items: classOptions,
-            onChanged: onClassChanged,
-          ),
+        AppDropdownField<String>(
+          label: 'Class',
+          items: classOptions,
+          value: selectedClass,
+          onChanged: (value) {
+            if (value != null) onClassChanged(value);
+          },
+          width: dropdownWidth,
         ),
-        SizedBox(width: dropdownSpacing),
-        Flexible(
-          flex: 1,
-          child: _DropdownFilter(
-            label: 'Subject',
-            value: selectedSubject,
-            items: subjectOptions,
-            onChanged: onSubjectChanged,
-          ),
+        AppDropdownField<String>(
+          label: 'Subject',
+          items: subjectOptions,
+          value: selectedSubject,
+          onChanged: (value) {
+            if (value != null) onSubjectChanged(value);
+          },
+          width: dropdownWidth,
         ),
       ],
     );
@@ -126,62 +96,3 @@ class _SearchField extends StatelessWidget {
     );
   }
 }
-
-class _DropdownFilter extends StatelessWidget {
-  const _DropdownFilter({
-    required this.label,
-    required this.value,
-    required this.items,
-    required this.onChanged,
-  });
-
-  final String label;
-  final String value;
-  final List<String> items;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppTypography.classCardMeta.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 6),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.studentsFilterBackground,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.studentsFilterBorder),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: DropdownButton<String>(
-                value: value,
-                isExpanded: true,
-                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textPrimary),
-                style: AppTypography.classCardMeta,
-                onChanged: (val) {
-                  if (val == null) return;
-                  onChanged(val);
-                },
-                items: items
-                    .map(
-                      (item) => DropdownMenuItem(
-                        value: item,
-                        child: Text(item),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-

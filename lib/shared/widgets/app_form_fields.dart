@@ -119,6 +119,8 @@ class AppDropdownFormField<T> extends StatelessWidget {
     this.height = 56,
     this.isExpanded = true,
     this.itemBuilder,
+    this.decoration,
+    this.icon,
   });
 
   final List<T> items;
@@ -129,6 +131,8 @@ class AppDropdownFormField<T> extends StatelessWidget {
   final double height;
   final bool isExpanded;
   final Widget Function(T value)? itemBuilder;
+  final InputDecoration? decoration;
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +143,7 @@ class AppDropdownFormField<T> extends StatelessWidget {
         initialValue: value,
         validator: validator,
         isExpanded: isExpanded,
+        icon: icon,
         items: items
             .map(
               (item) => DropdownMenuItem<T>(
@@ -148,7 +153,10 @@ class AppDropdownFormField<T> extends StatelessWidget {
             )
             .toList(),
         onChanged: onChanged,
-        decoration: AppFormDecorations.filled(hintText: hintText ?? ''),
+        decoration: decoration ??
+            AppFormDecorations.filled(
+              hintText: hintText ?? '',
+            ),
       ),
     );
   }

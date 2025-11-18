@@ -2,6 +2,7 @@ import 'package:ai_tutor_web/features/progress/domain/models/progress_models.dar
 import 'package:ai_tutor_web/features/progress/presentation/widgets/progress_styles.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/status_chip.dart';
 import 'package:flutter/material.dart';
 
 class ProgressModulesView extends StatelessWidget {
@@ -90,8 +91,12 @@ class _MathematicsCard extends StatelessWidget {
           ],
           const SizedBox(height: 22),
           for (int i = 0; i < detail.collapsedModules.length; i++) ...[
-            _CollapsedModuleTile(title: detail.collapsedModules[i], compact: compact),
-            if (i < detail.collapsedModules.length - 1) const SizedBox(height: 14),
+            _CollapsedModuleTile(
+              title: detail.collapsedModules[i],
+              compact: compact,
+            ),
+            if (i < detail.collapsedModules.length - 1)
+              const SizedBox(height: 14),
           ],
         ],
       ),
@@ -100,7 +105,10 @@ class _MathematicsCard extends StatelessWidget {
 }
 
 class _AdditionalSubjectsCard extends StatelessWidget {
-  const _AdditionalSubjectsCard({required this.subjects, required this.compact});
+  const _AdditionalSubjectsCard({
+    required this.subjects,
+    required this.compact,
+  });
 
   final List<SubjectSummary> subjects;
   final bool compact;
@@ -301,18 +309,13 @@ class _StatusChip extends StatelessWidget {
         break;
     }
 
-    return Container(
-      height: 27,
+    return AppStatusChip(
+      label: label,
+      backgroundColor: background,
+      textColor: foreground,
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        style: AppTypography.statusChip(foreground),
-      ),
+      height: 27,
+      textStyle: AppTypography.statusChip(foreground),
     );
   }
 }

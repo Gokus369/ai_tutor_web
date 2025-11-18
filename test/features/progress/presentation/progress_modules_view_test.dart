@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   final data = ProgressDemoData.build();
+  final initialClassData = data.initialClassData;
 
   Widget wrapWithApp(Widget child) => MaterialApp(
         home: Scaffold(
@@ -16,8 +17,8 @@ void main() {
     await tester.pumpWidget(
       wrapWithApp(
         ProgressModulesView(
-          detail: data.mathematics,
-          additionalSubjects: data.additionalSubjects,
+          detail: initialClassData.mathematics,
+          additionalSubjects: initialClassData.additionalSubjects,
           compact: false,
         ),
       ),
@@ -26,7 +27,7 @@ void main() {
     expect(find.text('Mathematics'), findsOneWidget);
     expect(find.text('Linear Equations'), findsOneWidget);
     expect(find.text('Chapter 1: Linear Equations (10/15 Topics)'), findsOneWidget);
-    for (final summary in data.additionalSubjects) {
+    for (final summary in initialClassData.additionalSubjects) {
       expect(find.text(summary.name), findsWidgets);
     }
   });

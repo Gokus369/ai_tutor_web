@@ -1,6 +1,8 @@
 import 'package:ai_tutor_web/features/dashboard/domain/models/upcoming_task.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/app_data_table.dart';
+import 'package:ai_tutor_web/shared/widgets/status_chip.dart';
 import 'package:flutter/material.dart';
 
 class UpcomingTasksTable extends StatelessWidget {
@@ -63,15 +65,53 @@ class UpcomingTasksTable extends StatelessWidget {
                     ],
                   ],
                 )
-              else ...[
-                _TableHeader(),
-                const SizedBox(height: 6),
-                for (int i = 0; i < tasks.length; i++) ...[
-                  _TaskRow(tasks[i]),
-                  if (i != tasks.length - 1)
-                    const Divider(height: 1, thickness: 0.6, color: AppColors.tableRowDivider),
-                ],
-              ],
+              else
+                AppDataTable(
+                  columns: const [
+                    AppTableColumn(label: 'Task', flex: 3),
+                    AppTableColumn(label: 'Class', flex: 2),
+                    AppTableColumn(label: 'Date - Time', flex: 2),
+                    AppTableColumn(
+                      label: 'Status',
+                      flex: 2,
+                      alignment: Alignment.centerRight,
+                    ),
+                  ],
+                  rows: tasks
+                      .map(
+                        (task) => AppTableRowData(
+                          cells: [
+                            Text(
+                              task.task,
+                              style: AppTypography.tableCell.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              task.className,
+                              style: AppTypography.tableCell.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              _formatDate(task.date),
+                              style: AppTypography.tableCell.copyWith(
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            _StatusChip(status: task.status),
+                          ],
+                        ),
+                      )
+                      .toList(),
+                  showColumnDividers: false,
+                  headerPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  rowPadding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 18,
+                  ),
+                  trailingWidth: 0,
+                ),
             ],
           ),
         );
@@ -96,7 +136,11 @@ class _StatusFilter extends StatelessWidget {
           child: DropdownButton<String>(
             value: 'All',
             isExpanded: true,
-            icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textPrimary),
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 18,
+              color: AppColors.textPrimary,
+            ),
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -133,97 +177,11 @@ class _StatusFilter extends StatelessWidget {
   }
 }
 
-class _TableHeader extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: AppColors.tableHeaderBackground,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.tableRowDivider, width: 0.6),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              'Task',
-              style: AppTypography.tableHeader.copyWith(color: AppColors.textPrimary),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              'Class',
-              style: AppTypography.tableHeader.copyWith(color: AppColors.textPrimary),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              'Date - Time',
-              style: AppTypography.tableHeader.copyWith(color: AppColors.textPrimary),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              'Status',
-              style: AppTypography.tableHeader.copyWith(color: AppColors.textPrimary),
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TaskRow extends StatelessWidget {
-  const _TaskRow(UpcomingTask task) : _task = task;
-
-  final UpcomingTask _task;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextStyle bodyStyle = AppTypography.tableCell.copyWith(color: AppColors.textPrimary);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(_task.task, style: bodyStyle),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(_task.className, style: bodyStyle),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(_formatDate(_task.date), style: bodyStyle),
-          ),
-          Expanded(
-            flex: 2,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: _StatusChip(status: _task.status),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final String day = date.day.toString().padLeft(2, '0');
-    final String month = date.month.toString().padLeft(2, '0');
-    final String year = date.year.toString();
-    return '$day-$month-$year';
-  }
+String _formatDate(DateTime date) {
+  final String day = date.day.toString().padLeft(2, '0');
+  final String month = date.month.toString().padLeft(2, '0');
+  final String year = date.year.toString();
+  return '$day-$month-$year';
 }
 
 class _StatusChip extends StatelessWidget {
@@ -250,13 +208,13 @@ class _StatusChip extends StatelessWidget {
         break;
     }
 
-    return Container(
+    return AppStatusChip(
+      label: label,
+      backgroundColor: bgColor,
+      textColor: textColor,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Text(label, style: AppTypography.statusChip(textColor)),
+      radius: 30,
+      textStyle: AppTypography.statusChip(textColor),
     );
   }
 }
@@ -282,7 +240,10 @@ class _CompactTaskCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.tableRowDivider.withValues(alpha: 0.8), width: 0.8),
+        border: Border.all(
+          color: AppColors.tableRowDivider.withValues(alpha: 0.8),
+          width: 0.8,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -293,26 +254,32 @@ class _CompactTaskCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(task.task, style: AppTypography.sectionTitle.copyWith(fontSize: 16)),
+                  child: Text(
+                    task.task,
+                    style: AppTypography.sectionTitle.copyWith(fontSize: 16),
+                  ),
                 ),
                 _StatusChip(status: task.status),
               ],
             ),
             const SizedBox(height: 12),
-            _MetaRow(label: 'Class', value: task.className, labelStyle: labelStyle, valueStyle: valueStyle),
+            _MetaRow(
+              label: 'Class',
+              value: task.className,
+              labelStyle: labelStyle,
+              valueStyle: valueStyle,
+            ),
             const SizedBox(height: 6),
-            _MetaRow(label: 'Date', value: _formatDate(task.date), labelStyle: labelStyle, valueStyle: valueStyle),
+            _MetaRow(
+              label: 'Date',
+              value: _formatDate(task.date),
+              labelStyle: labelStyle,
+              valueStyle: valueStyle,
+            ),
           ],
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    final String day = date.day.toString().padLeft(2, '0');
-    final String month = date.month.toString().padLeft(2, '0');
-    final String year = date.year.toString();
-    return '$day-$month-$year';
   }
 }
 

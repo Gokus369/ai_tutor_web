@@ -30,14 +30,20 @@ class DashboardShell extends StatelessWidget {
               ? null
               : Drawer(
                   child: SafeArea(
-                    child: DashboardSidebar(activeRoute: activeRoute),
+                    child: DashboardSidebar(
+                      activeRoute: activeRoute,
+                      inDrawer: true,
+                    ),
                   ),
                 ),
           body: SafeArea(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (isDesktop) DashboardSidebar(activeRoute: activeRoute),
+                if (isDesktop)
+                  DashboardSidebar(
+                    activeRoute: activeRoute,
+                  ),
                 Expanded(
                   child: Container(
                     decoration: const BoxDecoration(

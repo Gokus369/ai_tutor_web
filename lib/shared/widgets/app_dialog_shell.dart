@@ -62,6 +62,9 @@ class AppDialogActions extends StatelessWidget {
     this.primaryStyle,
     this.cancelStyle,
     this.spacing = 16,
+    this.secondaryLabel,
+    this.onSecondaryPressed,
+    this.secondaryStyle,
   });
 
   final String primaryLabel;
@@ -73,50 +76,80 @@ class AppDialogActions extends StatelessWidget {
   final ButtonStyle? primaryStyle;
   final ButtonStyle? cancelStyle;
   final double spacing;
+  final String? secondaryLabel;
+  final VoidCallback? onSecondaryPressed;
+  final ButtonStyle? secondaryStyle;
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> buttons = [
+      _buildOutlinedButton(
+        context: context,
+        label: cancelLabel,
+        onPressed: onCancel ?? () => Navigator.of(context).pop(),
+        style: cancelStyle,
+      ),
+      if (secondaryLabel != null && onSecondaryPressed != null)
+        _buildOutlinedButton(
+          context: context,
+          label: secondaryLabel!,
+          onPressed: onSecondaryPressed!,
+          style: secondaryStyle,
+        ),
+      SizedBox(
+        width: buttonSize.width,
+        height: buttonSize.height,
+        child: ElevatedButton(
+          onPressed: onPrimaryPressed,
+          style:
+              primaryStyle ??
+              ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+          child: Text(primaryLabel),
+        ),
+      ),
+    ];
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: mainAxisAlignment,
       children: [
-        SizedBox(
-          width: buttonSize.width,
-          height: buttonSize.height,
-          child: OutlinedButton(
-            onPressed: onCancel ?? () => Navigator.of(context).pop(),
-            style:
-                cancelStyle ??
-                OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.primary),
-                  foregroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-            child: Text(cancelLabel),
-            ),
-        ),
-        SizedBox(width: spacing),
-        SizedBox(
-          width: buttonSize.width,
-          height: buttonSize.height,
-          child: ElevatedButton(
-            onPressed: onPrimaryPressed,
-            style:
-                primaryStyle ??
-                ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-            child: Text(primaryLabel),
-          ),
-        ),
+        for (int i = 0; i < buttons.length; i++) ...[
+          buttons[i],
+          if (i != buttons.length - 1) SizedBox(width: spacing),
+        ],
       ],
+    );
+  }
+
+  Widget _buildOutlinedButton({
+    required BuildContext context,
+    required String label,
+    required VoidCallback onPressed,
+    ButtonStyle? style,
+  }) {
+    return SizedBox(
+      width: buttonSize.width,
+      height: buttonSize.height,
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style:
+            style ??
+            OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.primary),
+              foregroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+        child: Text(label),
+      ),
     );
   }
 }

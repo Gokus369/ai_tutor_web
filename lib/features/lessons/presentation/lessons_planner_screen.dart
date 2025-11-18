@@ -21,6 +21,7 @@ class _LessonsPlannerScreenState extends State<LessonsPlannerScreen> {
   late List<LessonPlan> _plans;
   late String _selectedClass;
   late String _selectedSubject;
+  LessonStatus? _statusFilter;
 
   List<String> get _classOptions => LessonsPlannerDemoData.classOptions;
   List<String> get _subjectOptions => LessonsPlannerDemoData.subjectOptions;
@@ -53,6 +54,7 @@ class _LessonsPlannerScreenState extends State<LessonsPlannerScreen> {
         query: _searchController.text,
         allClassLabel: LessonsPlannerDemoData.classOptions.first,
         allSubjectLabel: LessonsPlannerDemoData.subjectOptions.first,
+        selectedStatus: _statusFilter,
       ),
     );
   }
@@ -91,6 +93,8 @@ class _LessonsPlannerScreenState extends State<LessonsPlannerScreen> {
             const SizedBox(height: 24),
             LessonsTable(
               plans: _filteredPlans,
+              statusFilter: _statusFilter,
+              onStatusChanged: (value) => setState(() => _statusFilter = value),
               onRowMenuTap: (plan) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

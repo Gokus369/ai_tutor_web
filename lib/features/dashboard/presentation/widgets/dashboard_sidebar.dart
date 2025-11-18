@@ -5,9 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class DashboardSidebar extends StatelessWidget {
-  const DashboardSidebar({super.key, required this.activeRoute});
+  const DashboardSidebar({
+    super.key,
+    required this.activeRoute,
+    this.inDrawer = false,
+  });
 
   final String activeRoute;
+  final bool inDrawer;
 
   static final List<_SidebarItemData> _items = [
     _SidebarItemData(
@@ -111,10 +116,7 @@ class DashboardSidebar extends StatelessWidget {
                   active: data.route != null && data.route == activeRoute,
                   onTap: data.route == null
                       ? null
-                      : () {
-                          if (data.route == activeRoute) return;
-                          context.go(data.route!);
-                        },
+                      : (ctx) => _handleNavigation(ctx, data.route!, activeRoute),
                 );
               },
               separatorBuilder: (_, __) => const SizedBox(height: 4),
@@ -125,6 +127,31 @@ class DashboardSidebar extends StatelessWidget {
       ),
     );
   }
+  void _handleNavigation(
+    BuildContext context,
+    String destination,
+    String activeRoute,
+  ) {
+    final router = GoRouter.of(context);
+    if (destination == activeRoute) {
+      _closeDrawerIfNeeded(context);
+      return;
+    }
+    final bool drawerClosed = _closeDrawerIfNeeded(context);
+    if (drawerClosed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        router.go(destination);
+      });
+    } else {
+      router.go(destination);
+    }
+  }
+
+  bool _closeDrawerIfNeeded(BuildContext context) {
+    if (!inDrawer) return false;
+    Navigator.of(context).pop();
+    return true;
+  }
 }
 
 class _SidebarItem extends StatefulWidget {
@@ -132,7 +159,7 @@ class _SidebarItem extends StatefulWidget {
 
   final _SidebarItemData data;
   final bool active;
-  final VoidCallback? onTap;
+  final ValueChanged<BuildContext>? onTap;
 
   @override
   State<_SidebarItem> createState() => _SidebarItemState();
@@ -182,7 +209,7 @@ class _SidebarItemState extends State<_SidebarItem> {
           ),
           leading: Icon(widget.data.icon, color: iconColor, size: 22),
           title: Text(widget.data.label, style: textStyle),
-          onTap: widget.onTap,
+          onTap: widget.onTap == null ? null : () => widget.onTap!(context),
         ),
       ),
     );

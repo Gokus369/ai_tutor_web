@@ -86,17 +86,37 @@ class StudentProgress {
 }
 
 class ProgressPageData {
-  const ProgressPageData({
+  ProgressPageData({
     required this.classOptions,
     required this.initialClass,
+    required this.classes,
+  }) : assert(classes.isNotEmpty, 'classes must not be empty');
+
+  final List<String> classOptions;
+  final String initialClass;
+  final Map<String, ClassProgressData> classes;
+
+  ClassProgressData resolveClass(String className) {
+    if (classes.containsKey(className)) {
+      return classes[className]!;
+    }
+    if (classes.containsKey(initialClass)) {
+      return classes[initialClass]!;
+    }
+    return classes.values.first;
+  }
+
+  ClassProgressData get initialClassData => resolveClass(initialClass);
+}
+
+class ClassProgressData {
+  const ClassProgressData({
     required this.summary,
     required this.mathematics,
     required this.additionalSubjects,
     required this.students,
   });
 
-  final List<String> classOptions;
-  final String initialClass;
   final ProgressSummary summary;
   final SubjectDetail mathematics;
   final List<SubjectSummary> additionalSubjects;

@@ -1,6 +1,8 @@
 import 'package:ai_tutor_web/features/notifications/domain/models/notification_filters.dart';
 import 'package:ai_tutor_web/features/notifications/domain/models/notification_item.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
+import 'package:ai_tutor_web/shared/widgets/app_dropdown_field.dart';
+import 'package:ai_tutor_web/shared/widgets/filter_panel.dart';
 import 'package:flutter/material.dart';
 
 class NotificationFiltersBar extends StatelessWidget {
@@ -33,67 +35,45 @@ class NotificationFiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isCompact) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _SearchField(controller: searchController),
-          const SizedBox(height: 16),
-          _FilterDropdown<NotificationStatus>(
-            value: selectedStatus,
-            options: statusOptions,
-            onChanged: onStatusChanged,
-          ),
-          const SizedBox(height: 12),
-          _FilterDropdown<NotificationType>(
-            value: selectedType,
-            options: typeOptions,
-            onChanged: onTypeChanged,
-          ),
-          const SizedBox(height: 12),
-          _FilterDropdown<String>(
-            value: selectedClass,
-            options: classOptions,
-            onChanged: onClassChanged,
-          ),
-        ],
-      );
-    }
+    final statusSelection = _resolveSelectedOption(
+      statusOptions,
+      selectedStatus,
+    );
+    final typeSelection = _resolveSelectedOption(typeOptions, selectedType);
+    final classSelection = _resolveSelectedOption(classOptions, selectedClass);
+    final bool stack = isCompact;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return FilterPanel(
+      breakpoint: 940,
+      forceColumn: stack ? true : null,
       children: [
-        Expanded(flex: 3, child: _SearchField(controller: searchController)),
-        const SizedBox(width: 24),
-        Expanded(
-          flex: 2,
-          child: Row(
-            children: [
-              Expanded(
-                child: _FilterDropdown<NotificationStatus>(
-                  value: selectedStatus,
-                  options: statusOptions,
-                  onChanged: onStatusChanged,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _FilterDropdown<NotificationType>(
-                  value: selectedType,
-                  options: typeOptions,
-                  onChanged: onTypeChanged,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _FilterDropdown<String>(
-                  value: selectedClass,
-                  options: classOptions,
-                  onChanged: onClassChanged,
-                ),
-              ),
-            ],
-          ),
+        SizedBox(
+          width: stack ? double.infinity : 320,
+          child: _SearchField(controller: searchController),
+        ),
+        AppDropdownField<FilterOption<NotificationStatus>>(
+          label: 'Status',
+          items: statusOptions,
+          value: statusSelection,
+          onChanged: (option) => onStatusChanged(option?.value),
+          width: stack ? null : 180,
+          itemBuilder: (option) => Text(option.label),
+        ),
+        AppDropdownField<FilterOption<NotificationType>>(
+          label: 'Type',
+          items: typeOptions,
+          value: typeSelection,
+          onChanged: (option) => onTypeChanged(option?.value),
+          width: stack ? null : 180,
+          itemBuilder: (option) => Text(option.label),
+        ),
+        AppDropdownField<FilterOption<String>>(
+          label: 'Class',
+          items: classOptions,
+          value: classSelection,
+          onChanged: (option) => onClassChanged(option?.value),
+          width: stack ? null : 180,
+          itemBuilder: (option) => Text(option.label),
         ),
       ],
     );
@@ -134,54 +114,13 @@ class _SearchField extends StatelessWidget {
   }
 }
 
-class _FilterDropdown<T> extends StatelessWidget {
-  const _FilterDropdown({
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final T? value;
-  final List<FilterOption<T>> options;
-  final ValueChanged<T?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    assert(options.isNotEmpty, 'options must not be empty');
-    final FilterOption<T> selectedOption = options.firstWhere(
-      (option) => option.value == value,
-      orElse: () => options.first,
-    );
-
-    return SizedBox(
-      height: 48,
-      child: DropdownButtonHideUnderline(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: AppColors.searchFieldBackground,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.searchFieldBorder),
-          ),
-          child: DropdownButton<FilterOption<T>>(
-            value: selectedOption,
-            isExpanded: true,
-            icon: const Icon(
-              Icons.keyboard_arrow_down_rounded,
-              color: AppColors.iconMuted,
-            ),
-            onChanged: (option) => onChanged(option?.value),
-            items: options
-                .map(
-                  (option) => DropdownMenuItem<FilterOption<T>>(
-                    value: option,
-                    child: Text(option.label),
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-      ),
-    );
-  }
+FilterOption<T> _resolveSelectedOption<T>(
+  List<FilterOption<T>> options,
+  T? value,
+) {
+  assert(options.isNotEmpty, 'options must not be empty');
+  return options.firstWhere(
+    (option) => option.value == value,
+    orElse: () => options.first,
+  );
 }

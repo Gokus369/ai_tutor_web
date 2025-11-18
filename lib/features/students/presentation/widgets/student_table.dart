@@ -1,6 +1,7 @@
 import 'package:ai_tutor_web/features/students/domain/models/student_report.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/status_chip.dart';
 import 'package:flutter/material.dart';
 
 const double _kColumnSpacing = 24;
@@ -88,12 +89,17 @@ class _StudentDesktopTable extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
             decoration: BoxDecoration(
               color: AppColors.studentsHeaderBackground,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(18),
+              ),
             ),
             child: Row(
               children: [
                 Expanded(
-                  child: Text('Students', style: AppTypography.syllabusSectionHeading),
+                  child: Text(
+                    'Students',
+                    style: AppTypography.syllabusSectionHeading,
+                  ),
                 ),
                 DecoratedBox(
                   decoration: BoxDecoration(
@@ -103,7 +109,13 @@ class _StudentDesktopTable extends StatelessWidget {
                   ),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    child: Text('All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    child: Text(
+                      'All',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -121,7 +133,10 @@ class _StudentDesktopTable extends StatelessWidget {
                 for (int i = 0; i < students.length; i++) ...[
                   _DesktopRow(student: students[i]),
                   if (i != students.length - 1)
-                    const Divider(height: 1, color: AppColors.studentsTableDivider),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.studentsTableDivider,
+                    ),
                 ],
               ],
             ),
@@ -145,10 +160,14 @@ class _DesktopHeaderRow extends StatelessWidget {
             flex: _kDesktopColumnFlex[i],
             child: Align(
               alignment: _kDesktopHeaderAlignment[i],
-              child: Text(_kDesktopHeaders[i], style: AppTypography.studentsTableHeader),
+              child: Text(
+                _kDesktopHeaders[i],
+                style: AppTypography.studentsTableHeader,
+              ),
             ),
           ),
-          if (i != _kDesktopHeaders.length - 1) const SizedBox(width: _kColumnSpacing),
+          if (i != _kDesktopHeaders.length - 1)
+            const SizedBox(width: _kColumnSpacing),
         ],
         const SizedBox(width: _kActionsWidth),
       ],
@@ -177,7 +196,8 @@ class _DesktopRow extends StatelessWidget {
                 child: cells[i],
               ),
             ),
-            if (i != _kDesktopColumnFlex.length - 1) const SizedBox(width: _kColumnSpacing),
+            if (i != _kDesktopColumnFlex.length - 1)
+              const SizedBox(width: _kColumnSpacing),
           ],
           const SizedBox(width: _kActionsWidth, child: _RowActions()),
         ],
@@ -189,7 +209,10 @@ class _DesktopRow extends StatelessWidget {
     return [
       Text(student.name, style: AppTypography.studentsTableCell),
       Text(student.className, style: AppTypography.studentsTableCell),
-      Text('${(student.attendance * 100).round()}%', style: AppTypography.studentsTableCell),
+      Text(
+        '${(student.attendance * 100).round()}%',
+        style: AppTypography.studentsTableCell,
+      ),
       _ProgressCell(progress: student.progress),
       _PerformanceLabel(performance: student.performance),
       _StatusChip(status: student.status),
@@ -258,7 +281,9 @@ class _StudentCompactCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.studentsCardBorder.withValues(alpha: 0.6)),
+        border: Border.all(
+          color: AppColors.studentsCardBorder.withValues(alpha: 0.6),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -268,13 +293,21 @@ class _StudentCompactCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(student.name, style: AppTypography.sectionTitle.copyWith(fontSize: 18)),
+                  child: Text(
+                    student.name,
+                    style: AppTypography.sectionTitle.copyWith(fontSize: 18),
+                  ),
                 ),
                 const _RowActions(),
               ],
             ),
             const SizedBox(height: 12),
-            _MetaRow(label: 'Class', value: student.className, labelStyle: labelStyle, valueStyle: valueStyle),
+            _MetaRow(
+              label: 'Class',
+              value: student.className,
+              labelStyle: labelStyle,
+              valueStyle: valueStyle,
+            ),
             const SizedBox(height: 6),
             _MetaRow(
               label: 'Attendance',
@@ -355,7 +388,11 @@ class _PerformanceLabel extends StatelessWidget {
         Text(label, style: style),
         if (performance == StudentPerformance.topPerformer) ...[
           const SizedBox(width: 6),
-          const Icon(Icons.star_rounded, color: AppColors.studentsPerformanceTop, size: 18),
+          const Icon(
+            Icons.star_rounded,
+            color: AppColors.studentsPerformanceTop,
+            size: 18,
+          ),
         ],
       ],
     );
@@ -370,20 +407,22 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isActive = status == StudentStatus.active;
-    final Color background =
-        isActive ? AppColors.studentsStatusActive : AppColors.studentsStatusInactive;
+    final Color background = isActive
+        ? AppColors.studentsStatusActive
+        : AppColors.studentsStatusInactive;
     final String label = isActive ? 'Active' : 'Inactive';
 
-    return Container(
-      height: 27,
+    return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 93),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(14),
+      child: AppStatusChip(
+        label: label,
+        backgroundColor: background,
+        textColor: AppColors.white,
+        height: 27,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        radius: 14,
+        textStyle: AppTypography.studentsStatusText,
       ),
-      alignment: Alignment.center,
-      child: Text(label, style: AppTypography.studentsStatusText),
     );
   }
 }

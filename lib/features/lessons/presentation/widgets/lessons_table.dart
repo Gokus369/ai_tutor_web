@@ -2,16 +2,21 @@ import 'package:ai_tutor_web/features/lessons/domain/models/lesson_plan.dart';
 import 'package:ai_tutor_web/features/lessons/presentation/utils/lesson_formatters.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/status_chip.dart';
 import 'package:flutter/material.dart';
 
 class LessonsTable extends StatelessWidget {
   const LessonsTable({
     super.key,
     required this.plans,
+    required this.statusFilter,
+    required this.onStatusChanged,
     this.onRowMenuTap,
   });
 
   final List<LessonPlan> plans;
+  final LessonStatus? statusFilter;
+  final ValueChanged<LessonStatus?> onStatusChanged;
   final ValueChanged<LessonPlan>? onRowMenuTap;
 
   static const double _columnSpacing = 24;
@@ -34,14 +39,30 @@ class LessonsTable extends StatelessWidget {
       builder: (context, constraints) {
         final double width = constraints.maxWidth;
         if (width < _cardBreakpoint) {
-          return _LessonsCardList(plans: plans, onRowMenuTap: onRowMenuTap);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _TableHeadingBar(
+                  statusFilter: statusFilter,
+                  onStatusChanged: onStatusChanged,
+                ),
+              ),
+              _LessonsCardList(plans: plans, onRowMenuTap: onRowMenuTap),
+            ],
+          );
         }
 
         final bool needsHorizontalScroll = width < _minTableWidth;
-        final double tableWidth = needsHorizontalScroll ? _minTableWidth : width;
+        final double tableWidth = needsHorizontalScroll
+            ? _minTableWidth
+            : width;
         final table = _LessonsTableContent(
           plans: plans,
           width: tableWidth,
+          statusFilter: statusFilter,
+          onStatusChanged: onStatusChanged,
           onRowMenuTap: onRowMenuTap,
         );
 
@@ -62,11 +83,15 @@ class _LessonsTableContent extends StatelessWidget {
   const _LessonsTableContent({
     required this.plans,
     required this.width,
+    required this.statusFilter,
+    required this.onStatusChanged,
     this.onRowMenuTap,
   });
 
   final List<LessonPlan> plans;
   final double width;
+  final LessonStatus? statusFilter;
+  final ValueChanged<LessonStatus?> onStatusChanged;
   final ValueChanged<LessonPlan>? onRowMenuTap;
 
   @override
@@ -89,20 +114,35 @@ class _LessonsTableContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: _TableHeadingBar(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: _TableHeadingBar(
+                statusFilter: statusFilter,
+                onStatusChanged: onStatusChanged,
+              ),
             ),
-            const Divider(height: 1, thickness: 1, color: AppColors.studentsTableDivider),
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.studentsTableDivider,
+            ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: _TableHeader(),
             ),
-            const Divider(height: 1, thickness: 1, color: AppColors.studentsTableDivider),
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.studentsTableDivider,
+            ),
             for (int i = 0; i < plans.length; i++) ...[
               _TableRow(plan: plans[i], onMenuTap: onRowMenuTap),
               if (i != plans.length - 1)
-                const Divider(height: 1, thickness: 1, color: AppColors.studentsTableDivider),
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.studentsTableDivider,
+                ),
             ],
           ],
         ),
@@ -112,7 +152,13 @@ class _LessonsTableContent extends StatelessWidget {
 }
 
 class _TableHeadingBar extends StatelessWidget {
-  const _TableHeadingBar();
+  const _TableHeadingBar({
+    required this.statusFilter,
+    required this.onStatusChanged,
+  });
+
+  final LessonStatus? statusFilter;
+  final ValueChanged<LessonStatus?> onStatusChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +166,10 @@ class _TableHeadingBar extends StatelessWidget {
       children: [
         Text('Lessons', style: AppTypography.syllabusSectionHeading),
         const Spacer(),
-        const _StatusFilterDropdown(),
+        _StatusFilterDropdown(
+          selected: statusFilter,
+          onChanged: onStatusChanged,
+        ),
       ],
     );
   }
@@ -142,7 +191,10 @@ class _TableHeader extends StatelessWidget {
               flex: LessonsTable._flex[i],
               child: Align(
                 alignment: LessonsTable._alignment[i],
-                child: Text(labels[i], style: AppTypography.studentsTableHeader),
+                child: Text(
+                  labels[i],
+                  style: AppTypography.studentsTableHeader,
+                ),
               ),
             ),
             if (i != labels.length - 1) ...[
@@ -216,7 +268,10 @@ class _TableRow extends StatelessWidget {
       Text.rich(
         TextSpan(
           text: '${plan.subject}\n',
-          style: AppTypography.studentsTableCell.copyWith(fontWeight: FontWeight.w700, height: 1.2),
+          style: AppTypography.studentsTableCell.copyWith(
+            fontWeight: FontWeight.w700,
+            height: 1.2,
+          ),
           children: [
             TextSpan(
               text: plan.description,
@@ -226,7 +281,10 @@ class _TableRow extends StatelessWidget {
         ),
       ),
       Text(plan.topic, style: AppTypography.studentsTableCell),
-      Text(formatLessonTimeRange(plan.startTime, plan.endTime), style: AppTypography.studentsTableCell),
+      Text(
+        formatLessonTimeRange(plan.startTime, plan.endTime),
+        style: AppTypography.studentsTableCell,
+      ),
       _StatusChip(status: plan.status),
     ];
   }
@@ -240,22 +298,21 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool completed = status == LessonStatus.completed;
-    final Color background =
-        completed ? AppColors.statusCompletedBackground : AppColors.statusPendingBackground;
-    final Color textColor =
-        completed ? AppColors.statusCompletedText : AppColors.statusPendingText;
+    final Color background = completed
+        ? AppColors.statusCompletedBackground
+        : AppColors.statusPendingBackground;
+    final Color textColor = completed
+        ? AppColors.statusCompletedText
+        : AppColors.statusPendingText;
     final String label = completed ? 'Completed' : 'Pending';
 
-    return Container(
+    return AppStatusChip(
+      label: label,
+      backgroundColor: background,
+      textColor: textColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: AppTypography.studentsStatusText.copyWith(color: textColor, fontSize: 13),
-      ),
+      radius: 20,
+      textStyle: AppTypography.studentsStatusText.copyWith(fontSize: 13),
     );
   }
 }
@@ -329,12 +386,16 @@ class _LessonCard extends StatelessWidget {
                   children: [
                     Text(
                       formatLessonDate(plan.date),
-                      style: AppTypography.studentsTableCell.copyWith(fontWeight: FontWeight.w700),
+                      style: AppTypography.studentsTableCell.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       plan.className,
-                      style: AppTypography.classCardMeta.copyWith(fontWeight: FontWeight.w600),
+                      style: AppTypography.classCardMeta.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -345,7 +406,10 @@ class _LessonCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             plan.subject,
-            style: AppTypography.studentsTableCell.copyWith(fontSize: 18, fontWeight: FontWeight.w700),
+            style: AppTypography.studentsTableCell.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 4),
           Text(plan.description, style: AppTypography.classCardMeta),
@@ -354,7 +418,9 @@ class _LessonCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             formatLessonTimeRange(plan.startTime, plan.endTime),
-            style: AppTypography.classCardMeta.copyWith(fontWeight: FontWeight.w700),
+            style: AppTypography.classCardMeta.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 12),
           Align(
@@ -371,16 +437,14 @@ class _LessonCard extends StatelessWidget {
   }
 }
 
-class _StatusFilterDropdown extends StatefulWidget {
-  const _StatusFilterDropdown();
+class _StatusFilterDropdown extends StatelessWidget {
+  const _StatusFilterDropdown({
+    required this.selected,
+    required this.onChanged,
+  });
 
-  @override
-  State<_StatusFilterDropdown> createState() => _StatusFilterDropdownState();
-}
-
-class _StatusFilterDropdownState extends State<_StatusFilterDropdown> {
-  static const List<String> _options = ['All', 'Pending', 'Completed'];
-  String _selected = _options.first;
+  final LessonStatus? selected;
+  final ValueChanged<LessonStatus?> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -393,20 +457,24 @@ class _StatusFilterDropdownState extends State<_StatusFilterDropdown> {
       child: DropdownButtonHideUnderline(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: DropdownButton<String>(
-            value: _selected,
-            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textPrimary),
+          child: DropdownButton<LessonStatus?>(
+            value: selected,
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: AppColors.textPrimary,
+            ),
             style: AppTypography.classCardMeta,
-            onChanged: (value) {
-              if (value == null) return;
-              setState(() => _selected = value);
-            },
-            items: [
-              for (final option in _options)
-                DropdownMenuItem(
-                  value: option,
-                  child: Text(option),
-                ),
+            onChanged: onChanged,
+            items: const [
+              DropdownMenuItem<LessonStatus?>(value: null, child: Text('All')),
+              DropdownMenuItem<LessonStatus?>(
+                value: LessonStatus.pending,
+                child: Text('Pending'),
+              ),
+              DropdownMenuItem<LessonStatus?>(
+                value: LessonStatus.completed,
+                child: Text('Completed'),
+              ),
             ],
           ),
         ),
@@ -414,4 +482,3 @@ class _StatusFilterDropdownState extends State<_StatusFilterDropdown> {
     );
   }
 }
-
