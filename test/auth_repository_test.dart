@@ -21,17 +21,20 @@ void main() {
         expect(user.displayName, 'Rowan Teacher');
         expect(user.email, 'new@mail.com');
         expect(repository.hasAccount('new@mail.com'), isTrue);
+        expect(repository.authState.value?.id, user.id);
 
         final loginUser = await repository.loginWithEmail(
           'new@mail.com',
           'Secret123!',
         );
         expect(loginUser.id, user.id);
+        expect(repository.authState.value?.id, user.id);
 
         await expectLater(
           repository.loginWithEmail('new@mail.com', 'wrong'),
           throwsA(isA<AuthInvalidCredentialsException>()),
         );
+        expect(repository.authState.value?.id, user.id);
       },
     );
 
@@ -59,6 +62,14 @@ void main() {
       expect(repository.hasAccount('demo@aitutor.app'), isTrue);
       expect(repository.hasAccount('demo'), isTrue);
       expect(repository.hasAccount('missing'), isFalse);
+    });
+
+    test('logout clears auth state', () async {
+      await repository.loginWithEmail('demo@aitutor.app', 'password1');
+      expect(repository.authState.value, isNotNull);
+
+      await repository.logout();
+      expect(repository.authState.value, isNull);
     });
 
     test('sendPasswordReset validates email existence', () async {

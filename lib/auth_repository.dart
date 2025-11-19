@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 
 // A simple, swappable auth layer.
 // Start with MockAuthRepository; later replace with your real implementation.
@@ -29,6 +29,9 @@ abstract class AuthRepository {
   Future<UserAccount> loginWithEmail(String identifier, String password);
   Future<UserAccount> loginWithGoogle();
   Future<void> sendPasswordReset(String email);
+  Future<void> logout();
+  ValueListenable<UserAccount?> get authState;
+  UserAccount? get currentUser;
 }
 
 /// Base exception for all auth failures so the UI can map onto friendly errors.
@@ -66,7 +69,8 @@ class MockAuthRepository implements AuthRepository {
   static const _passwordSalt = 'ai_tutor_demo_salt';
 
   MockAuthRepository()
-    : _accounts = [
+    : _authState = ValueNotifier<UserAccount?>(null),
+      _accounts = [
         _MockAccount(
           id: 'u_001',
           email: _demoEmail,
@@ -76,7 +80,14 @@ class MockAuthRepository implements AuthRepository {
         ),
       ];
 
+  final ValueNotifier<UserAccount?> _authState;
   final List<_MockAccount> _accounts;
+
+  @override
+  ValueListenable<UserAccount?> get authState => _authState;
+
+  @override
+  UserAccount? get currentUser => _authState.value;
 
   @override
   Future<UserAccount> register({
@@ -109,7 +120,9 @@ class MockAuthRepository implements AuthRepository {
       school: school,
     );
     _accounts.add(account);
-    return account.asUser();
+    final user = account.asUser();
+    _authState.value = user;
+    return user;
   }
 
   _MockAccount? _findAccount(String identifier) {
@@ -127,7 +140,9 @@ class MockAuthRepository implements AuthRepository {
     await Future.delayed(const Duration(milliseconds: 700));
     final account = _findAccount(identifier);
     if (account != null && _passwordMatches(account, password)) {
-      return account.asUser();
+      final user = account.asUser();
+      _authState.value = user;
+      return user;
     }
     throw const AuthInvalidCredentialsException();
   }
@@ -135,11 +150,13 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<UserAccount> loginWithGoogle() async {
     await Future.delayed(const Duration(milliseconds: 600));
-    return UserAccount(
+    final user = UserAccount(
       id: 'g_123',
       email: 'google.user@example.com',
       displayName: 'Google User',
     );
+    _authState.value = user;
+    return user;
   }
 
   @override
@@ -150,6 +167,11 @@ class MockAuthRepository implements AuthRepository {
       throw const AuthValidationException('No account found with that email.');
     }
     // Simulate reset link sent
+  }
+
+  @override
+  Future<void> logout() async {
+    _authState.value = null;
   }
 
   static String _hashPassword(String password) {
