@@ -26,8 +26,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
-  AppRouter({required this.repository}) {
-    _progressData = ProgressDemoData.build();
+  AppRouter({required this.repository, ProgressPageData? progressData}) {
+    _progressData = progressData ?? ProgressDemoData.build();
     router = GoRouter(
       initialLocation: repository.currentUser == null
           ? AppRoutes.signup
@@ -35,10 +35,9 @@ class AppRouter {
       refreshListenable: repository.authState,
       redirect: (context, state) {
         final loggedIn = repository.currentUser != null;
-        final location = state.matchedLocation;
-        final accessingAuth =
-            location == AppRoutes.login || location == AppRoutes.signup;
-        final isPublic = _publicRoutes.contains(location);
+        final location = state.uri.path;
+        final accessingAuth = _isAuthRoute(location);
+        final isPublic = _isPublicRoute(location);
 
         if (!loggedIn && !isPublic) {
           return AppRoutes.login;
@@ -48,8 +47,10 @@ class AppRouter {
         }
         return null;
       },
-      errorBuilder: (context, state) =>
-          _RouteErrorScreen(message: state.error?.toString()),
+      errorBuilder: (context, state) => _RouteErrorScreen(
+        message: state.error?.toString(),
+        loggedIn: repository.currentUser != null,
+      ),
       routes: [
         GoRoute(
           name: 'signup',
@@ -144,14 +145,17 @@ class AppRouter {
         GoRoute(
           name: 'class-details',
           path: AppRoutes.classDetails,
-          builder: (context, state) {
+          redirect: (context, state) {
             final extra = state.extra;
             if (extra is! ClassInfo) {
-              return const _RouteErrorScreen(
-                message: 'Missing class information for details page.',
-              );
+              return AppRoutes.classes;
             }
-            return ClassDetailsScreen(initialInfo: extra);
+            return null;
+          },
+          builder: (context, state) {
+            final extra = state.extra;
+            final classInfo = extra! as ClassInfo;
+            return ClassDetailsScreen(initialInfo: classInfo);
           },
         ),
       ],
@@ -168,12 +172,26 @@ class AppRouter {
     AppRoutes.termsOfUse,
     AppRoutes.privacyPolicy,
   };
+
+  bool _isPublicRoute(String location) {
+    for (final route in _publicRoutes) {
+      if (location == route || location.startsWith('$route/')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool _isAuthRoute(String location) {
+    return location == AppRoutes.login || location == AppRoutes.signup;
+  }
 }
 
 class _RouteErrorScreen extends StatelessWidget {
-  const _RouteErrorScreen({this.message});
+  const _RouteErrorScreen({this.message, required this.loggedIn});
 
   final String? message;
+  final bool loggedIn;
 
   @override
   Widget build(BuildContext context) {
@@ -204,8 +222,10 @@ class _RouteErrorScreen extends StatelessWidget {
                 ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () => GoRouter.of(context).go(AppRoutes.dashboard),
-                child: const Text('Back to Dashboard'),
+                onPressed: () => GoRouter.of(
+                  context,
+                ).go(loggedIn ? AppRoutes.dashboard : AppRoutes.login),
+                child: Text(loggedIn ? 'Back to Dashboard' : 'Go to Login'),
               ),
             ],
           ),
