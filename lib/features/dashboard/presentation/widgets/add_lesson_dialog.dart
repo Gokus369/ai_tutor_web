@@ -146,9 +146,11 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
           children: [
             SizedBox(
               width: AddLessonDialog.contentWidth,
-              child: Row(
-                children: [
-                  AppDropdownField<String>(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final bool isStacked = constraints.maxWidth <
+                      (AddLessonDialog.splitFieldWidth * 2 + 16);
+                  final Widget subjectField = AppDropdownField<String>(
                     label: 'Subject',
                     items: widget.subjectOptions,
                     value: _subject,
@@ -158,9 +160,8 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
                     width: AddLessonDialog.splitFieldWidth,
                     height: AddLessonDialog.fieldHeight,
                     decoration: AppFormDecorations.filled(),
-                  ),
-                  const SizedBox(width: 16),
-                  AppLabeledField(
+                  );
+                  final Widget topicField = AppLabeledField(
                     width: AddLessonDialog.splitFieldWidth,
                     label: 'Topic',
                     child: AppTextFormField(
@@ -174,8 +175,28 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
                       },
                       height: AddLessonDialog.fieldHeight,
                     ),
-                  ),
-                ],
+                  );
+
+                  if (isStacked) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        subjectField,
+                        const SizedBox(height: 16),
+                        topicField,
+                      ],
+                    );
+                  }
+
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      subjectField,
+                      const SizedBox(width: 16),
+                      topicField,
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),
@@ -197,9 +218,11 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
             const SizedBox(height: 24),
             SizedBox(
               width: AddLessonDialog.contentWidth,
-              child: Row(
-                children: [
-                  AppDropdownField<String>(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final bool isStacked = constraints.maxWidth <
+                      (AddLessonDialog.smallFieldWidth * 3 + 32);
+                  final Widget classField = AppDropdownField<String>(
                     label: 'Class',
                     items: widget.classOptions,
                     value: _className,
@@ -209,9 +232,8 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
                     width: AddLessonDialog.smallFieldWidth,
                     height: AddLessonDialog.fieldHeight,
                     decoration: AppFormDecorations.filled(),
-                  ),
-                  const SizedBox(width: 16),
-                  AppLabeledField(
+                  );
+                  final Widget startField = AppLabeledField(
                     width: AddLessonDialog.smallFieldWidth,
                     label: 'Start Date',
                     child: AppDateButton(
@@ -219,9 +241,8 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
                       onTap: () => _pickDate(isStart: true),
                       height: AddLessonDialog.fieldHeight,
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  AppLabeledField(
+                  );
+                  final Widget endField = AppLabeledField(
                     width: AddLessonDialog.smallFieldWidth,
                     label: 'End Date',
                     child: AppDateButton(
@@ -229,8 +250,32 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
                       onTap: () => _pickDate(isStart: false),
                       height: AddLessonDialog.fieldHeight,
                     ),
-                  ),
-                ],
+                  );
+
+                  if (isStacked) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        classField,
+                        const SizedBox(height: 16),
+                        startField,
+                        const SizedBox(height: 16),
+                        endField,
+                      ],
+                    );
+                  }
+
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      classField,
+                      const SizedBox(width: 16),
+                      startField,
+                      const SizedBox(width: 16),
+                      endField,
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 32),
@@ -239,7 +284,7 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
               child: AppDialogActions(
                 primaryLabel: 'Add',
                 onPrimaryPressed: _submit,
-                onCancel: () => Navigator.of(context).pop(false),
+                onCancel: () => Navigator.of(context).pop(),
                 buttonSize: const Size(
                   AddLessonDialog.buttonWidth,
                   AddLessonDialog.buttonHeight,

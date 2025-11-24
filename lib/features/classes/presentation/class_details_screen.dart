@@ -570,22 +570,38 @@ class _SyllabusViewState extends State<_SyllabusView> {
     final subjects = ClassDetailsDemoData.syllabusSubjects;
     final overview = ClassDetailsDemoData.progressOverview;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 2,
-          child: _SyllabusSubjectsCard(
-            subjects: subjects,
-            expandedSubjectId: _expandedSubjectId,
-            expandedModules: _expandedModules,
-            onSubjectChanged: _handleSubjectToggle,
-            onModuleToggle: _handleModuleToggle,
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(child: _ProgressOverviewCard(items: overview)),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isStacked = constraints.maxWidth < 1000;
+        final syllabusCard = _SyllabusSubjectsCard(
+          subjects: subjects,
+          expandedSubjectId: _expandedSubjectId,
+          expandedModules: _expandedModules,
+          onSubjectChanged: _handleSubjectToggle,
+          onModuleToggle: _handleModuleToggle,
+        );
+        final overviewCard = _ProgressOverviewCard(items: overview);
+
+        if (isStacked) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              syllabusCard,
+              const SizedBox(height: 24),
+              overviewCard,
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 2, child: syllabusCard),
+            const SizedBox(width: 24),
+            Expanded(child: overviewCard),
+          ],
+        );
+      },
     );
   }
 }
@@ -696,13 +712,21 @@ class _SubjectAccordion extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Text(
-                      subject.title,
-                      style: AppTypography.sectionTitle.copyWith(fontSize: 18),
+                    Expanded(
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            subject.title,
+                            style:
+                                AppTypography.sectionTitle.copyWith(fontSize: 18),
+                          ),
+                          _SyllabusStatusChip(status: subject.status),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 12),
-                    _SyllabusStatusChip(status: subject.status),
-                    const Spacer(),
                     if (hasModules)
                       IconButton(
                         onPressed: onSubjectSelected,

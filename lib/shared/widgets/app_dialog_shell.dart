@@ -30,19 +30,32 @@ class AppDialogShell extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: width),
         child: Padding(
           padding: padding,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: crossAxisAlignment,
-            children: [
-              Center(
-                child: Text(
-                  title,
-                  style: AppTypography.sectionTitle.copyWith(fontSize: 24),
-                ),
-              ),
-              const SizedBox(height: 24),
-              child,
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final bool shouldScroll = constraints.maxHeight < 600;
+
+              final content = Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: crossAxisAlignment,
+                children: [
+                  Center(
+                    child: Text(
+                      title,
+                      style:
+                          AppTypography.sectionTitle.copyWith(fontSize: 24),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  child,
+                ],
+              );
+
+              if (!shouldScroll) {
+                return content;
+              }
+
+              return SingleChildScrollView(child: content);
+            },
           ),
         ),
       ),
@@ -116,15 +129,34 @@ class AppDialogActions extends StatelessWidget {
       ),
     ];
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: mainAxisAlignment,
-      children: [
-        for (int i = 0; i < buttons.length; i++) ...[
-          buttons[i],
-          if (i != buttons.length - 1) SizedBox(width: spacing),
-        ],
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double requiredWidth =
+            (buttonSize.width * buttons.length) + spacing * (buttons.length - 1);
+        final bool canUseRow =
+            constraints.maxWidth == double.infinity ||
+            constraints.maxWidth >= requiredWidth;
+
+        if (canUseRow) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: mainAxisAlignment,
+            children: [
+              for (int i = 0; i < buttons.length; i++) ...[
+                buttons[i],
+                if (i != buttons.length - 1) SizedBox(width: spacing),
+              ],
+            ],
+          );
+        }
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          alignment: _mapWrapAlignment(mainAxisAlignment),
+          children: buttons,
+        );
+      },
     );
   }
 
@@ -151,5 +183,23 @@ class AppDialogActions extends StatelessWidget {
         child: Text(label),
       ),
     );
+  }
+
+  WrapAlignment _mapWrapAlignment(MainAxisAlignment alignment) {
+    switch (alignment) {
+      case MainAxisAlignment.center:
+        return WrapAlignment.center;
+      case MainAxisAlignment.end:
+        return WrapAlignment.end;
+      case MainAxisAlignment.spaceBetween:
+        return WrapAlignment.spaceBetween;
+      case MainAxisAlignment.spaceAround:
+        return WrapAlignment.spaceAround;
+      case MainAxisAlignment.spaceEvenly:
+        return WrapAlignment.spaceEvenly;
+      case MainAxisAlignment.start:
+      default:
+        return WrapAlignment.start;
+    }
   }
 }
