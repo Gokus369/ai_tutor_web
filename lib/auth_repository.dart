@@ -1,31 +1,14 @@
 import 'dart:convert';
-
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 
-// A simple, swappable auth layer.
-// Start with MockAuthRepository; later replace with your real implementation.
-
 class UserAccount {
-  final String id;
-  final String email;
-  final String displayName;
-  UserAccount({
-    required this.id,
-    required this.email,
-    required this.displayName,
-  });
+  final String id, email, displayName;
+  UserAccount({required this.id, required this.email, required this.displayName});
 }
 
 abstract class AuthRepository {
-  Future<UserAccount> register({
-    required String fullName,
-    required String email,
-    required String password,
-    String? role,
-    String? educationBoard,
-    String? school,
-  });
+  Future<UserAccount> register({required String fullName, required String email, required String password, String? role, String? educationBoard, String? school});
   Future<UserAccount> loginWithEmail(String identifier, String password);
   Future<UserAccount> loginWithGoogle();
   Future<void> sendPasswordReset(String email);
@@ -34,191 +17,51 @@ abstract class AuthRepository {
   UserAccount? get currentUser;
 }
 
-/// Base exception for all auth failures so the UI can map onto friendly errors.
-class AuthException implements Exception {
-  const AuthException(this.message);
+class AuthException implements Exception { final String message; const AuthException(this.message); @override String toString() => message; }
+class AuthValidationException extends AuthException { const AuthValidationException(super.message); }
+class AuthDuplicateEmailException extends AuthValidationException { const AuthDuplicateEmailException(super.message); }
+class AuthInvalidCredentialsException extends AuthException { const AuthInvalidCredentialsException([super.message = 'Invalid credentials']); }
 
-  final String message;
-
-  @override
-  String toString() => 'AuthException: $message';
-}
-
-/// Input validation issues (e.g. missing name, duplicate email).
-class AuthValidationException extends AuthException {
-  const AuthValidationException(super.message);
-}
-
-/// Specific validation error for duplicate accounts so the UI can highlight email field.
-class AuthDuplicateEmailException extends AuthValidationException {
-  const AuthDuplicateEmailException(super.message);
-}
-
-/// Authentication failures (e.g. wrong password).
-class AuthInvalidCredentialsException extends AuthException {
-  const AuthInvalidCredentialsException([
-    super.message = 'Invalid credentials',
-  ]);
-}
-
-// --- Fully working mock for local testing/demo ---
 class MockAuthRepository implements AuthRepository {
-  static const _demoEmail = 'demo@aitutor.app';
-  static const _demoUser = 'demo';
-  static const _demoPass = 'password1';
-  static const _passwordSalt = 'ai_tutor_demo_salt';
+  final _authState = ValueNotifier<UserAccount?>(null);
+  final _accounts = <_MockAccount>[_MockAccount(id: 'u_001', email: 'demo@aitutor.app', displayName: 'AiTutor Demo', passwordHash: _hash('password1'), username: 'demo')];
 
-  MockAuthRepository()
-    : _authState = ValueNotifier<UserAccount?>(null),
-      _accounts = [
-        _MockAccount(
-          id: 'u_001',
-          email: _demoEmail,
-          displayName: 'AiTutor Demo',
-          passwordHash: _hashPassword(_demoPass),
-          username: _demoUser,
-        ),
-      ];
+  @override ValueListenable<UserAccount?> get authState => _authState;
+  @override UserAccount? get currentUser => _authState.value;
 
-  final ValueNotifier<UserAccount?> _authState;
-  final List<_MockAccount> _accounts;
-
-  @override
-  ValueListenable<UserAccount?> get authState => _authState;
-
-  @override
-  UserAccount? get currentUser => _authState.value;
-
-  @override
-  Future<UserAccount> register({
-    required String fullName,
-    required String email,
-    required String password,
-    String? role,
-    String? educationBoard,
-    String? school,
-  }) async {
+  @override Future<UserAccount> register({required String fullName, required String email, required String password, String? role, String? educationBoard, String? school}) async {
     await Future.delayed(const Duration(milliseconds: 700));
-    final trimmedName = fullName.trim();
-    final normalisedEmail = email.trim().toLowerCase();
-    if (trimmedName.isEmpty) {
-      throw const AuthValidationException('Full name is required.');
-    }
-    if (_accounts.any((account) => account.email == normalisedEmail)) {
-      throw const AuthDuplicateEmailException(
-        'An account with this email already exists.',
-      );
-    }
-    final idSuffix = (_accounts.length + 1).toString().padLeft(3, '0');
-    final account = _MockAccount(
-      id: 'u_$idSuffix',
-      email: normalisedEmail,
-      displayName: trimmedName,
-      passwordHash: _hashPassword(password),
-      role: role,
-      board: educationBoard,
-      school: school,
-    );
-    _accounts.add(account);
-    final user = account.asUser();
-    _authState.value = user;
-    return user;
+    if (fullName.trim().isEmpty) throw const AuthValidationException('Name required');
+    if (_accounts.any((a) => a.email == email.trim().toLowerCase())) throw const AuthDuplicateEmailException('Email exists');
+    final u = _MockAccount(id: 'u_${(_accounts.length + 1).toString().padLeft(3, '0')}', email: email.trim().toLowerCase(), displayName: fullName.trim(), passwordHash: _hash(password), role: role, board: educationBoard, school: school);
+    _accounts.add(u); return _authState.value = u.asUser();
   }
 
-  _MockAccount? _findAccount(String identifier) {
-    final normalised = identifier.trim().toLowerCase();
-    for (final account in _accounts) {
-      if (account.matchesIdentifier(normalised)) {
-        return account;
-      }
-    }
-    return null;
-  }
-
-  @override
-  Future<UserAccount> loginWithEmail(String identifier, String password) async {
+  @override Future<UserAccount> loginWithEmail(String id, String pw) async {
     await Future.delayed(const Duration(milliseconds: 700));
-    final account = _findAccount(identifier);
-    if (account != null && _passwordMatches(account, password)) {
-      final user = account.asUser();
-      _authState.value = user;
-      return user;
-    }
+    final a = _accounts.cast<_MockAccount?>().firstWhere((a) => a!.matches(id.trim().toLowerCase()), orElse: () => null);
+    if (a != null && a.passwordHash == _hash(pw)) return _authState.value = a.asUser();
     throw const AuthInvalidCredentialsException();
   }
 
-  @override
-  Future<UserAccount> loginWithGoogle() async {
+  @override Future<UserAccount> loginWithGoogle() async {
     await Future.delayed(const Duration(milliseconds: 600));
-    final user = UserAccount(
-      id: 'g_123',
-      email: 'google.user@example.com',
-      displayName: 'Google User',
-    );
-    _authState.value = user;
-    return user;
+    return _authState.value = UserAccount(id: 'g_123', email: 'google@example.com', displayName: 'Google User');
   }
 
-  @override
-  Future<void> sendPasswordReset(String email) async {
+  @override Future<void> sendPasswordReset(String email) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    final account = _findAccount(email);
-    if (account == null) {
-      throw const AuthValidationException('No account found with that email.');
-    }
-    // Simulate reset link sent
+    if (!_accounts.any((a) => a.matches(email))) throw const AuthValidationException('No account');
   }
 
-  @override
-  Future<void> logout() async {
-    _authState.value = null;
-  }
-
-  static String _hashPassword(String password) {
-    final salted = '$_passwordSalt$password';
-    final bytes = utf8.encode(salted);
-    return sha256.convert(bytes).toString();
-  }
-
-  bool _passwordMatches(_MockAccount account, String password) {
-    return account.passwordHash == _hashPassword(password);
-  }
-
-  @visibleForTesting
-  bool hasAccount(String identifier) => _findAccount(identifier) != null;
+  @override Future<void> logout() async => _authState.value = null;
+  static String _hash(String p) => sha256.convert(utf8.encode('ai_tutor_demo_salt$p')).toString();
 }
 
 class _MockAccount {
-  _MockAccount({
-    required this.id,
-    required this.email,
-    required this.displayName,
-    required this.passwordHash,
-    this.username,
-    this.role,
-    this.board,
-    this.school,
-  });
-
-  final String id;
-  final String email;
-  final String displayName;
-  final String passwordHash;
-  final String? username;
-  final String? role;
-  final String? board;
-  final String? school;
-
-  bool matchesIdentifier(String identifier) =>
-      identifier == email || (username != null && identifier == username);
-
-  UserAccount asUser() =>
-      UserAccount(id: id, email: email, displayName: displayName);
+  final String id, email, displayName, passwordHash;
+  final String? username, role, board, school;
+  _MockAccount({required this.id, required this.email, required this.displayName, required this.passwordHash, this.username, this.role, this.board, this.school});
+  bool matches(String i) => i == email || (username != null && i == username);
+  UserAccount asUser() => UserAccount(id: id, email: email, displayName: displayName);
 }
-
-/* -------------------------
-   When you’re ready to wire real auth,
-   create another class that implements AuthRepository,
-   e.g., AuthRepositoryHttp or FirebaseAuthRepository,
-   and pass that into MyApp(repository: YourRepo()).
--------------------------- */
