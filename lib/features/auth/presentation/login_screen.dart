@@ -103,28 +103,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _forgotPassword() async {
     final id = _idCtrl.text.trim();
-    if (!_looksLikeEmail(id) || !_validEmail(id)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid email above to reset')),
-      );
-      _idFocus.requestFocus();
-      return;
-    }
-    setState(() => _loading = true);
-    try {
-      await widget.repository.sendPasswordReset(id);
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Reset link sent to $id')));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Could not send reset link')));
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
+    final uri = id.isNotEmpty
+        ? '${AppRoutes.resetPassword}?email=${Uri.encodeComponent(id)}'
+        : AppRoutes.resetPassword;
+    if (!mounted) return;
+    context.push(uri);
   }
 
   Future<void> _googleSignIn() async {
@@ -193,9 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.emailAddress,
                 validator: _idValidator,
                 onFieldSubmitted: (_) => _passFocus.requestFocus(),
-                decoration: const InputDecoration(
-                  hintText: 'you@example.com',
-                ),
+                decoration: const InputDecoration(hintText: 'you@example.com'),
               ),
               const SizedBox(height: 18),
               const FormFieldLabel(text: 'Password'),
@@ -297,8 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
               AuthRedirectText(
                 prompt: "Don't have an account?",
                 actionLabel: 'Create one',
-                onTap:
-                    _loading ? null : () => context.go(AppRoutes.signup),
+                onTap: _loading ? null : () => context.go(AppRoutes.signup),
               ),
             ],
           ),

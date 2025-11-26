@@ -41,8 +41,7 @@ class AppDialogShell extends StatelessWidget {
                   Center(
                     child: Text(
                       title,
-                      style:
-                          AppTypography.sectionTitle.copyWith(fontSize: 24),
+                      style: AppTypography.sectionTitle.copyWith(fontSize: 24),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -132,7 +131,8 @@ class AppDialogActions extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double requiredWidth =
-            (buttonSize.width * buttons.length) + spacing * (buttons.length - 1);
+            (buttonSize.width * buttons.length) +
+            spacing * (buttons.length - 1);
         final bool canUseRow =
             constraints.maxWidth == double.infinity ||
             constraints.maxWidth >= requiredWidth;
@@ -198,7 +198,6 @@ class AppDialogActions extends StatelessWidget {
       case MainAxisAlignment.spaceEvenly:
         return WrapAlignment.spaceEvenly;
       case MainAxisAlignment.start:
-      default:
         return WrapAlignment.start;
     }
   }

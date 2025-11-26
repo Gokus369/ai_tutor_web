@@ -21,4 +21,5 @@ class AppRoutes {
   static const String termsOfUse = '/terms-of-use';
   static const String privacyPolicy = '/privacy-policy';
   static const String classDetails = '/class-details';
+  static const String resetPassword = '/reset-password';
 }

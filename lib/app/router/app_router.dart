@@ -4,6 +4,7 @@ import 'package:ai_tutor_web/features/ai_tutor/presentation/ai_tutor_screen.dart
 import 'package:ai_tutor_web/features/assessments/presentation/assessments_screen.dart';
 import 'package:ai_tutor_web/features/attendance/presentation/attendance_screen.dart';
 import 'package:ai_tutor_web/features/auth/presentation/login_screen.dart';
+import 'package:ai_tutor_web/features/auth/presentation/reset_password_screen.dart';
 import 'package:ai_tutor_web/features/auth/presentation/signup_screen.dart';
 import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/class_details_screen.dart';
@@ -61,6 +62,23 @@ class AppRouter {
           name: 'login',
           path: AppRoutes.login,
           builder: (context, state) => LoginScreen(repository: repository),
+        ),
+        GoRoute(
+          name: 'reset-password',
+          path: AppRoutes.resetPassword,
+          builder: (context, state) {
+            final emailParam = state.uri.queryParameters['email'];
+            final extraEmail = state.extra is String
+                ? state.extra as String
+                : null;
+            final initialEmail = emailParam?.isNotEmpty == true
+                ? emailParam
+                : (extraEmail?.isNotEmpty == true ? extraEmail : null);
+            return ResetPasswordScreen(
+              repository: repository,
+              initialEmail: initialEmail,
+            );
+          },
         ),
         GoRoute(
           name: 'dashboard',
@@ -169,6 +187,7 @@ class AppRouter {
   static const Set<String> _publicRoutes = {
     AppRoutes.signup,
     AppRoutes.login,
+    AppRoutes.resetPassword,
     AppRoutes.termsOfUse,
     AppRoutes.privacyPolicy,
   };
@@ -183,7 +202,9 @@ class AppRouter {
   }
 
   bool _isAuthRoute(String location) {
-    return location == AppRoutes.login || location == AppRoutes.signup;
+    return location == AppRoutes.login ||
+        location == AppRoutes.signup ||
+        location == AppRoutes.resetPassword;
   }
 }
 
