@@ -1,11 +1,9 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
 import 'package:ai_tutor_web/features/students/domain/models/student_report.dart';
 import 'package:ai_tutor_web/features/students/domain/student_filters.dart';
-import 'package:ai_tutor_web/features/students/presentation/widgets/student_filters_bar.dart';
-import 'package:ai_tutor_web/features/students/presentation/widgets/student_table.dart';
+import 'package:ai_tutor_web/features/students/presentation/widgets/students_header.dart';
+import 'package:ai_tutor_web/features/students/presentation/widgets/students_view.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
-import 'package:ai_tutor_web/shared/styles/app_colors.dart';
-import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
 const List<String> _classOptions = [
@@ -155,7 +153,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
       titleSpacing: 20,
       headerBuilder: (context, shell) {
         final bool isCompactHeader = shell.contentWidth < 640;
-        return _Header(
+        return StudentsHeader(
           isCompact: isCompactHeader,
           onAddStudent: () {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -165,113 +163,24 @@ class _StudentsScreenState extends State<StudentsScreen> {
         );
       },
       builder: (context, shell) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.studentsCardBackground,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.2),
-                  width: 1.2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              child: StudentFiltersBar(
-                isCompact: shell.contentWidth < 820,
-                classOptions: _classOptions,
-                attendanceOptions: _attendanceOptions,
-                progressOptions: _progressOptions,
-                performanceOptions: _performanceOptions,
-                selectedClass: _selectedClass,
-                selectedAttendance: _selectedAttendance,
-                selectedProgress: _selectedProgress,
-                selectedPerformance: _selectedPerformance,
-                searchController: _searchController,
-                onClassChanged: (value) => setState(() => _selectedClass = value),
-                onAttendanceChanged: (value) =>
-                    setState(() => _selectedAttendance = value),
-                onProgressChanged: (value) =>
-                    setState(() => _selectedProgress = value),
-                onPerformanceChanged: (value) =>
-                    setState(() => _selectedPerformance = value),
-              ),
-            ),
-            const SizedBox(height: 24),
-            if (_filteredStudents.isEmpty)
-              const _EmptyState()
-            else
-              StudentTable(students: _filteredStudents),
-          ],
+        return StudentsView(
+          students: _filteredStudents,
+          classOptions: _classOptions,
+          attendanceOptions: _attendanceOptions,
+          progressOptions: _progressOptions,
+          performanceOptions: _performanceOptions,
+          selectedClass: _selectedClass,
+          selectedAttendance: _selectedAttendance,
+          selectedProgress: _selectedProgress,
+          selectedPerformance: _selectedPerformance,
+          searchController: _searchController,
+          onClassChanged: (value) => setState(() => _selectedClass = value),
+          onAttendanceChanged: (value) => setState(() => _selectedAttendance = value),
+          onProgressChanged: (value) => setState(() => _selectedProgress = value),
+          onPerformanceChanged: (value) => setState(() => _selectedPerformance = value),
+          isCompactFilters: shell.contentWidth < 820,
         );
       },
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({required this.isCompact, required this.onAddStudent});
-
-  final bool isCompact;
-  final VoidCallback onAddStudent;
-
-  @override
-  Widget build(BuildContext context) {
-    if (isCompact) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Students', style: AppTypography.dashboardTitle),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 48,
-            child: ElevatedButton(
-              onPressed: onAddStudent,
-              child: const Text('+ Add Student'),
-            ),
-          ),
-        ],
-      );
-    }
-
-    return Row(
-      children: [
-        Expanded(
-          child: Text('Students', style: AppTypography.dashboardTitle),
-        ),
-        SizedBox(
-          width: 156,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: onAddStudent,
-            child: const Text('+ Add Student'),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      alignment: Alignment.center,
-      child: Text(
-        'No students match your filters. Try adjusting search or filters.',
-        style: AppTypography.classCardMeta,
-      ),
     );
   }
 }
