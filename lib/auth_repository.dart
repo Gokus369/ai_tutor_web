@@ -29,6 +29,8 @@ class MockAuthRepository implements AuthRepository {
   @override ValueListenable<UserAccount?> get authState => _authState;
   @override UserAccount? get currentUser => _authState.value;
 
+  bool hasAccount(String identifier) => _findAccount(identifier) != null;
+
   @override Future<UserAccount> register({required String fullName, required String email, required String password, String? role, String? educationBoard, String? school}) async {
     await Future.delayed(const Duration(milliseconds: 700));
     if (fullName.trim().isEmpty) throw const AuthValidationException('Name required');
@@ -39,7 +41,7 @@ class MockAuthRepository implements AuthRepository {
 
   @override Future<UserAccount> loginWithEmail(String id, String pw) async {
     await Future.delayed(const Duration(milliseconds: 700));
-    final a = _accounts.cast<_MockAccount?>().firstWhere((a) => a!.matches(id.trim().toLowerCase()), orElse: () => null);
+    final a = _findAccount(id);
     if (a != null && a.passwordHash == _hash(pw)) return _authState.value = a.asUser();
     throw const AuthInvalidCredentialsException();
   }
@@ -51,11 +53,16 @@ class MockAuthRepository implements AuthRepository {
 
   @override Future<void> sendPasswordReset(String email) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    if (!_accounts.any((a) => a.matches(email))) throw const AuthValidationException('No account');
+    if (_findAccount(email) == null) throw const AuthValidationException('No account');
   }
 
   @override Future<void> logout() async => _authState.value = null;
   static String _hash(String p) => sha256.convert(utf8.encode('ai_tutor_demo_salt$p')).toString();
+
+  _MockAccount? _findAccount(String identifier) {
+    final id = identifier.trim().toLowerCase();
+    return _accounts.cast<_MockAccount?>().firstWhere((a) => a!.matches(id), orElse: () => null);
+  }
 }
 
 class _MockAccount {

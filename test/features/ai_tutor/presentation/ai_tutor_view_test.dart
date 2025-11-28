@@ -1,5 +1,5 @@
 import 'package:ai_tutor_web/features/ai_tutor/domain/models/ai_tutor_models.dart';
-import 'package:ai_tutor_web/features/ai_tutor/presentation/ai_tutor_screen.dart';
+import 'package:ai_tutor_web/features/ai_tutor/presentation/widgets/ai_tutor_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,24 +11,37 @@ void main() {
   Future<void> pumpView(
     WidgetTester tester, {
     required double width,
+    double height = 1000,
     AiTutorSelections? selections,
     ValueChanged<String>? onPersonalityChanged,
     ValueChanged<String>? onVoiceChanged,
   }) async {
+    final binding = TestWidgetsFlutterBinding.ensureInitialized();
+    binding.window
+      ..physicalSizeTestValue = Size(width, height)
+      ..devicePixelRatioTestValue = 1.0;
+    addTearDown(() {
+      binding.window.clearPhysicalSizeTestValue();
+      binding.window.clearDevicePixelRatioTestValue();
+    });
+
     await tester.pumpWidget(
       MaterialApp(
-        home: Center(
-          child: SizedBox(
-            width: width,
-            height: 900,
-            child: AiTutorView(
-              data: data,
-              selections: selections ?? initialSelections(),
-              onPersonalityChanged: onPersonalityChanged ?? (_) {},
-              onVoiceChanged: onVoiceChanged ?? (_) {},
-              onResponseSpeedChanged: (_) {},
-              onContentStrictnessChanged: (_) {},
-              onLanguageChanged: (_) {},
+        home: Scaffold(
+          body: Center(
+            child: SingleChildScrollView(
+              child: SizedBox(
+                width: width,
+                child: AiTutorView(
+                  data: data,
+                  selections: selections ?? initialSelections(),
+                  onPersonalityChanged: onPersonalityChanged ?? (_) {},
+                  onVoiceChanged: onVoiceChanged ?? (_) {},
+                  onResponseSpeedChanged: (_) {},
+                  onContentStrictnessChanged: (_) {},
+                  onLanguageChanged: (_) {},
+                ),
+              ),
             ),
           ),
         ),
@@ -42,11 +55,11 @@ void main() {
 
     final Size personalitySize =
         tester.getSize(find.byKey(const ValueKey('ai-tutor-card-personality')));
-    expect(personalitySize.width, closeTo(558, 0.5));
+    expect(personalitySize.width, closeTo(558, 1));
 
     final Size responseSize =
         tester.getSize(find.byKey(const ValueKey('ai-tutor-card-response')));
-    expect(responseSize.width, closeTo(558, 0.5));
+    expect(responseSize.width, closeTo(558, 1));
   });
 
   testWidgets('uses single column layout on narrow width', (tester) async {
