@@ -4,9 +4,10 @@ import 'package:ai_tutor_web/features/notifications/domain/models/notification_i
 import 'package:ai_tutor_web/features/notifications/domain/services/notification_filter_service.dart';
 import 'package:ai_tutor_web/features/notifications/presentation/widgets/create_notification_dialog.dart';
 import 'package:ai_tutor_web/features/notifications/presentation/widgets/notification_filters_bar.dart';
+import 'package:ai_tutor_web/features/notifications/presentation/widgets/notification_create_button.dart';
+import 'package:ai_tutor_web/features/notifications/presentation/widgets/notification_empty_state.dart';
 import 'package:ai_tutor_web/features/notifications/presentation/widgets/notifications_table.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
-import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
@@ -234,23 +235,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         );
         final Widget createButton = SizedBox(
           height: buttonHeight,
-          child: ElevatedButton.icon(
+          child: NotificationCreateButton(
             onPressed: () => _showCreateNotificationDialog(context),
-            icon: const Icon(Icons.add, size: 20),
-            label: Text(
-              'Create Notifications',
-              style: AppTypography.button,
-            ),
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: horizontalPadding,
-              minimumSize: const Size(0, 44),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
+            horizontalPadding: horizontalPadding,
           ),
         );
 
@@ -304,7 +291,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             const SizedBox(height: 24),
             if (notifications.isEmpty)
-              _EmptyState(onClearFilters: _resetFilters)
+              NotificationEmptyState(onClearFilters: _resetFilters)
             else
               NotificationsTable(
                 notifications: notifications,
@@ -319,58 +306,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ],
         );
       },
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.onClearFilters});
-
-  final VoidCallback onClearFilters;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 64),
-      decoration: BoxDecoration(
-        color: AppColors.studentsCardBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.studentsCardBorder),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.notifications_none,
-            size: 48,
-            color: AppColors.iconMuted,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No notifications found',
-            style: AppTypography.sectionTitle,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Try adjusting your filters or reset to see all notifications.',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          OutlinedButton(
-            onPressed: onClearFilters,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary),
-              minimumSize: const Size(0, 42),
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-            ),
-            child: const Text('Reset Filters'),
-          ),
-        ],
-      ),
     );
   }
 }
