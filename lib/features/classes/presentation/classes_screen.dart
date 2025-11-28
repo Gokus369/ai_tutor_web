@@ -3,9 +3,10 @@ import 'package:ai_tutor_web/features/classes/domain/class_filters.dart';
 import 'package:ai_tutor_web/features/classes/domain/models/class_info.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_filters_bar.dart';
 import 'package:ai_tutor_web/features/classes/presentation/widgets/class_grid.dart';
+import 'package:ai_tutor_web/features/classes/presentation/widgets/classes_empty_state.dart';
+import 'package:ai_tutor_web/features/classes/presentation/widgets/new_class_button.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/create_class_dialog.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
-import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
@@ -147,7 +148,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 44,
-                    child: _NewClassButton(onPressed: _openCreateClassDialog),
+                    child: NewClassButton(onPressed: _openCreateClassDialog),
                   ),
                 ],
               )
@@ -158,7 +159,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
                   ),
                   SizedBox(
                     height: 44,
-                    child: _NewClassButton(onPressed: _openCreateClassDialog),
+                    child: NewClassButton(onPressed: _openCreateClassDialog),
                   ),
                 ],
               );
@@ -178,7 +179,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
             ),
             const SizedBox(height: 24),
             if (_filteredClasses.isEmpty)
-              const _EmptyState()
+              const ClassesEmptyState()
             else
               ClassGrid(
                 classes: _filteredClasses,
@@ -187,46 +188,6 @@ class _ClassesScreenState extends State<ClassesScreen> {
           ],
         );
       },
-    );
-  }
-}
-
-class _NewClassButton extends StatelessWidget {
-  const _NewClassButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: const Icon(Icons.add, size: 20),
-      label: Text('New Class', style: AppTypography.button),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 0,
-      ),
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      alignment: Alignment.center,
-      child: Text(
-        'No classes match your filters. Try adjusting the search or board.',
-        style: AppTypography.classCardMeta,
-      ),
     );
   }
 }
