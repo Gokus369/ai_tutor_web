@@ -1,5 +1,5 @@
 import 'package:ai_tutor_web/features/settings/data/settings_demo_data.dart';
-import 'package:ai_tutor_web/features/settings/presentation/settings_screen.dart';
+import 'package:ai_tutor_web/features/settings/presentation/widgets/settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
