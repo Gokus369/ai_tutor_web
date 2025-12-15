@@ -57,12 +57,17 @@ QuickActionsLayoutConfig buildQuickActionsLayout({
   double spacing = 16,
 }) {
   final double innerWidth = (availableWidth - 48).clamp(0.0, availableWidth);
-  final double requiredForSingleRow =
-      desiredWidth * actionCount + spacing * (actionCount - 1);
+  const double minItemWidth = 180;
+  final double availableForItems =
+      innerWidth - spacing * (actionCount - 1);
+  final double singleRowWidth = availableForItems / actionCount;
 
-  final bool useFixed = isDesktop || innerWidth >= requiredForSingleRow;
-  if (useFixed) {
-    return QuickActionsLayoutConfig.fixed(itemWidth: desiredWidth, spacing: spacing);
+  // Prefer a single row by shrinking buttons evenly if there's room above the minimum.
+  if (singleRowWidth >= minItemWidth) {
+    return QuickActionsLayoutConfig.fixed(
+      itemWidth: singleRowWidth,
+      spacing: spacing,
+    );
   }
 
   late final int columns;

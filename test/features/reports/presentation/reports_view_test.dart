@@ -12,13 +12,17 @@ void main() {
     double height = 1000,
     String? selectedClass,
   }) async {
-    final binding = TestWidgetsFlutterBinding.ensureInitialized();
-    binding.window
-      ..physicalSizeTestValue = Size(width, height)
-      ..devicePixelRatioTestValue = 1.0;
+    final view = tester.view;
+    final Size originalSize = view.physicalSize;
+    final double originalPixelRatio = view.devicePixelRatio;
+
+    view
+      ..physicalSize = Size(width, height)
+      ..devicePixelRatio = 1.0;
     addTearDown(() {
-      binding.window.clearPhysicalSizeTestValue();
-      binding.window.clearDevicePixelRatioTestValue();
+      view
+        ..physicalSize = originalSize
+        ..devicePixelRatio = originalPixelRatio;
     });
 
     await tester.pumpWidget(

@@ -4,6 +4,7 @@ import 'package:ai_tutor_web/features/dashboard/domain/models/quick_action.dart'
 import 'package:ai_tutor_web/features/dashboard/domain/models/upcoming_task.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/dashboard_demo_data.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_lesson_dialog.dart';
+import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_school_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/assign_quiz_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/create_class_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_quick_actions.dart';
@@ -99,6 +100,13 @@ class DashboardScreen extends StatelessWidget {
             ),
             messageBuilder: (result) =>
                 'Announcement sent to ${result.recipient}',
+          ),
+      QuickActionType.addSchool: () =>
+          _showDialogWithMessage<AddSchoolRequest>(
+            context: context,
+            builder: (_) => const AddSchoolDialog(),
+            messageBuilder: (result) =>
+                'School "${result.schoolName}" captured',
           ),
       QuickActionType.addLesson: () => _showDialogWithMessage<AddLessonRequest>(
         context: context,

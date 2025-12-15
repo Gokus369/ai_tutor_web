@@ -6,6 +6,7 @@ enum QuickActionType {
   addLesson,
   assignQuiz,
   sendAnnouncement,
+  addSchool,
 }
 
 /// Data model describing a shortcut action button on the dashboard.

@@ -1,14 +1,17 @@
 import 'package:ai_tutor_web/app/router/app_routes.dart';
+import 'package:ai_tutor_web/auth_repository.dart';
 import 'package:ai_tutor_web/features/settings/data/settings_demo_data.dart';
 import 'package:ai_tutor_web/features/settings/domain/models/settings_models.dart';
 import 'package:ai_tutor_web/features/settings/presentation/widgets/settings_view.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatefulWidget {
-  SettingsScreen({super.key, SettingsData? data})
+  SettingsScreen({super.key, required this.repository, SettingsData? data})
       : data = data ?? SettingsDemoData.build();
 
+  final AuthRepository repository;
   final SettingsData data;
 
   @override
@@ -35,9 +38,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
           notificationsEnabled: _notificationsEnabled,
           onToggleNotifications: _toggleNotifications,
           onEditProfile: () {},
-          onNavigate: (_) {},
+          onNavigate: _handleNavigate,
         );
       },
     );
+  }
+
+  Future<void> _handleNavigate(SettingsItem item) async {
+    if (item.kind == SettingsItemKind.action && item.destructive && item.label == 'Logout') {
+      try {
+        await widget.repository.logout();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Logout failed: $e')),
+          );
+        }
+      }
+      if (mounted) {
+        context.go(AppRoutes.login);
+      }
+    }
   }
 }

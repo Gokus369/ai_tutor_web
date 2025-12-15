@@ -10,7 +10,7 @@ class AppColors {
   static const shadow = Color(0x332B3034);
   static const sidebarBackground = Color(0xFF0D3B44), sidebarActive = Color(0xFF235A6E), sidebarHover = Color(0xFF13454E), sidebarIcon = Color(0xFF565656), sidebarSurface = Color(0xFFFFFFFF), sidebarBorder = Color(0xFFE3EDF2);
   static const dashboardGradientTop = Color(0xFFF5F6FA), dashboardGradientBottom = Color(0xFFE9F1F4);
-  static const quickActionBlue = Color(0xFF165DFB), quickActionGreen = Color(0xFF00A63E), quickActionPurple = Color(0xFF9810FA), quickActionOrange = Color(0xFFF54900), quickActionContent = Color(0xFFFFFFFF);
+  static const quickActionBlue = Color(0xFF165DFB), quickActionGreen = Color(0xFF00A63E), quickActionPurple = Color(0xFF9810FA), quickActionOrange = Color(0xFFF54900), quickActionTeal = Color(0xFF00B2A9), quickActionContent = Color(0xFFFFFFFF);
   static const metricIconBlue = Color(0xFF8280FF), metricIconGreen = Color(0xFF4AD991), metricIconYellow = Color(0xFFFEC53D), metricIconPeach = Color(0xFFFF9066);
   static const summaryCardGradientStart = Color(0xFFFCFDFD), summaryCardGradientEnd = Color(0xFFECECEC), summaryCardBorder = Color(0xFFD5D5D5), summaryTileBackground = Color(0xFFF5F6FA);
   static const quickActionsContainer = Color(0xFFFCFDFD), quickActionsTitle = Color(0xFF202224);

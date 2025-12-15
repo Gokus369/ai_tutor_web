@@ -217,38 +217,70 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor;
-    final Color textColor;
+    late final Color baseColor;
+    late final Color foreground;
+    late final IconData icon;
+
     switch (status) {
       case AssessmentStatus.completed:
-        backgroundColor = AppColors.statusCompletedBackground;
-        textColor = AppColors.statusCompletedText;
+        baseColor = AppColors.statusCompletedBackground;
+        foreground = AppColors.statusCompletedText;
+        icon = Icons.check_circle_rounded;
         break;
       case AssessmentStatus.pending:
-        backgroundColor = AppColors.statusPendingBackground;
-        textColor = AppColors.statusPendingText;
+        baseColor = AppColors.statusPendingBackground;
+        foreground = AppColors.statusPendingText;
+        icon = Icons.schedule_rounded;
         break;
       case AssessmentStatus.scheduled:
-        backgroundColor = AppColors.statusScheduledBackground;
-        textColor = AppColors.statusScheduledText;
+        baseColor = AppColors.statusScheduledBackground;
+        foreground = AppColors.statusScheduledText;
+        icon = Icons.event_rounded;
         break;
     }
 
+    final Color highlight = Color.alphaBlend(
+      Colors.white.withValues(alpha: 0.14),
+      baseColor,
+    );
+    final Color depth = Color.alphaBlend(
+      AppColors.shadow.withValues(alpha: 0.1),
+      baseColor,
+    );
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      constraints: const BoxConstraints(minHeight: 26),
-      alignment: Alignment.center,
-      child: Text(
-        status.label,
-        style: AppTypography.bodySmall.copyWith(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: textColor,
+        gradient: LinearGradient(
+          colors: [highlight, depth],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: baseColor.withValues(alpha: 0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: baseColor.withValues(alpha: 0.18),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: foreground),
+          const SizedBox(width: 8),
+          Text(
+            status.label,
+            style: AppTypography.statusChip(foreground).copyWith(
+              color: foreground,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
       ),
     );
   }

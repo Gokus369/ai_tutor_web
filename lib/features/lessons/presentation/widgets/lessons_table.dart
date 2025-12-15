@@ -2,7 +2,6 @@ import 'package:ai_tutor_web/features/lessons/domain/models/lesson_plan.dart';
 import 'package:ai_tutor_web/features/lessons/presentation/utils/lesson_formatters.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
-import 'package:ai_tutor_web/shared/widgets/status_chip.dart';
 import 'package:flutter/material.dart';
 
 class LessonsTable extends StatelessWidget {
@@ -301,18 +300,55 @@ class _StatusChip extends StatelessWidget {
     final Color background = completed
         ? AppColors.statusCompletedBackground
         : AppColors.statusPendingBackground;
-    final Color textColor = completed
+    final Color foreground = completed
         ? AppColors.statusCompletedText
         : AppColors.statusPendingText;
     final String label = completed ? 'Completed' : 'Pending';
+    final IconData icon =
+        completed ? Icons.check_circle_rounded : Icons.schedule_rounded;
+    final Color highlight = Color.alphaBlend(
+      Colors.white.withValues(alpha: 0.14),
+      background,
+    );
+    final Color depth = Color.alphaBlend(
+      AppColors.shadow.withValues(alpha: 0.1),
+      background,
+    );
 
-    return AppStatusChip(
-      label: label,
-      backgroundColor: background,
-      textColor: textColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      radius: 20,
-      textStyle: AppTypography.studentsStatusText.copyWith(fontSize: 13),
+    return Container(
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [highlight, depth],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: background.withValues(alpha: 0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: background.withValues(alpha: 0.18),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: foreground),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: AppTypography.statusChip(foreground).copyWith(
+              color: foreground,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

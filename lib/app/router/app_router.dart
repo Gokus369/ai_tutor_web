@@ -22,6 +22,7 @@ import 'package:ai_tutor_web/features/progress/presentation/progress_screen.dart
 import 'package:ai_tutor_web/features/reports/presentation/reports_screen.dart';
 import 'package:ai_tutor_web/features/settings/presentation/settings_screen.dart';
 import 'package:ai_tutor_web/features/students/presentation/students_screen.dart';
+import 'package:ai_tutor_web/features/schools/presentation/schools_screen.dart';
 import 'package:ai_tutor_web/features/syllabus/presentation/syllabus_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -33,7 +34,7 @@ class AppRouter {
 
   AppRouter({required this.repository, ProgressPageData? progressData}) : _progressData = progressData ?? ProgressDemoData.build() {
     router = GoRouter(
-      initialLocation: repository.currentUser == null ? AppRoutes.signup : AppRoutes.dashboard,
+      initialLocation: repository.currentUser == null ? AppRoutes.login : AppRoutes.dashboard,
       refreshListenable: repository.authState,
       redirect: (context, state) {
         final loggedIn = repository.currentUser != null;
@@ -45,11 +46,12 @@ class AppRouter {
       },
       errorBuilder: (c, s) => _RouteErrorScreen(message: s.error?.toString(), loggedIn: repository.currentUser != null),
       routes: [
-        _r('signup', AppRoutes.signup, (c, s) => SignupScreen(repository: repository)),
-        _r('login', AppRoutes.login, (c, s) => LoginScreen(repository: repository)),
+        _r('signup', AppRoutes.signup, (c, s) => const SignupScreen()),
+        _r('login', AppRoutes.login, (c, s) => const LoginScreen()),
         _r('reset-password', AppRoutes.resetPassword, (c, s) => ResetPasswordScreen(repository: repository, initialEmail: s.uri.queryParameters['email'] ?? (s.extra as String?))),
         _r('dashboard', AppRoutes.dashboard, (c, s) => const DashboardScreen()),
         _r('classes', AppRoutes.classes, (c, s) => const ClassesScreen()),
+        _r('schools', AppRoutes.schools, (c, s) => const SchoolsScreen()),
         _r('syllabus', AppRoutes.syllabus, (c, s) => const SyllabusScreen()),
         _r('students', AppRoutes.students, (c, s) => const StudentsScreen()),
         _r('aiTutor', AppRoutes.aiTutor, (c, s) => const AiTutorScreen()),
@@ -61,7 +63,7 @@ class AppRouter {
         _r('assessments', AppRoutes.assessments, (c, s) => AssessmentsScreen()),
         _r('notifications', AppRoutes.notifications, (c, s) => NotificationsScreen()),
         _r('reports', AppRoutes.reports, (c, s) => ReportsScreen()),
-        _r('settings', AppRoutes.settings, (c, s) => SettingsScreen()),
+        _r('settings', AppRoutes.settings, (c, s) => SettingsScreen(repository: repository)),
         _r('terms', AppRoutes.termsOfUse, (c, s) => const TermsOfUseScreen()),
         _r('privacy', AppRoutes.privacyPolicy, (c, s) => const PrivacyPolicyScreen()),
         GoRoute(name: 'class-details', path: AppRoutes.classDetails, redirect: (c, s) => s.extra is! ClassInfo ? AppRoutes.classes : null, builder: (c, s) => ClassDetailsScreen(initialInfo: s.extra as ClassInfo)),

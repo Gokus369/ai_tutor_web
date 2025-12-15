@@ -45,6 +45,8 @@ class DashboardQuickActions extends StatelessWidget {
         : Wrap(
             spacing: layout.spacing!,
             runSpacing: layout.spacing!,
+            alignment: WrapAlignment.spaceBetween,
+            runAlignment: WrapAlignment.start,
             children: actions
                 .map(
                   (action) => SizedBox(
@@ -90,4 +92,3 @@ class DashboardQuickActions extends StatelessWidget {
     );
   }
 }
-

@@ -2,7 +2,6 @@ import 'package:ai_tutor_web/features/dashboard/domain/models/upcoming_task.dart
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:ai_tutor_web/shared/widgets/app_data_table.dart';
-import 'package:ai_tutor_web/shared/widgets/status_chip.dart';
 import 'package:flutter/material.dart';
 
 class UpcomingTasksTable extends StatelessWidget {
@@ -191,30 +190,58 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late final Color bgColor;
-    late final Color textColor;
-    late final String label;
+    final bool isCompleted = status == TaskStatus.completed;
+    final Color baseColor = isCompleted
+        ? AppColors.statusCompletedBackground
+        : AppColors.statusPendingBackground;
+    final Color foreground =
+        isCompleted ? AppColors.statusCompletedText : AppColors.statusPendingText;
+    final String label = isCompleted ? 'Completed' : 'Pending';
+    final Color upperTone = Color.alphaBlend(
+      Colors.white.withValues(alpha: 0.12),
+      baseColor,
+    );
+    final Color lowerTone = Color.alphaBlend(
+      AppColors.shadow.withValues(alpha: 0.08),
+      baseColor,
+    );
+    final IconData icon =
+        isCompleted ? Icons.check_circle_rounded : Icons.schedule_rounded;
 
-    switch (status) {
-      case TaskStatus.completed:
-        bgColor = AppColors.statusCompletedBackground;
-        textColor = AppColors.statusCompletedText;
-        label = 'Completed';
-        break;
-      case TaskStatus.pending:
-        bgColor = AppColors.statusPendingBackground;
-        textColor = AppColors.statusPendingText;
-        label = 'Pending';
-        break;
-    }
-
-    return AppStatusChip(
-      label: label,
-      backgroundColor: bgColor,
-      textColor: textColor,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      radius: 30,
-      textStyle: AppTypography.statusChip(textColor),
+    return Container(
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [upperTone, lowerTone],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: baseColor.withValues(alpha: 0.35)),
+        boxShadow: [
+          BoxShadow(
+            color: baseColor.withValues(alpha: 0.18),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: foreground),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: AppTypography.statusChip(foreground).copyWith(
+              color: foreground,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.25,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -10,6 +10,7 @@ class AppRoutes {
   static const String students = '/students';
   static const String aiTutor = '/ai-tutor';
   static const String lessons = '/lessons';
+  static const String schools = '/schools';
   static const String attendance = '/attendance';
   static const String assessments = '/assessments';
   static const String progress = '/progress';

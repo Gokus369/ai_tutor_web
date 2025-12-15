@@ -1,10 +1,20 @@
 import 'dart:convert';
+import 'package:ai_tutor_web/core/network/api_client.dart';
 import 'package:crypto/crypto.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 class UserAccount {
   final String id, email, displayName;
-  UserAccount({required this.id, required this.email, required this.displayName});
+  final String? accessToken, refreshToken, userType;
+  UserAccount({
+    required this.id,
+    required this.email,
+    required this.displayName,
+    this.accessToken,
+    this.refreshToken,
+    this.userType,
+  });
 }
 
 abstract class AuthRepository {
@@ -21,6 +31,137 @@ class AuthException implements Exception { final String message; const AuthExcep
 class AuthValidationException extends AuthException { const AuthValidationException(super.message); }
 class AuthDuplicateEmailException extends AuthValidationException { const AuthDuplicateEmailException(super.message); }
 class AuthInvalidCredentialsException extends AuthException { const AuthInvalidCredentialsException([super.message = 'Invalid credentials']); }
+
+class ApiAuthRepository implements AuthRepository {
+  ApiAuthRepository({required ApiClient apiClient}) : _apiClient = apiClient;
+
+  final ApiClient _apiClient;
+  final _authState = ValueNotifier<UserAccount?>(null);
+
+  @override ValueListenable<UserAccount?> get authState => _authState;
+  @override UserAccount? get currentUser => _authState.value;
+
+  @override
+  Future<UserAccount> loginWithEmail(String identifier, String password) async {
+    final username = identifier.trim();
+    if (username.isEmpty) throw const AuthValidationException('Username required');
+    if (password.isEmpty) throw const AuthValidationException('Password required');
+
+    try {
+      final response = await _apiClient.dio.post<Map<String, dynamic>>(
+        '/login',
+        data: {'username': username, 'password': password},
+      );
+      final data = response.data;
+      if (data == null) throw const AuthException('Empty response');
+      final status = data['statusCode'] as int? ?? response.statusCode ?? 500;
+      if (status != 200) throw AuthException(data['message']?.toString() ?? 'Login failed ($status)');
+
+      final token = (data['token'] as String?)?.trim();
+      if (token == null || token.isEmpty) {
+        throw const AuthException('Missing token in response');
+      }
+      final refresh = (data['refreshToken'] as String?)?.trim();
+      _apiClient.dio.options.headers['Authorization'] = token;
+
+      final user = UserAccount(
+        id: data['id']?.toString() ?? username,
+        email: data['email']?.toString() ?? '',
+        displayName: data['name']?.toString().trim().isNotEmpty == true ? data['name'].toString() : username,
+        accessToken: token,
+        refreshToken: refresh,
+        userType: data['userType']?.toString(),
+      );
+      _authState.value = user;
+      return user;
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map<String, dynamic>
+          ? (e.response?.data['message']?.toString() ?? e.message)
+          : e.message;
+      throw AuthException(msg ?? 'Network error');
+    }
+  }
+
+  @override
+  Future<UserAccount> register({required String fullName, required String email, required String password, String? role, String? educationBoard, String? school}) async {
+    final name = fullName.trim();
+    final contactEmail = email.trim();
+    final normalizedRole = role?.trim() ?? '';
+    if (name.isEmpty) throw const AuthValidationException('Name required');
+    if (contactEmail.isEmpty) throw const AuthValidationException('Email required');
+    if (password.isEmpty) throw const AuthValidationException('Password required');
+
+    final Map<String, dynamic> payload = {
+      'name': name,
+      'contactEmail': contactEmail,
+      'password': password,
+      // API allows multiple numbers; we default to none unless provided later in UI.
+      'contactNumber': <String>[],
+      'countryCode': '+91',
+    };
+
+    // Only SUPER_ADMIN is supported beyond the default (student). Map accordingly.
+    if (normalizedRole.toLowerCase().contains('admin')) {
+      payload['userType'] = 'SUPER_ADMIN';
+    }
+
+    try {
+      final response = await _apiClient.dio.post<Map<String, dynamic>>(
+        '/users',
+        data: payload,
+      );
+      final data = response.data;
+      final status = response.statusCode ?? 500;
+      if (status != 201 || data == null) {
+        throw AuthException(data?['message']?.toString() ?? 'Signup failed ($status)');
+      }
+
+      return UserAccount(
+        id: data['id']?.toString() ?? '',
+        email: data['contactEmail']?.toString() ?? contactEmail,
+        displayName: data['name']?.toString() ?? name,
+        userType: data['userType']?.toString(),
+      );
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map<String, dynamic>
+          ? (e.response?.data['message']?.toString() ?? e.message)
+          : e.message;
+      throw AuthException(msg ?? 'Network error');
+    }
+  }
+
+  @override
+  Future<UserAccount> loginWithGoogle() async {
+    throw const AuthException('Google login not supported in API');
+  }
+
+  @override
+  Future<void> sendPasswordReset(String email) async {
+    throw const AuthException('Password reset not supported in API');
+  }
+
+  @override
+  Future<void> logout() async {
+    final refresh = _authState.value?.refreshToken;
+    try {
+      if (refresh != null && refresh.isNotEmpty) {
+        await _apiClient.dio.post('/logout', data: {'refreshToken': refresh});
+      }
+    } on DioException catch (e) {
+      final status = e.response?.statusCode ?? 0;
+      // If token already invalid/expired, still clear local session.
+      if (status != 400 && status != 401) {
+        final msg = e.response?.data is Map<String, dynamic>
+            ? (e.response?.data['message']?.toString() ?? e.message)
+            : e.message;
+        throw AuthException(msg ?? 'Network error');
+      }
+    } finally {
+      _apiClient.dio.options.headers.remove('Authorization');
+      _authState.value = null;
+    }
+  }
+}
 
 class MockAuthRepository implements AuthRepository {
   final _authState = ValueNotifier<UserAccount?>(null);

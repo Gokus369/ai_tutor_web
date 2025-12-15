@@ -26,7 +26,7 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
   void didUpdateWidget(covariant AiTutorScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.data != oldWidget.data) {
-      _selections = AiTutorSelections.fromData(widget.data);
+        _selections = AiTutorSelections.fromData(widget.data);
     }
   }
 
