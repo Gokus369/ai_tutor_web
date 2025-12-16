@@ -36,6 +36,11 @@ class DashboardSidebar extends StatelessWidget {
       route: AppRoutes.students,
     ),
     _SidebarItemData(
+      label: 'Teachers',
+      icon: Icons.person_outline,
+      route: AppRoutes.teachers,
+    ),
+    _SidebarItemData(
       label: 'Syllabus',
       icon: Icons.list_alt_outlined,
       route: AppRoutes.syllabus,

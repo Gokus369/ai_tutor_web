@@ -49,6 +49,12 @@ class DashboardDemoData {
       type: QuickActionType.addSchool,
     ),
     QuickAction(
+      label: 'Add Teacher',
+      icon: Icons.person_add_alt_1_outlined,
+      color: AppColors.quickActionGreen,
+      type: QuickActionType.addTeacher,
+    ),
+    QuickAction(
       label: 'Add Lesson',
       icon: Icons.calendar_today_outlined,
       color: AppColors.quickActionGreen,

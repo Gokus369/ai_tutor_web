@@ -8,6 +8,7 @@ class AppRoutes {
   static const String classes = '/classes';
   static const String syllabus = '/syllabus';
   static const String students = '/students';
+  static const String teachers = '/teachers';
   static const String aiTutor = '/ai-tutor';
   static const String lessons = '/lessons';
   static const String schools = '/schools';

@@ -21,6 +21,7 @@ import 'package:ai_tutor_web/features/progress/domain/models/progress_models.dar
 import 'package:ai_tutor_web/features/progress/presentation/progress_screen.dart';
 import 'package:ai_tutor_web/features/reports/presentation/reports_screen.dart';
 import 'package:ai_tutor_web/features/settings/presentation/settings_screen.dart';
+import 'package:ai_tutor_web/features/teachers/presentation/teachers_screen.dart';
 import 'package:ai_tutor_web/features/students/presentation/students_screen.dart';
 import 'package:ai_tutor_web/features/schools/presentation/schools_screen.dart';
 import 'package:ai_tutor_web/features/syllabus/presentation/syllabus_screen.dart';
@@ -54,6 +55,7 @@ class AppRouter {
         _r('schools', AppRoutes.schools, (c, s) => const SchoolsScreen()),
         _r('syllabus', AppRoutes.syllabus, (c, s) => const SyllabusScreen()),
         _r('students', AppRoutes.students, (c, s) => const StudentsScreen()),
+        _r('teachers', AppRoutes.teachers, (c, s) => const TeachersScreen()),
         _r('aiTutor', AppRoutes.aiTutor, (c, s) => const AiTutorScreen()),
         _r('lessons', AppRoutes.lessons, (c, s) => const LessonsPlannerScreen()),
         _r('attendance', AppRoutes.attendance, (c, s) => const AttendanceScreen()),

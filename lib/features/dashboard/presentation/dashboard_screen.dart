@@ -7,6 +7,7 @@ import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_lesson_
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_school_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/assign_quiz_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/create_class_dialog.dart';
+import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_teacher_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_quick_actions.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_summary_section.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/send_announcement_dialog.dart';
@@ -113,6 +114,11 @@ class DashboardScreen extends StatelessWidget {
         ),
         messageBuilder: (lesson) =>
             'Lesson "${lesson.lessonTitle}" added for ${lesson.className}',
+      ),
+      QuickActionType.addTeacher: () => _showDialogWithMessage<AddTeacherRequest>(
+        context: context,
+        builder: (_) => const AddTeacherDialog(),
+        messageBuilder: (teacher) => 'Teacher "${teacher.name}" added',
       ),
     };
   }
