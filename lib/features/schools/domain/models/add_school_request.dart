@@ -15,8 +15,26 @@ class AddSchoolRequest {
   final int? principalId;
   final int? createdById;
 
+  AddSchoolRequest copyWith({
+    String? schoolName,
+    String? address,
+    String? code,
+    int? boardId,
+    int? principalId,
+    int? createdById,
+  }) {
+    return AddSchoolRequest(
+      schoolName: schoolName ?? this.schoolName,
+      address: address ?? this.address,
+      code: code ?? this.code,
+      boardId: boardId ?? this.boardId,
+      principalId: principalId ?? this.principalId,
+      createdById: createdById ?? this.createdById,
+    );
+  }
+
   Map<String, dynamic> toJson() {
-    return {
+    return <String, dynamic>{
       'schoolName': schoolName,
       'address': address,
       'code': code,

@@ -11,8 +11,8 @@ import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_q
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_summary_section.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/send_announcement_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/upcoming_tasks_table.dart';
-import 'package:ai_tutor_web/features/schools/application/schools_cubit.dart';
 import 'package:ai_tutor_web/features/schools/domain/models/add_school_request.dart';
+import 'package:ai_tutor_web/features/schools/presentation/bloc/school_cubit.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -137,15 +137,16 @@ class DashboardScreen extends StatelessWidget {
     );
     if (result == null || !context.mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
     try {
-      final created = await context.read<SchoolsCubit>().createSchool(result);
-      messenger.showSnackBar(
-        SnackBar(content: Text('School "${created.schoolName}" added')),
+      final created = await context.read<SchoolCubit>().createSchool(result);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('School "${created.name}" added')),
       );
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(e.toString())),
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add school: $e')),
       );
     }
   }

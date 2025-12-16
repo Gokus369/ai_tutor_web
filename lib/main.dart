@@ -3,8 +3,8 @@ import 'package:ai_tutor_web/app/theme/app_theme.dart';
 import 'package:ai_tutor_web/core/network/api_client.dart';
 import 'package:ai_tutor_web/core/network/api_config_cubit.dart';
 import 'package:ai_tutor_web/features/auth/application/auth_cubit.dart';
-import 'package:ai_tutor_web/features/schools/application/schools_cubit.dart';
-import 'package:ai_tutor_web/features/schools/data/schools_repository.dart';
+import 'package:ai_tutor_web/features/schools/data/school_repository.dart';
+import 'package:ai_tutor_web/features/schools/presentation/bloc/school_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'auth_repository.dart';
@@ -13,21 +13,21 @@ void main() {
   final apiConfig = ApiConfigCubit();
   final apiClient = ApiClient(initialConfig: apiConfig.state);
   final repository = ApiAuthRepository(apiClient: apiClient);
-  final schoolsRepository = SchoolsRepository(apiClient: apiClient);
+  final schoolsRepository = SchoolRepository(apiClient);
 
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<ApiClient>.value(value: apiClient),
         RepositoryProvider<AuthRepository>.value(value: repository),
-        RepositoryProvider<SchoolsRepository>.value(value: schoolsRepository),
+        RepositoryProvider<SchoolRepository>.value(value: schoolsRepository),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider<ApiConfigCubit>.value(value: apiConfig),
           BlocProvider<AuthCubit>(create: (context) => AuthCubit(repository)),
-          BlocProvider<SchoolsCubit>(
-            create: (context) => SchoolsCubit(schoolsRepository)..loadSchools(),
+          BlocProvider<SchoolCubit>(
+            create: (context) => SchoolCubit(schoolsRepository)..loadSchools(),
           ),
         ],
         child: MyApp(repository: repository),
