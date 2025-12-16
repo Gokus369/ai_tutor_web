@@ -1,4 +1,4 @@
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_school_dialog.dart';
+import 'package:ai_tutor_web/features/schools/domain/models/school.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class SchoolCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  final AddSchoolRequest school;
+  final School school;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -54,6 +54,11 @@ class SchoolCard extends StatelessWidget {
                   children: [
                     _MetaChip(label: 'Code', value: school.code),
                     _MetaChip(label: 'Board ID', value: '${school.boardId}'),
+                    if (school.principalId != null)
+                      _MetaChip(
+                        label: 'Principal',
+                        value: '${school.principalId}',
+                      ),
                     if (school.createdById != null)
                       _MetaChip(
                         label: 'Created by',

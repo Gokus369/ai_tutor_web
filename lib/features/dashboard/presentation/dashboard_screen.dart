@@ -11,8 +11,11 @@ import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_q
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/dashboard_summary_section.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/send_announcement_dialog.dart';
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/upcoming_tasks_table.dart';
+import 'package:ai_tutor_web/features/schools/application/schools_cubit.dart';
+import 'package:ai_tutor_web/features/schools/domain/models/add_school_request.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -101,13 +104,7 @@ class DashboardScreen extends StatelessWidget {
             messageBuilder: (result) =>
                 'Announcement sent to ${result.recipient}',
           ),
-      QuickActionType.addSchool: () =>
-          _showDialogWithMessage<AddSchoolRequest>(
-            context: context,
-            builder: (_) => const AddSchoolDialog(),
-            messageBuilder: (result) =>
-                'School "${result.schoolName}" captured',
-          ),
+      QuickActionType.addSchool: () => _handleAddSchoolQuickAction(context),
       QuickActionType.addLesson: () => _showDialogWithMessage<AddLessonRequest>(
         context: context,
         builder: (_) => AddLessonDialog(
@@ -131,5 +128,25 @@ class DashboardScreen extends StatelessWidget {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(messageBuilder(result))));
+  }
+
+  Future<void> _handleAddSchoolQuickAction(BuildContext context) async {
+    final result = await showDialog<AddSchoolRequest>(
+      context: context,
+      builder: (_) => const AddSchoolDialog(),
+    );
+    if (result == null || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final created = await context.read<SchoolsCubit>().createSchool(result);
+      messenger.showSnackBar(
+        SnackBar(content: Text('School "${created.schoolName}" added')),
+      );
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
   }
 }
