@@ -9,10 +9,14 @@ class ClassGrid extends StatelessWidget {
     super.key,
     required this.classes,
     required this.contentWidth,
+    this.onPatch,
+    this.onDelete,
   });
 
   final List<ClassInfo> classes;
   final double contentWidth;
+  final ValueChanged<ClassInfo>? onPatch;
+  final ValueChanged<ClassInfo>? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +46,8 @@ class ClassGrid extends StatelessWidget {
                 info: info,
                 onViewDetails: () =>
                     context.push(AppRoutes.classDetails, extra: info),
+                onPatch: onPatch == null ? null : () => onPatch!(info),
+                onDelete: onDelete == null ? null : () => onDelete!(info),
               ),
             ),
           )

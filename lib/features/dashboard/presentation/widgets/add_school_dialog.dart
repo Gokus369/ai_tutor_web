@@ -25,9 +25,15 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
   final _nameCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   final _codeCtrl = TextEditingController();
-  final _boardCtrl = TextEditingController();
   final _principalCtrl = TextEditingController();
   final _createdByCtrl = TextEditingController();
+  int? _selectedBoardId;
+
+  static const List<_BoardOption> _boardOptions = [
+    _BoardOption(id: 1, label: 'CBSE'),
+    _BoardOption(id: 2, label: 'ICSE'),
+    _BoardOption(id: 3, label: 'State Board'),
+  ];
 
   @override
   void initState() {
@@ -37,13 +43,19 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
       _nameCtrl.text = initial.schoolName;
       _addressCtrl.text = initial.address;
       _codeCtrl.text = initial.code;
-      _boardCtrl.text = initial.boardId.toString();
+      _selectedBoardId = _boardOptions
+          .map((option) => option.id)
+          .contains(initial.boardId)
+          ? initial.boardId
+          : _boardOptions.first.id;
       if (initial.principalId != null) {
         _principalCtrl.text = initial.principalId.toString();
       }
       if (initial.createdById != null) {
         _createdByCtrl.text = initial.createdById.toString();
       }
+    } else {
+      _selectedBoardId = _boardOptions.first.id;
     }
   }
 
@@ -52,7 +64,6 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
     _nameCtrl.dispose();
     _addressCtrl.dispose();
     _codeCtrl.dispose();
-    _boardCtrl.dispose();
     _principalCtrl.dispose();
     _createdByCtrl.dispose();
     super.dispose();
@@ -111,20 +122,20 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: AppLabeledField(
-                    label: 'Board ID',
-                    child: AppTextFormField(
-                      controller: _boardCtrl,
-                      hintText: '1',
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      validator: (v) {
-                        final trimmed = (v ?? '').trim();
-                        if (trimmed.isEmpty) return 'Enter a board ID';
-                        final parsed = int.tryParse(trimmed);
-                        if (parsed == null) return 'Board ID must be a number';
-                        return null;
-                      },
+                    label: 'Board',
+                    child: AppDropdownFormField<int>(
+                      items: _boardOptions.map((option) => option.id).toList(),
+                      value: _selectedBoardId,
+                      itemBuilder: (id) => Text(
+                        _boardOptions.firstWhere((option) => option.id == id).label,
+                      ),
+                      onChanged: (value) =>
+                          setState(() => _selectedBoardId = value),
+                      validator: (value) =>
+                          value == null ? 'Select a board' : null,
                       height: AddSchoolDialog.fieldHeight,
+                      decoration:
+                          AppFormDecorations.filled(hintText: 'Select board'),
                     ),
                   ),
                 ),
@@ -178,7 +189,7 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
                 cancelLabel: 'Cancel',
                 onPrimaryPressed: () {
                   if (!_formKey.currentState!.validate()) return;
-                  final boardId = int.parse(_boardCtrl.text.trim());
+                  final boardId = _selectedBoardId ?? _boardOptions.first.id;
                   final createdByText = _createdByCtrl.text.trim();
                   final principalText = _principalCtrl.text.trim();
                   final createdById = createdByText.isEmpty ? null : int.tryParse(createdByText);
@@ -212,4 +223,11 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
       ),
     );
   }
+}
+
+class _BoardOption {
+  const _BoardOption({required this.id, required this.label});
+
+  final int id;
+  final String label;
 }

@@ -8,10 +8,14 @@ class ClassCard extends StatelessWidget {
     super.key,
     required this.info,
     this.onViewDetails,
+    this.onPatch,
+    this.onDelete,
   });
 
   final ClassInfo info;
   final VoidCallback? onViewDetails;
+  final VoidCallback? onPatch;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,25 @@ class ClassCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(info.name, style: AppTypography.classCardTitle),
-              Icon(Icons.more_horiz, color: AppColors.grey, size: 24),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (info.schoolName != null && info.schoolName!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Text(
+                        info.schoolName!,
+                        style: AppTypography.classCardMeta.copyWith(
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ),
+                  _CardMenuButton(
+                    onPatch: onPatch,
+                    onDelete: onDelete,
+                  ),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -76,6 +98,49 @@ class ClassCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+enum _ClassCardAction { patch, delete }
+
+class _CardMenuButton extends StatelessWidget {
+  const _CardMenuButton({
+    required this.onPatch,
+    required this.onDelete,
+  });
+
+  final VoidCallback? onPatch;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    if (onPatch == null && onDelete == null) {
+      return const Icon(Icons.more_horiz, color: AppColors.grey, size: 24);
+    }
+
+    return PopupMenuButton<_ClassCardAction>(
+      icon: const Icon(Icons.more_horiz, color: AppColors.grey, size: 24),
+      tooltip: 'Actions',
+      onSelected: (action) {
+        if (action == _ClassCardAction.patch && onPatch != null) {
+          onPatch!();
+        } else if (action == _ClassCardAction.delete && onDelete != null) {
+          onDelete!();
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem<_ClassCardAction>(
+          value: _ClassCardAction.patch,
+          enabled: onPatch != null,
+          child: const Text('Patch'),
+        ),
+        PopupMenuItem<_ClassCardAction>(
+          value: _ClassCardAction.delete,
+          enabled: onDelete != null,
+          child: const Text('Delete'),
+        ),
+      ],
     );
   }
 }

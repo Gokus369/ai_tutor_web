@@ -5,15 +5,21 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final classes = [
     const ClassInfo(
+      id: 1,
       name: 'Class 12',
       board: 'CBSE',
+      boardId: 1,
+      schoolId: 101,
       studentCount: 45,
       subjectSummary: 'Mathematics, Physics',
       syllabusProgress: 0.7,
     ),
     const ClassInfo(
+      id: 2,
       name: 'Class 10',
       board: 'ICSE',
+      boardId: 2,
+      schoolId: 102,
       studentCount: 40,
       subjectSummary: 'English, History',
       syllabusProgress: 0.6,
@@ -53,4 +59,3 @@ void main() {
     expect(filtered.first.name.compareTo(filtered.last.name) <= 0, isTrue);
   });
 }
-

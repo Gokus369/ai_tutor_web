@@ -13,12 +13,14 @@ class SyllabusView extends StatelessWidget {
     required this.progressEntries,
     required this.expandedIndex,
     required this.onSubjectToggle,
+    required this.onAddSubject,
   });
 
   final List<SyllabusSubject> subjects;
   final List<SyllabusProgress> progressEntries;
   final int expandedIndex;
   final ValueChanged<int> onSubjectToggle;
+  final VoidCallback onAddSubject;
 
   @override
   Widget build(BuildContext context) {
@@ -32,16 +34,24 @@ class SyllabusView extends StatelessWidget {
           children: [
             if (width >= 720)
               Row(
-                children: const [
-                  Expanded(flex: 3, child: _SearchField()),
-                  SizedBox(width: 20),
-                  SizedBox(width: 163, height: 48, child: _AddSubjectButton()),
+                children: [
+                  const Expanded(flex: 3, child: _SearchField()),
+                  const SizedBox(width: 20),
+                  SizedBox(
+                    width: 163,
+                    height: 48,
+                    child: _AddSubjectButton(onPressed: onAddSubject),
+                  ),
                 ],
               )
-            else ...const [
-              _SearchField(),
-              SizedBox(height: 12),
-              SizedBox(width: double.infinity, height: 48, child: _AddSubjectButton()),
+            else ...[
+              const _SearchField(),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: _AddSubjectButton(onPressed: onAddSubject),
+              ),
             ],
             const SizedBox(height: 18),
             if (width >= 720)
@@ -132,11 +142,13 @@ class _SearchField extends StatelessWidget {
 }
 
 class _AddSubjectButton extends StatelessWidget {
-  const _AddSubjectButton();
+  const _AddSubjectButton({required this.onPressed});
+
+  final VoidCallback onPressed;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,

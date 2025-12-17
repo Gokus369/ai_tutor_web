@@ -14,6 +14,10 @@ import 'package:ai_tutor_web/features/dashboard/presentation/widgets/send_announ
 import 'package:ai_tutor_web/features/dashboard/presentation/widgets/upcoming_tasks_table.dart';
 import 'package:ai_tutor_web/features/schools/domain/models/add_school_request.dart';
 import 'package:ai_tutor_web/features/schools/presentation/bloc/school_cubit.dart';
+import 'package:ai_tutor_web/features/classes/data/classes_repository.dart';
+import 'package:ai_tutor_web/features/schools/data/school_repository.dart';
+import 'package:ai_tutor_web/core/network/api_client.dart';
+import 'package:ai_tutor_web/shared/models/school_option.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -77,13 +81,7 @@ class DashboardScreen extends StatelessWidget {
   ) {
     return {
       QuickActionType.createClass: () =>
-          _showDialogWithMessage<CreateClassRequest>(
-            context: context,
-            builder: (_) => CreateClassDialog(
-              boardOptions: DashboardDemoData.classBoardOptions,
-            ),
-            messageBuilder: (request) => 'Class "${request.className}" created',
-          ),
+          _handleCreateClassQuickAction(context),
       QuickActionType.assignQuiz: () =>
           _showDialogWithMessage<AssignQuizRequest>(
             context: context,
@@ -115,11 +113,8 @@ class DashboardScreen extends StatelessWidget {
         messageBuilder: (lesson) =>
             'Lesson "${lesson.lessonTitle}" added for ${lesson.className}',
       ),
-      QuickActionType.addTeacher: () => _showDialogWithMessage<AddTeacherRequest>(
-        context: context,
-        builder: (_) => const AddTeacherDialog(),
-        messageBuilder: (teacher) => 'Teacher "${teacher.name}" added',
-      ),
+      QuickActionType.addTeacher: () =>
+          _handleAddTeacherQuickAction(context),
     };
   }
 
@@ -154,6 +149,79 @@ class DashboardScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to add school: $e')),
       );
+    }
+  }
+
+  Future<void> _handleCreateClassQuickAction(BuildContext context) async {
+    final schoolOptions = await _fetchSchoolOptions(context);
+    if (!context.mounted) return;
+    final result = await showDialog<CreateClassRequest>(
+      context: context,
+      builder: (_) => CreateClassDialog(
+        boardOptions: DashboardDemoData.classBoardOptions,
+        schoolOptions: schoolOptions,
+      ),
+    );
+    if (result == null) return;
+    if (!context.mounted) return;
+    try {
+      final repository =
+          ClassesRepository(context.read<ApiClient>());
+      final grade = await repository.createGrade(result);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Class "${grade.name}" created')),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to create class: $e')),
+      );
+    }
+  }
+
+  Future<void> _handleAddTeacherQuickAction(BuildContext context) async {
+    final schoolOptions = await _fetchSchoolOptions(context);
+    if (!context.mounted) return;
+    final result = await showDialog<AddTeacherRequest>(
+      context: context,
+      builder: (_) => AddTeacherDialog(schoolOptions: schoolOptions),
+    );
+    if (result == null || !context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Teacher "${result.name}" added')),
+    );
+  }
+
+  Future<List<SchoolOption>> _fetchSchoolOptions(BuildContext context) async {
+    final cubitSchools = context.read<SchoolCubit>().state.schools;
+    if (cubitSchools.isNotEmpty) {
+      return cubitSchools
+          .where((s) => s.id != null)
+          .map(
+            (s) => SchoolOption(
+              id: s.id!,
+              name: s.name,
+            ),
+          )
+          .toList();
+    }
+
+    try {
+      final repo = SchoolRepository(context.read<ApiClient>());
+      final page = await repo.fetchSchools(take: 100);
+      final options = page.data
+          .where((s) => s.id != null)
+          .map(
+            (s) => SchoolOption(
+              id: s.id!,
+              name: (s.name).trim().isEmpty ? 'School ${s.id}' : s.name,
+            ),
+          )
+          .toList();
+      return options;
+    } catch (_) {
+      return const [];
     }
   }
 }

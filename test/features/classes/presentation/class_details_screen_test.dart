@@ -19,8 +19,11 @@ void main() {
 
   testWidgets('Class card navigates to class details on tap', (tester) async {
     final info = const ClassInfo(
+      id: 1,
       name: 'Class 11',
       board: 'CBSE',
+      boardId: 1,
+      schoolId: 101,
       studentCount: 30,
       subjectSummary: 'Mathematics, English',
       syllabusProgress: 0.6,
