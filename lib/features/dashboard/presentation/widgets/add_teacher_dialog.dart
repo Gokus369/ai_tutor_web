@@ -28,6 +28,7 @@ class AddTeacherDialog extends StatefulWidget {
   const AddTeacherDialog({
     super.key,
     this.schoolOptions = const [],
+    this.subjectOptions = const [],
     this.initial,
     this.title,
     this.confirmLabel,
@@ -40,6 +41,7 @@ class AddTeacherDialog extends StatefulWidget {
   static const double buttonHeight = 48;
 
   final List<SchoolOption>? schoolOptions;
+  final List<String>? subjectOptions;
   final AddTeacherRequest? initial;
   final String? title;
   final String? confirmLabel;
@@ -54,16 +56,28 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
-  final _subjectCtrl = TextEditingController();
   int? _selectedSchoolId;
   late final List<SchoolOption> _schoolOptions;
+  late List<String> _subjectOptions;
+  String? _selectedSubject;
+
+  static const List<String> _defaultSubjects = [
+    'Mathematics',
+    'Science',
+    'Physics',
+    'Chemistry',
+    'Biology',
+    'English',
+    'History',
+    'Geography',
+    'Computer Science',
+  ];
 
   @override
   void dispose() {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
-    _subjectCtrl.dispose();
     super.dispose();
   }
 
@@ -71,12 +85,19 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   void initState() {
     super.initState();
     _schoolOptions = widget.schoolOptions ?? const [];
+    _subjectOptions = _buildSubjectOptions(widget.subjectOptions);
     final initial = widget.initial;
     if (initial != null) {
       _nameCtrl.text = initial.name;
       _emailCtrl.text = initial.email;
       _phoneCtrl.text = initial.phone ?? '';
-      _subjectCtrl.text = initial.subject ?? '';
+      final subject = initial.subject?.trim();
+      if (subject != null && subject.isNotEmpty) {
+        _selectedSubject = subject;
+        if (!_subjectOptions.contains(subject)) {
+          _subjectOptions = List<String>.from(_subjectOptions)..add(subject);
+        }
+      }
       if (_schoolOptions.isNotEmpty) {
         final initialId = initial.schoolId;
         final hasMatch =
@@ -165,11 +186,14 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
             AppLabeledField(
               width: AddTeacherDialog.contentWidth,
               label: 'Subject (optional)',
-              child: AppTextFormField(
-                controller: _subjectCtrl,
-                hintText: 'Mathematics',
-                textInputAction: TextInputAction.done,
+              child: AppDropdownFormField<String>(
+                items: _subjectOptions,
+                value: _selectedSubject,
+                onChanged: (value) =>
+                    setState(() => _selectedSubject = value),
                 height: AddTeacherDialog.fieldHeight,
+                decoration:
+                    AppFormDecorations.filled(hintText: 'Select subject'),
               ),
             ),
             const SizedBox(height: 28),
@@ -202,15 +226,31 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     if (!_formKey.currentState!.validate()) return;
     final selectedSchool = _schoolOptions
         .firstWhere((s) => s.id == _selectedSchoolId, orElse: () => const SchoolOption(id: 0, name: ''));
+    final subject = _selectedSubject?.trim();
     Navigator.of(context).pop(
       AddTeacherRequest(
         name: _nameCtrl.text.trim(),
         email: _emailCtrl.text.trim(),
         phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
-        subject: _subjectCtrl.text.trim().isEmpty ? null : _subjectCtrl.text.trim(),
+        subject: subject == null || subject.isEmpty ? null : subject,
         schoolId: _selectedSchoolId,
         schoolName: selectedSchool.id == 0 ? null : selectedSchool.name,
       ),
     );
+  }
+
+  List<String> _buildSubjectOptions(List<String>? options) {
+    final rawOptions = options == null || options.isEmpty
+        ? _defaultSubjects
+        : options;
+    final unique = <String>{};
+    final List<String> results = [];
+    for (final option in rawOptions) {
+      final trimmed = option.trim();
+      if (trimmed.isEmpty || unique.contains(trimmed)) continue;
+      unique.add(trimmed);
+      results.add(trimmed);
+    }
+    return results;
   }
 }
