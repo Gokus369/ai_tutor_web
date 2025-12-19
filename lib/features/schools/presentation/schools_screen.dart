@@ -4,12 +4,13 @@ import 'package:ai_tutor_web/features/dashboard/presentation/widgets/confirmatio
 import 'package:ai_tutor_web/features/schools/data/school_repository.dart';
 import 'package:ai_tutor_web/features/schools/domain/models/add_school_request.dart';
 import 'package:ai_tutor_web/features/schools/presentation/bloc/school_cubit.dart';
-import 'package:ai_tutor_web/features/schools/presentation/widgets/school_card.dart';
 import 'package:ai_tutor_web/shared/layout/dashboard_page.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
+import 'package:ai_tutor_web/shared/widgets/section_card.dart' as shared;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'widgets/school_table.dart' as school_widgets;
 
 class SchoolsScreen extends StatefulWidget {
   const SchoolsScreen({super.key});
@@ -110,7 +111,7 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
                 final error = state.error;
                 final schools = _filtered(state.schools);
 
-                return SectionCard(
+                return shared.SectionCard(
                   title: 'Supplier list',
                   trailing: DecoratedBox(
                     decoration: BoxDecoration(
@@ -189,7 +190,7 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
                           ),
                         )
                       else
-                        SchoolTable(
+                        school_widgets.SchoolTable(
                           schools: schools,
                           onEdit: (school) =>
                               _openEditSchoolDialog(context, school),
