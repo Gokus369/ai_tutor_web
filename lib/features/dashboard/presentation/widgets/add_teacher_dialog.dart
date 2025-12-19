@@ -185,12 +185,14 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
             const SizedBox(height: 20),
             AppLabeledField(
               width: AddTeacherDialog.contentWidth,
-              label: 'Subject (optional)',
+              label: 'Subject',
               child: AppDropdownFormField<String>(
                 items: _subjectOptions,
                 value: _selectedSubject,
                 onChanged: (value) =>
                     setState(() => _selectedSubject = value),
+                validator: (value) =>
+                    value == null ? 'Select a subject' : null,
                 height: AddTeacherDialog.fieldHeight,
                 decoration:
                     AppFormDecorations.filled(hintText: 'Select subject'),
