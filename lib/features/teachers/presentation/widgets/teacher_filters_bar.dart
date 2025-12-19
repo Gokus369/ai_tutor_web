@@ -2,104 +2,87 @@ import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
 
-class StudentFiltersBar extends StatelessWidget {
-  const StudentFiltersBar({
+class TeacherFiltersBar extends StatelessWidget {
+  const TeacherFiltersBar({
     super.key,
     required this.isCompact,
-    required this.classOptions,
-    required this.attendanceOptions,
-    required this.progressOptions,
-    required this.performanceOptions,
-    required this.selectedClass,
-    required this.selectedAttendance,
-    required this.selectedProgress,
-    required this.selectedPerformance,
+    required this.schoolOptions,
+    required this.subjectOptions,
+    required this.selectedSchool,
+    required this.selectedSubject,
     required this.searchController,
-    required this.onClassChanged,
-    required this.onAttendanceChanged,
-    required this.onProgressChanged,
-    required this.onPerformanceChanged,
+    required this.onSchoolChanged,
+    required this.onSubjectChanged,
   });
 
   final bool isCompact;
-  final List<String> classOptions;
-  final List<String> attendanceOptions;
-  final List<String> progressOptions;
-  final List<String> performanceOptions;
-  final String selectedClass;
-  final String selectedAttendance;
-  final String selectedProgress;
-  final String selectedPerformance;
+  final List<String> schoolOptions;
+  final List<String> subjectOptions;
+  final String selectedSchool;
+  final String selectedSubject;
   final TextEditingController searchController;
-  final ValueChanged<String> onClassChanged;
-  final ValueChanged<String> onAttendanceChanged;
-  final ValueChanged<String> onProgressChanged;
-  final ValueChanged<String> onPerformanceChanged;
+  final ValueChanged<String> onSchoolChanged;
+  final ValueChanged<String> onSubjectChanged;
 
   @override
   Widget build(BuildContext context) {
-    const double gap = 12;
-    final entries = [
-      _FilterDropdown(
-        label: 'Class',
-        value: selectedClass,
-        items: classOptions,
-        onChanged: onClassChanged,
-      ),
-      _FilterDropdown(
-        label: 'Attendance',
-        value: selectedAttendance,
-        items: attendanceOptions,
-        onChanged: onAttendanceChanged,
-      ),
-      _FilterDropdown(
-        label: 'Progress',
-        value: selectedProgress,
-        items: progressOptions,
-        onChanged: onProgressChanged,
-      ),
-      _FilterDropdown(
-        label: 'Performance',
-        value: selectedPerformance,
-        items: performanceOptions,
-        onChanged: onPerformanceChanged,
-      ),
-    ];
-
     if (isCompact) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _SearchField(controller: searchController),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: entries.map((dropdown) => SizedBox(width: double.infinity, child: dropdown)).toList(),
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: _FilterDropdown(
+                  label: 'School',
+                  value: selectedSchool,
+                  items: schoolOptions,
+                  onChanged: onSchoolChanged,
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: _FilterDropdown(
+                  label: 'Subject',
+                  value: selectedSubject,
+                  items: subjectOptions,
+                  onChanged: onSubjectChanged,
+                ),
+              ),
+            ],
           ),
         ],
       );
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: _SearchField(controller: searchController),
-            ),
-            const SizedBox(width: gap),
-            Expanded(child: entries[0]),
-            const SizedBox(width: gap),
-            Expanded(child: entries[1]),
-            const SizedBox(width: gap),
-            Expanded(child: entries[2]),
-            const SizedBox(width: gap),
-            Expanded(child: entries[3]),
-          ],
-        );
-      },
+    const double gap = 12;
+    return Row(
+      children: [
+        Expanded(flex: 2, child: _SearchField(controller: searchController)),
+        const SizedBox(width: gap),
+        Expanded(
+          child: _FilterDropdown(
+            label: 'School',
+            value: selectedSchool,
+            items: schoolOptions,
+            onChanged: onSchoolChanged,
+          ),
+        ),
+        const SizedBox(width: gap),
+        Expanded(
+          child: _FilterDropdown(
+            label: 'Subject',
+            value: selectedSubject,
+            items: subjectOptions,
+            onChanged: onSubjectChanged,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -116,7 +99,7 @@ class _SearchField extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          hintText: 'Search students by name, class...',
+          hintText: 'Search teachers by name, email, subject, school...',
           prefixIcon: const Icon(Icons.search, color: AppColors.iconMuted),
           filled: true,
           fillColor: AppColors.studentsSearchBackground,
@@ -156,7 +139,12 @@ class _FilterDropdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.classCardMeta.copyWith(fontWeight: FontWeight.w700)),
+        Text(
+          label,
+          style: AppTypography.classCardMeta.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 6),
         DecoratedBox(
           decoration: BoxDecoration(
@@ -170,7 +158,10 @@ class _FilterDropdown extends StatelessWidget {
               child: DropdownButton<String>(
                 value: value,
                 isExpanded: true,
-                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textPrimary),
+                icon: const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: AppColors.textPrimary,
+                ),
                 style: AppTypography.classCardMeta,
                 onChanged: (val) {
                   if (val == null) return;
@@ -178,10 +169,8 @@ class _FilterDropdown extends StatelessWidget {
                 },
                 items: items
                     .map(
-                      (item) => DropdownMenuItem(
-                        value: item,
-                        child: Text(item),
-                      ),
+                      (item) =>
+                          DropdownMenuItem(value: item, child: Text(item)),
                     )
                     .toList(),
               ),

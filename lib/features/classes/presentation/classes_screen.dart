@@ -258,9 +258,12 @@ class _ClassesScreenState extends State<ClassesScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      final message = e is DioException ? _parseDioMessage(e) : e.toString();
+      final rawMessage = e is DioException ? _parseDioMessage(e) : e.toString();
+      final friendly = rawMessage.toLowerCase().contains('cannot delete grade')
+          ? 'Cannot delete this class while students exist under it. Please move or remove students first.'
+          : rawMessage;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete class: $message')),
+        SnackBar(content: Text('Failed to delete class: $friendly')),
       );
     }
   }

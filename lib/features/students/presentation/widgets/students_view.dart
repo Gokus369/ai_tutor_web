@@ -3,6 +3,7 @@ import 'package:ai_tutor_web/features/students/presentation/widgets/student_filt
 import 'package:ai_tutor_web/features/students/presentation/widgets/student_table.dart';
 import 'package:ai_tutor_web/features/students/presentation/widgets/students_empty_state.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
+import 'package:ai_tutor_web/shared/widgets/section_card.dart';
 import 'package:flutter/material.dart';
 
 class StudentsView extends StatelessWidget {
@@ -44,9 +45,10 @@ class StudentsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
+          width: double.infinity,
           decoration: BoxDecoration(
             color: AppColors.studentsCardBackground,
             borderRadius: BorderRadius.circular(16),
@@ -84,7 +86,24 @@ class StudentsView extends StatelessWidget {
         if (students.isEmpty)
           const StudentsEmptyState()
         else
-          StudentTable(students: students),
+          SectionCard(
+            title: 'Students',
+            trailing: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.studentsFilterBorder),
+                color: AppColors.studentsFilterBackground,
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                child: Text(
+                  'All',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            child: StudentTable(students: students),
+          ),
       ],
     );
   }

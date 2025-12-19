@@ -20,6 +20,44 @@ class SchoolsScreen extends StatefulWidget {
 
 class _SchoolsScreenState extends State<SchoolsScreen> {
   SchoolCubit get _cubit => context.read<SchoolCubit>();
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedBoard = 'All Boards';
+
+  static const List<String> _boardOptions = [
+    'All Boards',
+    'CBSE',
+    'ICSE',
+    'State Board',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<School> _filtered(List<School> schools) {
+    final needle = _searchController.text.trim().toLowerCase();
+    return schools.where((s) {
+      final matchesSearch =
+          needle.isEmpty ||
+          s.name.toLowerCase().contains(needle) ||
+          (s.code ?? '').toLowerCase().contains(needle) ||
+          (s.address ?? '').toLowerCase().contains(needle);
+      final matchesBoard =
+          _selectedBoard == 'All Boards' ||
+          (_selectedBoard == 'CBSE' && (s.boardId == 1)) ||
+          (_selectedBoard == 'ICSE' && (s.boardId == 2)) ||
+          (_selectedBoard == 'State Board' && (s.boardId == 3));
+      return matchesSearch && matchesBoard;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +79,10 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     elevation: 4,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -56,90 +97,108 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.summaryCardBorder),
-                boxShadow: const [
-                  BoxShadow(
-                    color: AppColors.shadow,
-                    blurRadius: 14,
-                    offset: Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: BlocBuilder<SchoolCubit, SchoolState>(
-                builder: (context, state) {
-                  final loading = state.status == SchoolStatus.loading;
-                  final error = state.error;
-                  final schools = state.schools;
+            _FiltersBar(
+              controller: _searchController,
+              boardOptions: _boardOptions,
+              selectedBoard: _selectedBoard,
+              onBoardChanged: (value) => setState(() => _selectedBoard = value),
+            ),
+            const SizedBox(height: 16),
+            BlocBuilder<SchoolCubit, SchoolState>(
+              builder: (context, state) {
+                final loading = state.status == SchoolStatus.loading;
+                final error = state.error;
+                final schools = _filtered(state.schools);
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                return SectionCard(
+                  title: 'Supplier list',
+                  trailing: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.studentsFilterBorder),
+                      color: AppColors.studentsFilterBackground,
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      child: Text(
+                        'All',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(32, 16, 32, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('Supplier list', style: AppTypography.sectionTitle),
-                      const SizedBox(height: 12),
                       if (loading)
-                        const Center(child: CircularProgressIndicator())
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: CircularProgressIndicator(),
+                          ),
+                        )
                       else if (error != null)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Could not load suppliers',
-                              style: AppTypography.bodySmall.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.accentRed,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              error,
-                              style: const TextStyle(color: AppColors.accentRed),
-                            ),
-                            const SizedBox(height: 10),
-                            ElevatedButton.icon(
-                              onPressed: () => _cubit.loadSchools(),
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Retry'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 10,
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Could not load suppliers',
+                                style: AppTypography.bodySmall.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.accentRed,
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 6),
+                              Text(
+                                error,
+                                style: const TextStyle(
+                                  color: AppColors.accentRed,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              ElevatedButton.icon(
+                                onPressed: () => _cubit.loadSchools(),
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Retry'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         )
                       else if (schools.isEmpty)
-                        const Text(
-                          'No suppliers found. Adjust filters and try again.',
-                          style: TextStyle(color: AppColors.textMuted),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            'No suppliers found. Adjust filters and try again.',
+                            style: TextStyle(color: AppColors.textMuted),
+                          ),
                         )
                       else
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: schools.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final school = schools[index];
-                            return SchoolCard(
-                              school: school,
-                              onEdit: () => _openEditSchoolDialog(context, school),
-                              onDelete: () => _deleteSchool(context, school),
-                            );
-                          },
+                        SchoolTable(
+                          schools: schools,
+                          onEdit: (school) =>
+                              _openEditSchoolDialog(context, school),
+                          onDelete: (school) => _deleteSchool(context, school),
                         ),
                     ],
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ],
         );
@@ -157,17 +216,13 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
       final created = await _cubit.createSchool(result);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Supplier "${created.name}" added'),
-        ),
+        SnackBar(content: Text('Supplier "${created.name}" added')),
       );
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to add supplier: $e'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to add supplier: $e')));
     }
   }
 
@@ -239,10 +294,158 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
       );
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete supplier: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete supplier: $e')));
     }
   }
+}
 
+class _FiltersBar extends StatelessWidget {
+  const _FiltersBar({
+    this.controller,
+    required this.boardOptions,
+    required this.selectedBoard,
+    required this.onBoardChanged,
+  });
+
+  final TextEditingController? controller;
+  final List<String> boardOptions;
+  final String selectedBoard;
+  final ValueChanged<String> onBoardChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    const double gap = 12;
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.studentsCardBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.2),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: SizedBox(
+              height: 48,
+              child: TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  hintText: 'Search suppliers by name, code, address...',
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppColors.iconMuted,
+                  ),
+                  filled: true,
+                  fillColor: AppColors.studentsSearchBackground,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: AppColors.studentsSearchBorder,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: AppColors.studentsSearchBorder,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: gap),
+          Expanded(
+            child: _Dropdown(
+              label: 'Board',
+              value: selectedBoard,
+              items: boardOptions,
+              onChanged: onBoardChanged,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Dropdown extends StatelessWidget {
+  const _Dropdown({
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  final String label;
+  final String value;
+  final List<String> items;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTypography.classCardMeta.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 6),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.studentsFilterBackground,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.studentsFilterBorder),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: DropdownButton<String>(
+                value: value,
+                isExpanded: true,
+                icon: const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: AppColors.textPrimary,
+                ),
+                style: AppTypography.classCardMeta,
+                onChanged: (val) {
+                  if (val == null) return;
+                  onChanged(val);
+                },
+                items: items
+                    .map(
+                      (item) =>
+                          DropdownMenuItem(value: item, child: Text(item)),
+                    )
+                    .toList(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
