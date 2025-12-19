@@ -94,6 +94,102 @@ final List<StudentReport> _seedStudents = [
     performance: StudentPerformance.needAttention,
     status: StudentStatus.inactive,
   ),
+  const StudentReport(
+    name: 'Amelia Turner',
+    className: 'Class 12',
+    attendance: 0.88,
+    progress: 0.61,
+    performance: StudentPerformance.average,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Liam Watson',
+    className: 'Class 11',
+    attendance: 0.94,
+    progress: 0.77,
+    performance: StudentPerformance.topPerformer,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Noah Patel',
+    className: 'Class 10',
+    attendance: 0.68,
+    progress: 0.41,
+    performance: StudentPerformance.needAttention,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Mia Rodriguez',
+    className: 'Class 9',
+    attendance: 0.81,
+    progress: 0.58,
+    performance: StudentPerformance.average,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Ethan Cooper',
+    className: 'Class 8',
+    attendance: 0.75,
+    progress: 0.49,
+    performance: StudentPerformance.needAttention,
+    status: StudentStatus.inactive,
+  ),
+  const StudentReport(
+    name: 'Sophia Nguyen',
+    className: 'Class 7',
+    attendance: 0.90,
+    progress: 0.86,
+    performance: StudentPerformance.topPerformer,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Ava Stewart',
+    className: 'Class 12',
+    attendance: 0.79,
+    progress: 0.73,
+    performance: StudentPerformance.average,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Oliver Brooks',
+    className: 'Class 11',
+    attendance: 0.84,
+    progress: 0.57,
+    performance: StudentPerformance.average,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Isabella King',
+    className: 'Class 10',
+    attendance: 0.96,
+    progress: 0.91,
+    performance: StudentPerformance.topPerformer,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Lucas Evans',
+    className: 'Class 9',
+    attendance: 0.71,
+    progress: 0.36,
+    performance: StudentPerformance.needAttention,
+    status: StudentStatus.inactive,
+  ),
+  const StudentReport(
+    name: 'Harper Scott',
+    className: 'Class 8',
+    attendance: 0.89,
+    progress: 0.64,
+    performance: StudentPerformance.average,
+    status: StudentStatus.active,
+  ),
+  const StudentReport(
+    name: 'Henry Barnes',
+    className: 'Class 7',
+    attendance: 0.93,
+    progress: 0.82,
+    performance: StudentPerformance.topPerformer,
+    status: StudentStatus.active,
+  ),
 ];
 
 class StudentsScreen extends StatefulWidget {
@@ -106,11 +202,13 @@ class StudentsScreen extends StatefulWidget {
 class _StudentsScreenState extends State<StudentsScreen> {
   final TextEditingController _searchController = TextEditingController();
 
+  static const int _pageSize = 10;
   final List<StudentReport> _students = List.of(_seedStudents);
   String _selectedClass = _classOptions.first;
   String _selectedAttendance = _attendanceOptions.first;
   String _selectedProgress = _progressOptions.first;
   String _selectedPerformance = _performanceOptions.first;
+  int _currentPage = 1;
 
   @override
   void initState() {
@@ -126,7 +224,11 @@ class _StudentsScreenState extends State<StudentsScreen> {
     super.dispose();
   }
 
-  void _handleFilterChanged() => setState(() {});
+  void _handleFilterChanged() {
+    setState(() {
+      _currentPage = 1;
+    });
+  }
 
   List<StudentReport> get _filteredStudents {
     return filterStudents(
@@ -143,6 +245,28 @@ class _StudentsScreenState extends State<StudentsScreen> {
         allPerformanceLabel: _performanceOptions.first,
       ),
     );
+  }
+
+  int get _pageCount {
+    final total = _filteredStudents.length;
+    if (total == 0) return 0;
+    return (total / _pageSize).ceil();
+  }
+
+  List<StudentReport> get _pagedStudents {
+    final filtered = _filteredStudents;
+    if (filtered.isEmpty) return const [];
+    final start = (_currentPage - 1) * _pageSize;
+    return filtered.skip(start).take(_pageSize).toList();
+  }
+
+  void _goToPage(int page) {
+    final pageCount = _pageCount;
+    if (pageCount == 0) return;
+    final nextPage = page < 1
+        ? 1
+        : (page > pageCount ? pageCount : page);
+    setState(() => _currentPage = nextPage);
   }
 
   @override
@@ -163,8 +287,10 @@ class _StudentsScreenState extends State<StudentsScreen> {
         );
       },
       builder: (context, shell) {
+        final pageCount = _pageCount;
+        final currentPage = pageCount == 0 ? 1 : _currentPage;
         return StudentsView(
-          students: _filteredStudents,
+          students: _pagedStudents,
           classOptions: _classOptions,
           attendanceOptions: _attendanceOptions,
           progressOptions: _progressOptions,
@@ -174,11 +300,40 @@ class _StudentsScreenState extends State<StudentsScreen> {
           selectedProgress: _selectedProgress,
           selectedPerformance: _selectedPerformance,
           searchController: _searchController,
-          onClassChanged: (value) => setState(() => _selectedClass = value),
-          onAttendanceChanged: (value) => setState(() => _selectedAttendance = value),
-          onProgressChanged: (value) => setState(() => _selectedProgress = value),
-          onPerformanceChanged: (value) => setState(() => _selectedPerformance = value),
+          onClassChanged: (value) {
+            setState(() {
+              _selectedClass = value;
+              _currentPage = 1;
+            });
+          },
+          onAttendanceChanged: (value) {
+            setState(() {
+              _selectedAttendance = value;
+              _currentPage = 1;
+            });
+          },
+          onProgressChanged: (value) {
+            setState(() {
+              _selectedProgress = value;
+              _currentPage = 1;
+            });
+          },
+          onPerformanceChanged: (value) {
+            setState(() {
+              _selectedPerformance = value;
+              _currentPage = 1;
+            });
+          },
           isCompactFilters: shell.contentWidth < 820,
+          currentPage: currentPage,
+          totalPages: pageCount == 0 ? 1 : pageCount,
+          showPagination: pageCount > 1,
+          onPreviousPage: currentPage > 1
+              ? () => _goToPage(currentPage - 1)
+              : null,
+          onNextPage: currentPage < pageCount
+              ? () => _goToPage(currentPage + 1)
+              : null,
         );
       },
     );

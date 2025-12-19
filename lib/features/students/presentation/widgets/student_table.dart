@@ -69,80 +69,19 @@ class _StudentDesktopTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.studentsCardBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.studentsCardBorder),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 20,
-            offset: Offset(0, 12),
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _DesktopHeaderRow(),
+        const SizedBox(height: 12),
+        const Divider(height: 1, color: AppColors.studentsTableDivider),
+        const SizedBox(height: 12),
+        for (int i = 0; i < students.length; i++) ...[
+          _DesktopRow(student: students[i]),
+          if (i != students.length - 1)
+            const Divider(height: 1, color: AppColors.studentsTableDivider),
         ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-            decoration: BoxDecoration(
-              color: AppColors.studentsHeaderBackground,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(18),
-              ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Students',
-                    style: AppTypography.syllabusSectionHeading,
-                  ),
-                ),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.studentsFilterBorder),
-                    color: AppColors.studentsFilterBackground,
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    child: Text(
-                      'All',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(32, 24, 32, 28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const _DesktopHeaderRow(),
-                const SizedBox(height: 12),
-                const Divider(height: 1, color: AppColors.studentsTableDivider),
-                const SizedBox(height: 12),
-                for (int i = 0; i < students.length; i++) ...[
-                  _DesktopRow(student: students[i]),
-                  if (i != students.length - 1)
-                    const Divider(
-                      height: 1,
-                      color: AppColors.studentsTableDivider,
-                    ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:ai_tutor_web/features/students/presentation/widgets/student_filt
 import 'package:ai_tutor_web/features/students/presentation/widgets/student_table.dart';
 import 'package:ai_tutor_web/features/students/presentation/widgets/students_empty_state.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
+import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:ai_tutor_web/shared/widgets/section_card.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +25,11 @@ class StudentsView extends StatelessWidget {
     required this.onProgressChanged,
     required this.onPerformanceChanged,
     required this.isCompactFilters,
+    required this.currentPage,
+    required this.totalPages,
+    required this.showPagination,
+    this.onPreviousPage,
+    this.onNextPage,
   });
 
   final List<StudentReport> students;
@@ -41,6 +47,11 @@ class StudentsView extends StatelessWidget {
   final ValueChanged<String> onProgressChanged;
   final ValueChanged<String> onPerformanceChanged;
   final bool isCompactFilters;
+  final int currentPage;
+  final int totalPages;
+  final bool showPagination;
+  final VoidCallback? onPreviousPage;
+  final VoidCallback? onNextPage;
 
   @override
   Widget build(BuildContext context) {
@@ -102,9 +113,100 @@ class StudentsView extends StatelessWidget {
                 ),
               ),
             ),
-            child: StudentTable(students: students),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                StudentTable(students: students),
+                if (showPagination) ...[
+                  const SizedBox(height: 16),
+                  _PaginationControls(
+                    currentPage: currentPage,
+                    totalPages: totalPages,
+                    onPrevious: onPreviousPage,
+                    onNext: onNextPage,
+                  ),
+                ],
+              ],
+            ),
           ),
       ],
+    );
+  }
+}
+
+class _PaginationControls extends StatelessWidget {
+  const _PaginationControls({
+    required this.currentPage,
+    required this.totalPages,
+    this.onPrevious,
+    this.onNext,
+  });
+
+  final int currentPage;
+  final int totalPages;
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle labelStyle = AppTypography.bodySmall.copyWith(
+      fontWeight: FontWeight.w700,
+      color: AppColors.textPrimary,
+    );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Page $currentPage of $totalPages', style: labelStyle),
+        Row(
+          children: [
+            _PaginationButton(
+              label: 'Prev',
+              icon: Icons.chevron_left_rounded,
+              onPressed: onPrevious,
+            ),
+            const SizedBox(width: 8),
+            _PaginationButton(
+              label: 'Next',
+              icon: Icons.chevron_right_rounded,
+              onPressed: onNext,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _PaginationButton extends StatelessWidget {
+  const _PaginationButton({
+    required this.label,
+    required this.icon,
+    this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.textPrimary,
+        disabledForegroundColor: AppColors.textMuted,
+        side: const BorderSide(color: AppColors.studentsFilterBorder),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        textStyle: AppTypography.bodySmall.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 }

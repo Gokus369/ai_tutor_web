@@ -126,7 +126,8 @@ class _SchoolDesktopTable extends StatelessWidget {
   final ValueChanged<School> onDelete;
 
   static const double _columnSpacing = 24;
-  static const double _actionsWidth = 80;
+  static const double _actionsWidth = 96;
+  static const double _actionCellWidth = 48;
   static const List<int> _flex = [22, 24, 16, 12, 10];
   static const List<String> _headers = [
     'Name',
@@ -182,7 +183,29 @@ class _HeaderRow extends StatelessWidget {
           if (i != headers.length - 1)
             const SizedBox(width: _SchoolDesktopTable._columnSpacing),
         ],
-        const SizedBox(width: _SchoolDesktopTable._actionsWidth),
+        SizedBox(
+          width: _SchoolDesktopTable._actionsWidth,
+          child: Row(
+            children: [
+              SizedBox(
+                width: _SchoolDesktopTable._actionCellWidth,
+                child: Text(
+                  'Edit',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.studentsTableHeader,
+                ),
+              ),
+              SizedBox(
+                width: _SchoolDesktopTable._actionCellWidth,
+                child: Text(
+                  'Delete',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.studentsTableHeader,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -212,6 +235,7 @@ class _SchoolRow extends StatelessWidget {
             flex: flex[0],
             child: Text(school.name, style: AppTypography.studentsTableCell),
           ),
+          const SizedBox(width: _SchoolDesktopTable._columnSpacing),
           Expanded(
             flex: flex[1],
             child: Text(
@@ -220,6 +244,7 @@ class _SchoolRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: _SchoolDesktopTable._columnSpacing),
           Expanded(
             flex: flex[2],
             child: Text(
@@ -227,6 +252,7 @@ class _SchoolRow extends StatelessWidget {
               style: AppTypography.studentsTableCell,
             ),
           ),
+          const SizedBox(width: _SchoolDesktopTable._columnSpacing),
           Expanded(
             flex: flex[3],
             child: Text(
@@ -234,6 +260,7 @@ class _SchoolRow extends StatelessWidget {
               style: AppTypography.studentsTableCell,
             ),
           ),
+          const SizedBox(width: _SchoolDesktopTable._columnSpacing),
           Expanded(
             flex: flex[4],
             child: Text(
@@ -241,24 +268,27 @@ class _SchoolRow extends StatelessWidget {
               style: AppTypography.studentsTableCell,
             ),
           ),
-          const SizedBox(width: _SchoolDesktopTable._actionsWidth),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                tooltip: 'Edit',
-                icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
-                onPressed: onEdit,
-              ),
-              IconButton(
-                tooltip: 'Delete',
-                icon: const Icon(
-                  Icons.delete_outline,
-                  color: AppColors.accentRed,
+          SizedBox(
+            width: _SchoolDesktopTable._actionsWidth,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  tooltip: 'Edit',
+                  icon:
+                      const Icon(Icons.edit_outlined, color: AppColors.primary),
+                  onPressed: onEdit,
                 ),
-                onPressed: onDelete,
-              ),
-            ],
+                IconButton(
+                  tooltip: 'Delete',
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: AppColors.accentRed,
+                  ),
+                  onPressed: onDelete,
+                ),
+              ],
+            ),
           ),
         ],
       ),

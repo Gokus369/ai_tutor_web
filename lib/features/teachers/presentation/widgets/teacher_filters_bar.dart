@@ -8,21 +8,27 @@ class TeacherFiltersBar extends StatelessWidget {
     required this.isCompact,
     required this.schoolOptions,
     required this.subjectOptions,
+    required this.attendanceOptions,
     required this.selectedSchool,
     required this.selectedSubject,
+    required this.selectedAttendance,
     required this.searchController,
     required this.onSchoolChanged,
     required this.onSubjectChanged,
+    required this.onAttendanceChanged,
   });
 
   final bool isCompact;
   final List<String> schoolOptions;
   final List<String> subjectOptions;
+  final List<String> attendanceOptions;
   final String selectedSchool;
   final String selectedSubject;
+  final String selectedAttendance;
   final TextEditingController searchController;
   final ValueChanged<String> onSchoolChanged;
   final ValueChanged<String> onSubjectChanged;
+  final ValueChanged<String> onAttendanceChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +60,15 @@ class TeacherFiltersBar extends StatelessWidget {
                   onChanged: onSubjectChanged,
                 ),
               ),
+              SizedBox(
+                width: double.infinity,
+                child: _FilterDropdown(
+                  label: 'Attendance',
+                  value: selectedAttendance,
+                  items: attendanceOptions,
+                  onChanged: onAttendanceChanged,
+                ),
+              ),
             ],
           ),
         ],
@@ -62,6 +77,7 @@ class TeacherFiltersBar extends StatelessWidget {
 
     const double gap = 12;
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(flex: 2, child: _SearchField(controller: searchController)),
         const SizedBox(width: gap),
@@ -80,6 +96,15 @@ class TeacherFiltersBar extends StatelessWidget {
             value: selectedSubject,
             items: subjectOptions,
             onChanged: onSubjectChanged,
+          ),
+        ),
+        const SizedBox(width: gap),
+        Expanded(
+          child: _FilterDropdown(
+            label: 'Attendance',
+            value: selectedAttendance,
+            items: attendanceOptions,
+            onChanged: onAttendanceChanged,
           ),
         ),
       ],

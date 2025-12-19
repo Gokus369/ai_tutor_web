@@ -57,20 +57,43 @@ class ApiAuthRepository implements AuthRepository {
       final status = data['statusCode'] as int? ?? response.statusCode ?? 500;
       if (status != 200) throw AuthException(data['message']?.toString() ?? 'Login failed ($status)');
 
-      final token = (data['token'] as String?)?.trim();
+      final token = _extractToken(data, response.headers);
       if (token == null || token.isEmpty) {
         throw const AuthException('Missing token in response');
       }
-      final refresh = (data['refreshToken'] as String?)?.trim();
-      _apiClient.dio.options.headers['Authorization'] = token;
+      final refresh = _extractRefreshToken(data);
+      _apiClient.dio.options.headers['Authorization'] =
+          _resolveAuthorizationHeader(token, data);
 
+      final payload = _extractPayload(data);
+      final userPayload = _extractUserPayload(payload, data);
       final user = UserAccount(
-        id: data['id']?.toString() ?? username,
-        email: data['email']?.toString() ?? '',
-        displayName: data['name']?.toString().trim().isNotEmpty == true ? data['name'].toString() : username,
+        id: _stringValue(
+              userPayload['id'] ??
+                  userPayload['userId'] ??
+                  userPayload['user_id'] ??
+                  data['id'] ??
+                  data['userId'] ??
+                  data['user_id'],
+            ) ??
+            username,
+        email: _stringValue(
+              userPayload['contactEmail'] ??
+                  userPayload['email'] ??
+                  data['contactEmail'] ??
+                  data['email'],
+            ) ??
+            '',
+        displayName: _stringValue(
+              userPayload['name'] ??
+                  userPayload['fullName'] ??
+                  userPayload['displayName'] ??
+                  data['name'],
+            ) ??
+            username,
         accessToken: token,
         refreshToken: refresh,
-        userType: data['userType']?.toString(),
+        userType: _stringValue(userPayload['userType'] ?? data['userType']),
       );
       _authState.value = user;
       return user;
@@ -160,6 +183,127 @@ class ApiAuthRepository implements AuthRepository {
       _apiClient.dio.options.headers.remove('Authorization');
       _authState.value = null;
     }
+  }
+
+  Map<String, dynamic> _extractPayload(Map<String, dynamic> data) {
+    const keys = ['data', 'payload', 'result', 'user'];
+    for (final key in keys) {
+      final value = data[key];
+      if (value is Map<String, dynamic>) return value;
+    }
+    return data;
+  }
+
+  Map<String, dynamic> _extractUserPayload(
+    Map<String, dynamic> payload,
+    Map<String, dynamic> root,
+  ) {
+    final userFromPayload = payload['user'];
+    if (userFromPayload is Map<String, dynamic>) return userFromPayload;
+    final userFromRoot = root['user'];
+    if (userFromRoot is Map<String, dynamic>) return userFromRoot;
+    return payload;
+  }
+
+  String? _extractToken(Map<String, dynamic> data, Headers headers) {
+    final payload = _extractPayload(data);
+    return _firstNonEmpty([
+      _extractTokenFromMap(payload),
+      _extractTokenFromMap(data),
+      _extractHeaderToken(headers),
+    ]);
+  }
+
+  String? _extractRefreshToken(Map<String, dynamic> data) {
+    final payload = _extractPayload(data);
+    return _firstNonEmpty([
+      _extractRefreshTokenFromMap(payload),
+      _extractRefreshTokenFromMap(data),
+    ]);
+  }
+
+  String _resolveAuthorizationHeader(String token, Map<String, dynamic> data) {
+    final payload = _extractPayload(data);
+    final type = _stringValue(
+      payload['tokenType'] ??
+          payload['token_type'] ??
+          data['tokenType'] ??
+          data['token_type'],
+    );
+    final normalized = token.trim();
+    if (type != null && type.toLowerCase() == 'bearer') {
+      return normalized.toLowerCase().startsWith('bearer ')
+          ? normalized
+          : 'Bearer $normalized';
+    }
+    return normalized;
+  }
+
+  String? _extractTokenFromMap(Map<String, dynamic> source) {
+    final direct = _firstNonEmpty([
+      _stringValue(source['token']),
+      _stringValue(source['accessToken']),
+      _stringValue(source['access_token']),
+      _stringValue(source['jwt']),
+      _stringValue(source['idToken']),
+      _stringValue(source['id_token']),
+    ]);
+    if (direct != null) return direct;
+
+    final tokenField = source['token'];
+    if (tokenField is Map<String, dynamic>) {
+      final nested = _extractTokenFromMap(tokenField);
+      if (nested != null) return nested;
+    }
+    final tokensField = source['tokens'];
+    if (tokensField is Map<String, dynamic>) {
+      final nested = _extractTokenFromMap(tokensField);
+      if (nested != null) return nested;
+    }
+    return null;
+  }
+
+  String? _extractRefreshTokenFromMap(Map<String, dynamic> source) {
+    final direct = _firstNonEmpty([
+      _stringValue(source['refreshToken']),
+      _stringValue(source['refresh_token']),
+    ]);
+    if (direct != null) return direct;
+
+    final tokenField = source['token'];
+    if (tokenField is Map<String, dynamic>) {
+      final nested = _extractRefreshTokenFromMap(tokenField);
+      if (nested != null) return nested;
+    }
+    final tokensField = source['tokens'];
+    if (tokensField is Map<String, dynamic>) {
+      final nested = _extractRefreshTokenFromMap(tokensField);
+      if (nested != null) return nested;
+    }
+    return null;
+  }
+
+  String? _extractHeaderToken(Headers headers) {
+    return _stringValue(
+      headers.value('authorization') ??
+          headers.value('Authorization') ??
+          headers.value('x-access-token') ??
+          headers.value('x-auth-token'),
+    );
+  }
+
+  String? _firstNonEmpty(List<String?> values) {
+    for (final value in values) {
+      final trimmed = value?.trim();
+      if (trimmed != null && trimmed.isNotEmpty) return trimmed;
+    }
+    return null;
+  }
+
+  String? _stringValue(dynamic value) {
+    if (value == null) return null;
+    final text = value.toString().trim();
+    return text.isEmpty ? null : text;
   }
 }
 

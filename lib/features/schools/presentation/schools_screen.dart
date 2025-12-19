@@ -23,6 +23,7 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
   SchoolCubit get _cubit => context.read<SchoolCubit>();
   final TextEditingController _searchController = TextEditingController();
   String _selectedBoard = 'All Boards';
+  static const int _pageSize = 10;
 
   static const List<String> _boardOptions = [
     'All Boards',
@@ -45,19 +46,38 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
 
   List<School> _filtered(List<School> schools) {
     final needle = _searchController.text.trim().toLowerCase();
+    final boardId = _selectedBoardId();
     return schools.where((s) {
       final matchesSearch =
           needle.isEmpty ||
           s.name.toLowerCase().contains(needle) ||
           (s.code ?? '').toLowerCase().contains(needle) ||
           (s.address ?? '').toLowerCase().contains(needle);
-      final matchesBoard =
-          _selectedBoard == 'All Boards' ||
-          (_selectedBoard == 'CBSE' && (s.boardId == 1)) ||
-          (_selectedBoard == 'ICSE' && (s.boardId == 2)) ||
-          (_selectedBoard == 'State Board' && (s.boardId == 3));
+      final matchesBoard = boardId == null || s.boardId == boardId;
       return matchesSearch && matchesBoard;
     }).toList();
+  }
+
+  int? _selectedBoardId() {
+    switch (_selectedBoard) {
+      case 'CBSE':
+        return 1;
+      case 'ICSE':
+        return 2;
+      case 'State Board':
+        return 3;
+      default:
+        return null;
+    }
+  }
+
+  void _loadPage(int page) {
+    if (page < 1) return;
+    _cubit.loadSchools(
+      offset: page,
+      take: _pageSize,
+      boardId: _selectedBoardId(),
+    );
   }
 
   @override
@@ -75,7 +95,7 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
                 Text('Manage Suppliers', style: AppTypography.sectionTitle),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Supplier'),
+                  label: const Text('Add School'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -102,7 +122,10 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
               controller: _searchController,
               boardOptions: _boardOptions,
               selectedBoard: _selectedBoard,
-              onBoardChanged: (value) => setState(() => _selectedBoard = value),
+              onBoardChanged: (value) {
+                setState(() => _selectedBoard = value);
+                _loadPage(1);
+              },
             ),
             const SizedBox(height: 16),
             BlocBuilder<SchoolCubit, SchoolState>(
@@ -110,6 +133,7 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
                 final loading = state.status == SchoolStatus.loading;
                 final error = state.error;
                 final schools = _filtered(state.schools);
+                final showPagination = schools.isNotEmpty;
 
                 return shared.SectionCard(
                   title: 'Supplier list',
@@ -166,7 +190,7 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
                               ),
                               const SizedBox(height: 10),
                               ElevatedButton.icon(
-                                onPressed: () => _cubit.loadSchools(),
+                                onPressed: () => _loadPage(state.currentPage),
                                 icon: const Icon(Icons.refresh),
                                 label: const Text('Retry'),
                                 style: ElevatedButton.styleFrom(
@@ -190,11 +214,30 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
                           ),
                         )
                       else
-                        school_widgets.SchoolTable(
-                          schools: schools,
-                          onEdit: (school) =>
-                              _openEditSchoolDialog(context, school),
-                          onDelete: (school) => _deleteSchool(context, school),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            school_widgets.SchoolTable(
+                              schools: schools,
+                              onEdit: (school) =>
+                                  _openEditSchoolDialog(context, school),
+                              onDelete: (school) =>
+                                  _deleteSchool(context, school),
+                            ),
+                            if (showPagination) ...[
+                              const SizedBox(height: 16),
+                              _PaginationControls(
+                                currentPage: state.currentPage,
+                                hasNext: state.hasNext,
+                                onPrevious: state.currentPage > 1
+                                    ? () => _loadPage(state.currentPage - 1)
+                                    : null,
+                                onNext: state.hasNext
+                                    ? () => _loadPage(state.currentPage + 1)
+                                    : null,
+                              ),
+                            ],
+                          ],
                         ),
                     ],
                   ),
@@ -302,6 +345,83 @@ class _SchoolsScreenState extends State<SchoolsScreen> {
   }
 }
 
+class _PaginationControls extends StatelessWidget {
+  const _PaginationControls({
+    required this.currentPage,
+    required this.hasNext,
+    this.onPrevious,
+    this.onNext,
+  });
+
+  final int currentPage;
+  final bool hasNext;
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle labelStyle = AppTypography.bodySmall.copyWith(
+      fontWeight: FontWeight.w700,
+      color: AppColors.textPrimary,
+    );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Page $currentPage', style: labelStyle),
+        Row(
+          children: [
+            _PaginationButton(
+              label: 'Prev',
+              icon: Icons.chevron_left_rounded,
+              onPressed: onPrevious,
+            ),
+            const SizedBox(width: 8),
+            _PaginationButton(
+              label: 'Next',
+              icon: Icons.chevron_right_rounded,
+              onPressed: hasNext ? onNext : null,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _PaginationButton extends StatelessWidget {
+  const _PaginationButton({
+    required this.label,
+    required this.icon,
+    this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.textPrimary,
+        disabledForegroundColor: AppColors.textMuted,
+        side: const BorderSide(color: AppColors.studentsFilterBorder),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        textStyle: AppTypography.bodySmall.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+}
+
 class _FiltersBar extends StatelessWidget {
   const _FiltersBar({
     this.controller,
@@ -337,6 +457,7 @@ class _FiltersBar extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             flex: 2,

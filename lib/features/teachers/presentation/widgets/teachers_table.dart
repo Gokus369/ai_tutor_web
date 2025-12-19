@@ -1,4 +1,4 @@
-import 'package:ai_tutor_web/features/dashboard/presentation/widgets/add_teacher_dialog.dart';
+import 'package:ai_tutor_web/features/teachers/domain/models/teacher.dart';
 import 'package:ai_tutor_web/shared/styles/app_colors.dart';
 import 'package:ai_tutor_web/shared/styles/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +7,13 @@ class TeachersTable extends StatelessWidget {
   const TeachersTable({
     super.key,
     required this.teachers,
+    required this.onEdit,
     required this.onRemove,
   });
 
-  final List<AddTeacherRequest> teachers;
-  final ValueChanged<AddTeacherRequest> onRemove;
+  final List<Teacher> teachers;
+  final ValueChanged<Teacher> onEdit;
+  final ValueChanged<Teacher> onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -19,19 +21,32 @@ class TeachersTable extends StatelessWidget {
       builder: (context, constraints) {
         final bool useCards = constraints.maxWidth < 940;
         if (useCards) {
-          return _TeacherCardList(teachers: teachers, onRemove: onRemove);
+          return _TeacherCardList(
+            teachers: teachers,
+            onEdit: onEdit,
+            onRemove: onRemove,
+          );
         }
-        return _TeacherDesktopTable(teachers: teachers, onRemove: onRemove);
+        return _TeacherDesktopTable(
+          teachers: teachers,
+          onEdit: onEdit,
+          onRemove: onRemove,
+        );
       },
     );
   }
 }
 
 class _TeacherCardList extends StatelessWidget {
-  const _TeacherCardList({required this.teachers, required this.onRemove});
+  const _TeacherCardList({
+    required this.teachers,
+    required this.onEdit,
+    required this.onRemove,
+  });
 
-  final List<AddTeacherRequest> teachers;
-  final ValueChanged<AddTeacherRequest> onRemove;
+  final List<Teacher> teachers;
+  final ValueChanged<Teacher> onEdit;
+  final ValueChanged<Teacher> onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +55,7 @@ class _TeacherCardList extends StatelessWidget {
         for (int i = 0; i < teachers.length; i++) ...[
           _TeacherCard(
             teacher: teachers[i],
+            onEdit: () => onEdit(teachers[i]),
             onRemove: () => onRemove(teachers[i]),
           ),
           if (i != teachers.length - 1) const SizedBox(height: 16),
@@ -50,9 +66,14 @@ class _TeacherCardList extends StatelessWidget {
 }
 
 class _TeacherCard extends StatelessWidget {
-  const _TeacherCard({required this.teacher, required this.onRemove});
+  const _TeacherCard({
+    required this.teacher,
+    required this.onEdit,
+    required this.onRemove,
+  });
 
-  final AddTeacherRequest teacher;
+  final Teacher teacher;
+  final VoidCallback onEdit;
   final VoidCallback onRemove;
 
   @override
@@ -96,13 +117,23 @@ class _TeacherCard extends StatelessWidget {
                     'Subject: ${teacher.subject}',
                     style: AppTypography.bodySmall,
                   ),
+                if (teacher.attendance != null)
+                  Text(
+                    'Attendance: ${_formatAttendance(teacher.attendance)}',
+                    style: AppTypography.bodySmall,
+                  ),
                 if ((teacher.phone ?? '').isNotEmpty)
                   Text(teacher.phone!, style: AppTypography.bodySmall),
               ],
             ),
           ),
           IconButton(
-            tooltip: 'Remove',
+            tooltip: 'Edit',
+            icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+            onPressed: onEdit,
+          ),
+          IconButton(
+            tooltip: 'Delete',
             icon: const Icon(Icons.delete_outline, color: AppColors.accentRed),
             onPressed: onRemove,
           ),
@@ -113,102 +144,52 @@ class _TeacherCard extends StatelessWidget {
 }
 
 class _TeacherDesktopTable extends StatelessWidget {
-  const _TeacherDesktopTable({required this.teachers, required this.onRemove});
+  const _TeacherDesktopTable({
+    required this.teachers,
+    required this.onEdit,
+    required this.onRemove,
+  });
 
-  final List<AddTeacherRequest> teachers;
-  final ValueChanged<AddTeacherRequest> onRemove;
+  final List<Teacher> teachers;
+  final ValueChanged<Teacher> onEdit;
+  final ValueChanged<Teacher> onRemove;
 
   static const double _columnSpacing = 24;
-  static const double _actionsWidth = 44;
-  static const List<int> _flex = [18, 22, 18, 18, 16];
+  static const double _actionsWidth = 96;
+  static const double _actionCellWidth = 48;
+  static const List<int> _flex = [16, 22, 18, 16, 12, 12];
   static const List<String> _headers = [
     'Name',
     'Email',
     'School',
     'Subject',
+    'Attendance %',
     'Phone',
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.studentsCardBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.studentsCardBorder),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 20,
-            offset: Offset(0, 12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _HeaderRow(headers: _headers, flex: _flex),
+        const SizedBox(height: 12),
+        const Divider(height: 1, color: AppColors.studentsTableDivider),
+        const SizedBox(height: 12),
+        for (int i = 0; i < teachers.length; i++) ...[
+          _TeacherRow(
+            teacher: teachers[i],
+            flex: _flex,
+            onEdit: () => onEdit(teachers[i]),
+            onRemove: () => onRemove(teachers[i]),
           ),
+          if (i != teachers.length - 1)
+            const Divider(
+              height: 1,
+              color: AppColors.studentsTableDivider,
+            ),
         ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-            decoration: BoxDecoration(
-              color: AppColors.studentsHeaderBackground,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(18),
-              ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Teachers',
-                    style: AppTypography.syllabusSectionHeading,
-                  ),
-                ),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.studentsFilterBorder),
-                    color: AppColors.studentsFilterBackground,
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    child: Text(
-                      'All',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(32, 24, 32, 28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _HeaderRow(headers: _headers, flex: _flex),
-                const SizedBox(height: 12),
-                const Divider(height: 1, color: AppColors.studentsTableDivider),
-                const SizedBox(height: 12),
-                for (int i = 0; i < teachers.length; i++) ...[
-                  _TeacherRow(
-                    teacher: teachers[i],
-                    flex: _flex,
-                    onRemove: () => onRemove(teachers[i]),
-                  ),
-                  if (i != teachers.length - 1)
-                    const Divider(
-                      height: 1,
-                      color: AppColors.studentsTableDivider,
-                    ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -235,7 +216,29 @@ class _HeaderRow extends StatelessWidget {
           if (i != headers.length - 1)
             const SizedBox(width: _TeacherDesktopTable._columnSpacing),
         ],
-        const SizedBox(width: _TeacherDesktopTable._actionsWidth),
+        SizedBox(
+          width: _TeacherDesktopTable._actionsWidth,
+          child: Row(
+            children: [
+              SizedBox(
+                width: _TeacherDesktopTable._actionCellWidth,
+                child: Text(
+                  'Edit',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.studentsTableHeader,
+                ),
+              ),
+              SizedBox(
+                width: _TeacherDesktopTable._actionCellWidth,
+                child: Text(
+                  'Delete',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.studentsTableHeader,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -245,11 +248,13 @@ class _TeacherRow extends StatelessWidget {
   const _TeacherRow({
     required this.teacher,
     required this.flex,
+    required this.onEdit,
     required this.onRemove,
   });
 
-  final AddTeacherRequest teacher;
+  final Teacher teacher;
   final List<int> flex;
+  final VoidCallback onEdit;
   final VoidCallback onRemove;
 
   @override
@@ -263,10 +268,12 @@ class _TeacherRow extends StatelessWidget {
             flex: flex[0],
             child: Text(teacher.name, style: AppTypography.studentsTableCell),
           ),
+          const SizedBox(width: _TeacherDesktopTable._columnSpacing),
           Expanded(
             flex: flex[1],
             child: Text(teacher.email, style: AppTypography.studentsTableCell),
           ),
+          const SizedBox(width: _TeacherDesktopTable._columnSpacing),
           Expanded(
             flex: flex[2],
             child: Text(
@@ -274,6 +281,7 @@ class _TeacherRow extends StatelessWidget {
               style: AppTypography.studentsTableCell,
             ),
           ),
+          const SizedBox(width: _TeacherDesktopTable._columnSpacing),
           Expanded(
             flex: flex[3],
             child: Text(
@@ -281,21 +289,60 @@ class _TeacherRow extends StatelessWidget {
               style: AppTypography.studentsTableCell,
             ),
           ),
+          const SizedBox(width: _TeacherDesktopTable._columnSpacing),
           Expanded(
             flex: flex[4],
+            child: Text(
+              _formatAttendance(teacher.attendance),
+              style: AppTypography.studentsTableCell,
+            ),
+          ),
+          const SizedBox(width: _TeacherDesktopTable._columnSpacing),
+          Expanded(
+            flex: flex[5],
             child: Text(
               teacher.phone ?? '',
               style: AppTypography.studentsTableCell,
             ),
           ),
-          const SizedBox(width: _TeacherDesktopTable._actionsWidth),
-          IconButton(
-            tooltip: 'Remove',
-            icon: const Icon(Icons.delete_outline, color: AppColors.accentRed),
-            onPressed: onRemove,
+          SizedBox(
+            width: _TeacherDesktopTable._actionsWidth,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: _TeacherDesktopTable._actionCellWidth,
+                  child: IconButton(
+                    tooltip: 'Edit',
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      color: AppColors.primary,
+                    ),
+                    onPressed: onEdit,
+                  ),
+                ),
+                SizedBox(
+                  width: _TeacherDesktopTable._actionCellWidth,
+                  child: IconButton(
+                    tooltip: 'Delete',
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: AppColors.accentRed,
+                    ),
+                    onPressed: onRemove,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+String _formatAttendance(double? value) {
+  if (value == null || value.isNaN) return '-';
+  final normalized = value <= 1 ? value : value / 100;
+  return '${(normalized * 100).round()}%';
 }

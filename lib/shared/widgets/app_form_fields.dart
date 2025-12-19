@@ -72,6 +72,7 @@ class AppTextFormField extends StatelessWidget {
     this.maxLines = 1,
     this.expands = false,
     this.contentPadding,
+    this.enabled = true,
   });
 
   final TextEditingController controller;
@@ -83,6 +84,7 @@ class AppTextFormField extends StatelessWidget {
   final int maxLines;
   final bool expands;
   final EdgeInsetsGeometry? contentPadding;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +93,7 @@ class AppTextFormField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         validator: validator,
+        enabled: enabled,
         keyboardType: keyboardType,
         textInputAction: textInputAction,
         maxLines: expands ? null : maxLines,

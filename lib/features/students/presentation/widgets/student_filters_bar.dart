@@ -84,6 +84,7 @@ class StudentFiltersBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
               flex: 2,

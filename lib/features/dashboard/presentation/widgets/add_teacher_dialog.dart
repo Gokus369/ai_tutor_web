@@ -10,6 +10,7 @@ class AddTeacherRequest {
     required this.email,
     this.phone,
     this.subject,
+    this.attendance,
     this.schoolId,
     this.schoolName,
   });
@@ -18,6 +19,7 @@ class AddTeacherRequest {
   final String email;
   final String? phone;
   final String? subject;
+  final double? attendance;
   final int? schoolId;
   final String? schoolName;
 }
@@ -26,6 +28,10 @@ class AddTeacherDialog extends StatefulWidget {
   const AddTeacherDialog({
     super.key,
     this.schoolOptions = const [],
+    this.initial,
+    this.title,
+    this.confirmLabel,
+    this.allowEmailEdit = true,
   });
 
   static const double dialogWidth = 620;
@@ -34,6 +40,10 @@ class AddTeacherDialog extends StatefulWidget {
   static const double buttonHeight = 48;
 
   final List<SchoolOption>? schoolOptions;
+  final AddTeacherRequest? initial;
+  final String? title;
+  final String? confirmLabel;
+  final bool allowEmailEdit;
 
   @override
   State<AddTeacherDialog> createState() => _AddTeacherDialogState();
@@ -61,7 +71,20 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   void initState() {
     super.initState();
     _schoolOptions = widget.schoolOptions ?? const [];
-    if (_schoolOptions.isNotEmpty) {
+    final initial = widget.initial;
+    if (initial != null) {
+      _nameCtrl.text = initial.name;
+      _emailCtrl.text = initial.email;
+      _phoneCtrl.text = initial.phone ?? '';
+      _subjectCtrl.text = initial.subject ?? '';
+      if (_schoolOptions.isNotEmpty) {
+        final initialId = initial.schoolId;
+        final hasMatch =
+            initialId != null &&
+            _schoolOptions.any((option) => option.id == initialId);
+        _selectedSchoolId = hasMatch ? initialId : null;
+      }
+    } else if (_schoolOptions.isNotEmpty) {
       _selectedSchoolId = _schoolOptions.first.id;
     }
   }
@@ -69,7 +92,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
   @override
   Widget build(BuildContext context) {
     return AppDialogShell(
-      title: 'Add Teacher',
+      title: widget.title ?? 'Add Teacher',
       width: AddTeacherDialog.dialogWidth,
       child: Form(
         key: _formKey,
@@ -97,8 +120,10 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
                 hintText: 'jane.doe@example.com',
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
+                enabled: widget.allowEmailEdit,
                 validator: (v) {
                   final trimmed = (v ?? '').trim();
+                  if (!widget.allowEmailEdit && trimmed.isEmpty) return null;
                   if (trimmed.isEmpty) return 'Enter an email';
                   if (!trimmed.contains('@')) return 'Enter a valid email';
                   return null;
@@ -151,7 +176,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
             Align(
               alignment: Alignment.centerRight,
               child: AppDialogActions(
-                primaryLabel: 'Add',
+                primaryLabel: widget.confirmLabel ?? 'Add',
                 cancelLabel: 'Cancel',
                 onPrimaryPressed: _submit,
                 onCancel: () => Navigator.of(context).pop(),
